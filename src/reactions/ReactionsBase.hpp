@@ -19,24 +19,20 @@ template< typename REAL_DATA_ARRAY_VIEW_TYPE,
 class ReactionsBase
 {
 public:
-  static constexpr INT_TYPE maxNumPrimarySpecies = 12;
-  static constexpr INT_TYPE maxNumSecondarySpecies = 15;
-
-
   template< typename PARAMS_DATA >
-  void computeLog10ActCoefBDotModel( REAL_TYPE const temperature,
+  static void computeLog10ActCoefBDotModel( REAL_TYPE const temperature,
                                      REAL_TYPE const ionicStrength,
                                      PARAMS_DATA const & params,
-                                     REAL_DATA_ARRAY_VIEW_TYPE const & log10PrimaryActCoeff,
-                                     REAL_DATA_ARRAY_VIEW_TYPE const & dLog10PrimaryActCoeff_dIonicStrength,
-                                     REAL_DATA_ARRAY_VIEW_TYPE const & log10SecActCoeff,
-                                     REAL_DATA_ARRAY_VIEW_TYPE const & dLog10SecActCoeff_dIonicStrength ) const;
+                                     REAL_DATA_ARRAY_VIEW_TYPE & log10PrimaryActCoeff,
+                                     REAL_DATA_ARRAY_VIEW_TYPE & dLog10PrimaryActCoeff_dIonicStrength,
+                                     REAL_DATA_ARRAY_VIEW_TYPE & log10SecActCoeff,
+                                     REAL_DATA_ARRAY_VIEW_TYPE & dLog10SecActCoeff_dIonicStrength );
 
   template< typename PARAMS_DATA >
-  void computeIonicStrength( PARAMS_DATA const & params,
+  static void computeIonicStrength( PARAMS_DATA const & params,
                              REAL_DATA_ARRAY_VIEW_TYPE const & primarySpeciesConcentration,
                              REAL_DATA_ARRAY_VIEW_TYPE const & secondarySpeciesConcentration,
-                             REAL_TYPE & ionicStrength ) const;
+                             REAL_TYPE & ionicStrength );
 
 
   template< int NUM_PRIMARY_SPECIES, 

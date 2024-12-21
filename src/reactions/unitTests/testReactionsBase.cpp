@@ -61,6 +61,61 @@ TEST( testReactionsBase, testParamsInitialization )
   static_assert( ( params.m_WATEQBDot - 0.0438 ) * ( params.m_WATEQBDot - 0.0438 ) < 1.0e-15, "WATEQBDot is not 0.0438" );
 }
 
+
+TEST( testReactionsBase, testComputeLog10ActCoefBDotModel )
+{
+  using ReactionsType = ReactionsBase< double const*, int const*, double, int, int >;
+
+  constexpr
+  ReactionsType::ParamsData< 7, 11 > params { { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
+                                                     { 3.50, 3.00, 4.50, 3.00, 4.00, 3.00, 3.00, 4.00, 3.00, 3.00, 4.00 },
+                                                     { 1, -1, 2, -2, -1, 2, 1 },
+                                                     { -1, 0, -2, 0, 1, 0, 0, 1, 0, 0, -1}, 
+                                                     0.5465, 
+                                                     0.3346, 
+                                                     0.0438 };
+
+  double const temperature = 298.15;
+  double const ionicStrength = 0.5;
+  double log10PrimaryActCoeff[7] = {
+  };
+  double dLog10PrimaryActCoeff_dIonicStrength[7] = {
+  };
+  double log10SecActCoeff[11] = {
+  };
+  double dLog10SecActCoeff_dIonicStrength[11] = {
+  };
+  ReactionsType::computeLog10ActCoefBDotModel( temperature, 
+                                               ionicStrength, 
+                                               params, 
+                                               log10PrimaryActCoeff, 
+                                               dLog10PrimaryActCoeff_dIonicStrength, 
+                                               log10SecActCoeff, 
+                                               dLog10SecActCoeff_dIonicStrength );
+}
+
+TEST( testReactionsBase , testComputeIonicStrength )
+{
+
+  using ReactionsType = ReactionsBase< double const*, int const*, double, int, int >;
+
+  constexpr
+  ReactionsType::ParamsData< 7, 11 > params { { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
+                                                     { 3.50, 3.00, 4.50, 3.00, 4.00, 3.00, 3.00, 4.00, 3.00, 3.00, 4.00 },
+                                                     { 1, -1, 2, -2, -1, 2, 1 },
+                                                     { -1, 0, -2, 0, 1, 0, 0, 1, 0, 0, -1}, 
+                                                     0.5465, 
+                                                     0.3346, 
+                                                     0.0438 };
+
+  double const primarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
+  double const secondarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0 };
+  double ionicStrength = 0.0;
+
+  ReactionsType::computeIonicStrength( params, primarySpeciesConcentration, secondarySpeciesConcentration, ionicStrength );
+  //ASSERT_NEAR( ionicStrength, 0.5 * ( 1.0 + 4.0 + 9.0 + 16.0 + 25.0 + 36.0 + 49.0 + 1.0 + 0.0 + 4.0 + 0.0 + 5.0 + 0.0 + 0.0 + 1.0 + 0.0 + 0.0 + 0.0 + 1.0 + 0.0 +
+}
+
 int main( int argc, char * * argv )
 {
   ::testing::InitGoogleTest( &argc, argv );
