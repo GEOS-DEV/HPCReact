@@ -2,7 +2,7 @@
 #ifndef REACTIONS_REACTIONSBASE_HPP
 #define REACTIONS_REACTIONSBASE_HPP
 
-
+#include <cmath>
 
 namespace hpcReact
 {
@@ -10,15 +10,26 @@ namespace hpcReact
 
 
 
-template< typename REAL_DATA_ARRAY_VIEW_TYPE,
-          typename INTEGER_DATA_ARRAY_VIEW_TYPE,
-          typename REAL_TYPE, 
+template< typename REAL_TYPE, 
+          typename REAL_DATA_ARRAY_VIEW_TYPE,
+          typename REAL_CONST_DATA_ARRAY_VIEW_TYPE,
           typename INT_TYPE,
+          typename INT_DATA_ARRAY_VIEW_TYPE,
+          typename INT_CONST_DATA_ARRAY_VIEW_TYPE,
           typename INDEX_TYPE
         >
 class ReactionsBase
 {
 public:
+  using RealType = REAL_TYPE;
+  using RealDataArrayViewType = REAL_DATA_ARRAY_VIEW_TYPE;
+  using RealConstDataArrayViewType = REAL_CONST_DATA_ARRAY_VIEW_TYPE;
+  using IntType = INT_TYPE;
+  using IntDataArrayViewType = INT_DATA_ARRAY_VIEW_TYPE;
+  using IntConstDataArrayViewType = INT_CONST_DATA_ARRAY_VIEW_TYPE;
+  using IndexType = INDEX_TYPE;
+
+
   template< typename PARAMS_DATA >
   static void computeLog10ActCoefBDotModel( REAL_TYPE const temperature,
                                      REAL_TYPE const ionicStrength,
@@ -30,8 +41,8 @@ public:
 
   template< typename PARAMS_DATA >
   static void computeIonicStrength( PARAMS_DATA const & params,
-                             REAL_DATA_ARRAY_VIEW_TYPE const & primarySpeciesConcentration,
-                             REAL_DATA_ARRAY_VIEW_TYPE const & secondarySpeciesConcentration,
+                             REAL_CONST_DATA_ARRAY_VIEW_TYPE const & primarySpeciesConcentration,
+                             REAL_CONST_DATA_ARRAY_VIEW_TYPE const & secondarySpeciesConcentration,
                              REAL_TYPE & ionicStrength );
 
 
@@ -39,6 +50,8 @@ public:
             int NUM_SECONDARY_SPECIES >
   struct ParamsData
   {
+    using PARENT_TYPE = ReactionsBase;
+
     static constexpr INT_TYPE numPrimarySpecies() { return NUM_PRIMARY_SPECIES ;}
 
     static constexpr INT_TYPE numSecondarySpecies() { return NUM_SECONDARY_SPECIES ;}

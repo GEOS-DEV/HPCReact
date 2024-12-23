@@ -8,9 +8,11 @@ TEST( testReactionsBase, testParamsInitialization )
 {
   constexpr
   ReactionsBase< double, 
+                 double,
+                 double const,
                  int, 
-                 double, 
                  int, 
+                 int const, 
                  int >::ParamsData< 7, 11 > params { { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
                                                      { 3.50, 3.00, 4.50, 3.00, 4.00, 3.00, 3.00, 4.00, 3.00, 3.00, 4.00 },
                                                      { 1, -1, 2, -2, -1, 2, 1 },
@@ -62,11 +64,116 @@ TEST( testReactionsBase, testParamsInitialization )
 }
 
 
-TEST( testReactionsBase, testComputeLog10ActCoefBDotModel )
+
+
+
+template< typename PARAMS_TYPE >
+auto testComputIonicStrengthHelper( PARAMS_TYPE const & params,
+                                    typename PARAMS_TYPE::PARENT_TYPE::RealConstDataArrayViewType const & primarySpeciesConcentration,
+                                    typename PARAMS_TYPE::PARENT_TYPE::RealConstDataArrayViewType const & secondarySpeciesConcentration )  
+{  
+  using ReactionBaseType = typename PARAMS_TYPE::PARENT_TYPE;
+
+  typename ReactionBaseType::RealType ionicStrength = 0.0;
+
+  ReactionBaseType::computeIonicStrength( params, 
+                                          primarySpeciesConcentration, 
+                                          secondarySpeciesConcentration, 
+                                          ionicStrength );
+
+  return ionicStrength;
+
+}
+
+TEST( testReactionsBase , testComputeIonicStrength )
 {
-  using ReactionsType = ReactionsBase< double const*, int const*, double, int, int >;
+
+  using ReactionsType = ReactionsBase< double, 
+                                       double*, 
+                                       double const*, 
+                                       int, 
+                                       int *, 
+                                       int const *, 
+                                       int >;
+
+  double const primarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
+  double const secondarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0 };
+
+  ReactionsType::ParamsData< 7, 11 > params { { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
+                                              { 3.50, 3.00, 4.50, 3.00, 4.00, 3.00, 3.00, 4.00, 3.00, 3.00, 4.00 },
+                                              { 1, -1, 2, -2, -1, 2, 1 },
+                                              { -1, 0, -2, 0, 1, 0, 0, 1, 0, 0, -1}, 
+                                              0.5465, 
+                                              0.3346, 
+                                              0.0438 };
+
+  typename ReactionsType::RealType const ionicStrength = testComputIonicStrengthHelper( params,
+                                 primarySpeciesConcentration,
+                                 secondarySpeciesConcentration );
+  
+  EXPECT_NEAR( ionicStrength, 52.0, 1.0e-12 );
+}
+
+
+TEST( testReactionsBase , testComputeIonicStrengthVector )
+{
+
+  using ReactionsType = ReactionsBase< double, 
+                                       std::vector<double>, 
+                                       std::vector<double const>,
+                                       int,
+                                       std::vector<int>,
+                                       std::vector<int const>, int >;
 
   constexpr
+  ReactionsType::ParamsData< 7, 11 > params { { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
+                                                     { 3.50, 3.00, 4.50, 3.00, 4.00, 3.00, 3.00, 4.00, 3.00, 3.00, 4.00 },
+                                                     { 1, -1, 2, -2, -1, 2, 1 },
+                                                     { -1, 0, -2, 0, 1, 0, 0, 1, 0, 0, -1}, 
+                                                     0.5465, 
+                                                     0.3346, 
+                                                     0.0438 };
+
+  std::vector<double const> const primarySpeciesConcentration{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
+  std::vector<double const> const secondarySpeciesConcentration{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0 };
+  typename ReactionsType::RealType const ionicStrength = testComputIonicStrengthHelper( params,
+                                 primarySpeciesConcentration,
+                                 secondarySpeciesConcentration );
+  
+  EXPECT_NEAR( ionicStrength, 52.0, 1.0e-12 );
+
+}
+
+template< typename PARAMS_TYPE >
+void testComputeLog10ActCoefBDotModelHelper( PARAMS_TYPE const & params,
+                                             typename PARAMS_TYPE::PARENT_TYPE::RealType const temperature,
+                                             typename PARAMS_TYPE::PARENT_TYPE::RealType const ionicStrength,
+                                             typename PARAMS_TYPE::PARENT_TYPE::RealDataArrayViewType & log10PrimaryActCoeff,
+                                             typename PARAMS_TYPE::PARENT_TYPE::RealDataArrayViewType & dLog10PrimaryActCoeff_dIonicStrength,
+                                             typename PARAMS_TYPE::PARENT_TYPE::RealDataArrayViewType & log10SecActCoeff,
+                                             typename PARAMS_TYPE::PARENT_TYPE::RealDataArrayViewType & dLog10SecActCoeff_dIonicStrength )  
+{  
+  using ReactionBaseType = typename PARAMS_TYPE::PARENT_TYPE;
+
+  ReactionBaseType::computeLog10ActCoefBDotModel( temperature, 
+                                               ionicStrength, 
+                                               params, 
+                                               log10PrimaryActCoeff, 
+                                               dLog10PrimaryActCoeff_dIonicStrength, 
+                                               log10SecActCoeff, 
+                                               dLog10SecActCoeff_dIonicStrength );
+}
+
+TEST( testReactionsBase, testComputeLog10ActCoefBDotModel )
+{
+  using ReactionsType = ReactionsBase< double, 
+                                       double* const, 
+                                       double const* const, 
+                                       int, 
+                                       int * const, 
+                                       int const * const, 
+                                       int >;
+  
   ReactionsType::ParamsData< 7, 11 > params { { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
                                                      { 3.50, 3.00, 4.50, 3.00, 4.00, 3.00, 3.00, 4.00, 3.00, 3.00, 4.00 },
                                                      { 1, -1, 2, -2, -1, 2, 1 },
@@ -77,29 +184,34 @@ TEST( testReactionsBase, testComputeLog10ActCoefBDotModel )
 
   double const temperature = 298.15;
   double const ionicStrength = 0.5;
-  double log10PrimaryActCoeff[7] = {
-  };
-  double dLog10PrimaryActCoeff_dIonicStrength[7] = {
-  };
-  double log10SecActCoeff[11] = {
-  };
-  double dLog10SecActCoeff_dIonicStrength[11] = {
-  };
-  ReactionsType::computeLog10ActCoefBDotModel( temperature, 
+
+  double log10PrimaryActCoeff[7] = {0};
+  double dLog10PrimaryActCoeff_dIonicStrength[7] = {0};
+
+  double log10SecActCoeff[11] = {0};
+  double dLog10SecActCoeff_dIonicStrength[11] = {0};
+
+
+  testComputeLog10ActCoefBDotModelHelper( params, temperature, 
                                                ionicStrength, 
-                                               params, 
+                                                
                                                log10PrimaryActCoeff, 
                                                dLog10PrimaryActCoeff_dIonicStrength, 
                                                log10SecActCoeff, 
                                                dLog10SecActCoeff_dIonicStrength );
+
 }
 
-TEST( testReactionsBase , testComputeIonicStrength )
+TEST( testReactionsBase, testComputeLog10ActCoefBDotModel_vector )
 {
-
-  using ReactionsType = ReactionsBase< double const*, int const*, double, int, int >;
-
-  constexpr
+  using ReactionsType = ReactionsBase< double, 
+                                       std::vector<double>, 
+                                       std::vector<double>,
+                                       int,
+                                       std::vector<int>,
+                                       std::vector<int>, 
+                                       int >;
+  
   ReactionsType::ParamsData< 7, 11 > params { { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
                                                      { 3.50, 3.00, 4.50, 3.00, 4.00, 3.00, 3.00, 4.00, 3.00, 3.00, 4.00 },
                                                      { 1, -1, 2, -2, -1, 2, 1 },
@@ -108,12 +220,24 @@ TEST( testReactionsBase , testComputeIonicStrength )
                                                      0.3346, 
                                                      0.0438 };
 
-  double const primarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
-  double const secondarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0 };
-  double ionicStrength = 0.0;
+  double const temperature = 298.15;
+  double const ionicStrength = 0.5;
 
-  ReactionsType::computeIonicStrength( params, primarySpeciesConcentration, secondarySpeciesConcentration, ionicStrength );
-  //ASSERT_NEAR( ionicStrength, 0.5 * ( 1.0 + 4.0 + 9.0 + 16.0 + 25.0 + 36.0 + 49.0 + 1.0 + 0.0 + 4.0 + 0.0 + 5.0 + 0.0 + 0.0 + 1.0 + 0.0 + 0.0 + 0.0 + 1.0 + 0.0 +
+  std::vector<double> log10PrimaryActCoeff(7, 0);
+  std::vector<double> dLog10PrimaryActCoeff_dIonicStrength(7, 0);
+
+  std::vector<double> log10SecActCoeff(11, 0);
+  std::vector<double> dLog10SecActCoeff_dIonicStrength(11, 0);
+
+
+  testComputeLog10ActCoefBDotModelHelper( params, temperature, 
+                                               ionicStrength, 
+                                                
+                                               log10PrimaryActCoeff, 
+                                               dLog10PrimaryActCoeff_dIonicStrength, 
+                                               log10SecActCoeff, 
+                                               dLog10SecActCoeff_dIonicStrength );
+
 }
 
 int main( int argc, char * * argv )
