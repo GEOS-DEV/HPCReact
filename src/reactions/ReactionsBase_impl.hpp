@@ -4,8 +4,8 @@ namespace hpcReact
 {
 
 template< typename REAL_TYPE, 
-          typename REAL_DATA_ARRAY_VIEW_TYPE,
-          typename REAL_CONST_DATA_ARRAY_VIEW_TYPE,
+          template< int > typename REAL_DATA_ARRAY_VIEW_TYPE,
+          template< int > typename REAL_CONST_DATA_ARRAY_VIEW_TYPE,
           typename INT_TYPE,
           typename INT_DATA_ARRAY_VIEW_TYPE,
           typename INT_CONST_DATA_ARRAY_VIEW_TYPE,
@@ -21,10 +21,10 @@ void ReactionsBase< REAL_TYPE,
                     INDEX_TYPE >::computeLog10ActCoefBDotModel( REAL_TYPE const ,//temperature,
                                                               REAL_TYPE const ionicStrength,
                                                               PARAMS_DATA const & params,
-                                                              REAL_DATA_ARRAY_VIEW_TYPE & log10PrimaryActCoeff,
-                                                              REAL_DATA_ARRAY_VIEW_TYPE & dLog10PrimaryActCoeff_dIonicStrength,
-                                                              REAL_DATA_ARRAY_VIEW_TYPE & log10SecActCoeff,
-                                                              REAL_DATA_ARRAY_VIEW_TYPE & dLog10SecActCoeff_dIonicStrength )
+                                                              RealDataArrayView1d & log10PrimaryActCoeff,
+                                                              RealDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
+                                                              RealDataArrayView1d & log10SecActCoeff,
+                                                              RealDataArrayView1d & dLog10SecActCoeff_dIonicStrength )
 {
   // Compute log10(ActivityCoefficient) for basis and dependent species along with their
   // derivatives with respect to Ionic strength using the B-Dot Model
@@ -56,8 +56,8 @@ void ReactionsBase< REAL_TYPE,
 
 
 template< typename REAL_TYPE, 
-          typename REAL_DATA_ARRAY_VIEW_TYPE,
-          typename REAL_CONST_DATA_ARRAY_VIEW_TYPE,
+          template< int > typename REAL_DATA_ARRAY_VIEW_TYPE,
+          template< int > typename REAL_CONST_DATA_ARRAY_VIEW_TYPE,
           typename INT_TYPE,
           typename INT_DATA_ARRAY_VIEW_TYPE,
           typename INT_CONST_DATA_ARRAY_VIEW_TYPE,
@@ -71,8 +71,8 @@ void ReactionsBase< REAL_TYPE,
                     INT_DATA_ARRAY_VIEW_TYPE,
                     INT_CONST_DATA_ARRAY_VIEW_TYPE,
                     INDEX_TYPE >::computeIonicStrength( PARAMS_DATA const & params,
-                                                      REAL_CONST_DATA_ARRAY_VIEW_TYPE const & primarySpeciesConcentration,
-                                                      REAL_CONST_DATA_ARRAY_VIEW_TYPE const & secondarySpeciesConcentration,
+                                                      RealConstDataArrayView1d const & primarySpeciesConcentration,
+                                                      RealConstDataArrayView1d const & secondarySpeciesConcentration,
                                                       REAL_TYPE & ionicStrength )
 {
   //get ionic strength

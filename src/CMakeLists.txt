@@ -1,5 +1,6 @@
 
 set( hpcReact_headers
+     common/CArrayWrapper.hpp
      reactions/ReactionsBase.hpp
      )
 
@@ -12,10 +13,11 @@ blt_add_library( NAME             hpcReact
                  DEPENDS_ON       ${hpcReact_dependencies}
                 )
 
-# target_include_directories( hpcReact
-#                             INTERFACE
-#                             $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-#                             $<INSTALL_INTERFACE:include> )
+target_include_directories( hpcReact
+                            INTERFACE
+                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+                            $<INSTALL_INTERFACE:include> )
 
 # install( FILES ${hpcReact_headers} 
 #          DESTINATION include )
