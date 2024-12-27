@@ -34,18 +34,18 @@ public:
 
   template< typename PARAMS_DATA >
   static void computeLog10ActCoefBDotModel( REAL_TYPE const temperature,
-                                     REAL_TYPE const ionicStrength,
-                                     PARAMS_DATA const & params,
-                                     RealDataArrayView1d & log10PrimaryActCoeff,
-                                     RealDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
-                                     RealDataArrayView1d & log10SecActCoeff,
-                                     RealDataArrayView1d & dLog10SecActCoeff_dIonicStrength );
+                                            REAL_TYPE const ionicStrength,
+                                            PARAMS_DATA const & params,
+                                            RealDataArrayView1d & log10PrimaryActCoeff,
+                                            RealDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
+                                            RealDataArrayView1d & log10SecActCoeff,
+                                            RealDataArrayView1d & dLog10SecActCoeff_dIonicStrength );
 
   template< typename PARAMS_DATA >
   static void computeIonicStrength( PARAMS_DATA const & params,
-                             RealConstDataArrayView1d const & primarySpeciesConcentration,
-                             RealConstDataArrayView1d const & secondarySpeciesConcentration,
-                             REAL_TYPE & ionicStrength );
+                                    RealConstDataArrayView1d const & primarySpeciesConcentration,
+                                    RealConstDataArrayView1d const & secondarySpeciesConcentration,
+                                    REAL_TYPE & ionicStrength );
 
 
   template< int NUM_PRIMARY_SPECIES, 
