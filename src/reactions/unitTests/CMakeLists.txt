@@ -1,7 +1,7 @@
 # Specify list of tests
 set( testSourceFiles
+     testEqualibriumReactions.cpp
      testReactionsBase.cpp )
-
 
 set( dependencyList hpcReact gtest )
 

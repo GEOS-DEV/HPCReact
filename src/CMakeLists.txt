@@ -7,6 +7,18 @@ set( hpcReact_headers
 set( hpcReact_sources
      )
 
+find_package(LAPACK REQUIRED)
+find_package(BLAS REQUIRED)
+
+
+
+#target_link_libraries(MyExecutable PRIVATE LAPACK::LAPACK)
+     
+set( hpcReack_dependencies
+     LAPACK::LAPACK
+     BLAS::BLAS
+     )
+
 blt_add_library( NAME             hpcReact
 #                 SOURCES          ${hpcReact_sources}
                  HEADERS          ${hpcReact_headers}

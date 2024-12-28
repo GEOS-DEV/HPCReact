@@ -11,24 +11,18 @@ namespace hpcReact
 
 
 template< typename REAL_TYPE, 
-          template< int > typename REAL_DATA_ARRAY_VIEW_TYPE,
-          template< int > typename REAL_CONST_DATA_ARRAY_VIEW_TYPE,
+          typename REAL_DATA_ARRAY_1D_VIEW_TYPE,
+          typename REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
           typename INT_TYPE,
-          typename INT_DATA_ARRAY_VIEW_TYPE,
-          typename INT_CONST_DATA_ARRAY_VIEW_TYPE,
           typename INDEX_TYPE
         >
 class ReactionsBase
 {
 public:
   using RealType = REAL_TYPE;
-  using RealDataArrayView1d = REAL_DATA_ARRAY_VIEW_TYPE<1>;
-  using RealConstDataArrayView1d = REAL_CONST_DATA_ARRAY_VIEW_TYPE<1>;
-  using RealDataArrayView2d = REAL_DATA_ARRAY_VIEW_TYPE<2>;
-  using RealConstDataArrayView2d = REAL_CONST_DATA_ARRAY_VIEW_TYPE<2>;
+  using RealDataArrayView1d = REAL_DATA_ARRAY_1D_VIEW_TYPE;
+  using RealConstDataArrayView1d = REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE;
   using IntType = INT_TYPE;
-  using IntDataArrayViewType = INT_DATA_ARRAY_VIEW_TYPE;
-  using IntConstDataArrayType = INT_CONST_DATA_ARRAY_VIEW_TYPE;
   using IndexType = INDEX_TYPE;
 
 
@@ -54,20 +48,23 @@ public:
   {
     using PARENT_TYPE = ReactionsBase;
 
-    static constexpr INT_TYPE numPrimarySpecies() { return NUM_PRIMARY_SPECIES ;}
+    static constexpr INT_TYPE numPrimarySpecies = NUM_PRIMARY_SPECIES;
 
-    static constexpr INT_TYPE numSecondarySpecies() { return NUM_SECONDARY_SPECIES ;}
+    static constexpr INT_TYPE numSecondarySpecies = NUM_SECONDARY_SPECIES;
 
-    REAL_TYPE m_ionSizePrimary[numPrimarySpecies()];
+    REAL_TYPE m_ionSizePrimary[numPrimarySpecies];
 
-    REAL_TYPE m_ionSizeSec[numSecondarySpecies()];
+    REAL_TYPE m_ionSizeSec[numSecondarySpecies];
 
-    INT_TYPE m_chargePrimary[numPrimarySpecies()];
-    INT_TYPE m_chargeSec[numSecondarySpecies()];
+    INT_TYPE m_chargePrimary[numPrimarySpecies];
+    INT_TYPE m_chargeSec[numSecondarySpecies];
 
     REAL_TYPE m_DebyeHuckelA;
     REAL_TYPE m_DebyeHuckelB;
     REAL_TYPE m_WATEQBDot;
+
+    REAL_TYPE m_stoichMatrix[numSecondarySpecies][numPrimarySpecies];
+
   };
 
 };

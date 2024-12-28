@@ -11,68 +11,82 @@ namespace hpcReact
 {
 
 template< typename REAL_TYPE, 
-          template< int > typename REAL_DATA_ARRAY_VIEW_TYPE,
-          template< int > typename REAL_CONST_DATA_ARRAY_VIEW_TYPE,
+          typename REAL_DATA_ARRAY_1D_VIEW_TYPE,
+          typename REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+          typename REAL_DATA_ARRAY_2D_VIEW_TYPE,
+          typename REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
           typename INT_TYPE,
-          typename INT_DATA_ARRAY_VIEW_TYPE,
-          typename INT_CONST_DATA_ARRAY_VIEW_TYPE,
-          typename INDEX_TYPE
-        >
+          typename INDEX_TYPE >
 class EquilibriumReactions : public ReactionsBase< REAL_TYPE,
-                                                   REAL_DATA_ARRAY_VIEW_TYPE,
-                                                   REAL_CONST_DATA_ARRAY_VIEW_TYPE,
+                                                   REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                                                   REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
                                                    INT_TYPE,
-                                                   INT_DATA_ARRAY_VIEW_TYPE,
-                                                   INT_CONST_DATA_ARRAY_VIEW_TYPE,
                                                    INDEX_TYPE >
 {
 public:
 
   using Base = ReactionsBase< REAL_TYPE,
-                              REAL_DATA_ARRAY_VIEW_TYPE,
-                              REAL_CONST_DATA_ARRAY_VIEW_TYPE,
+                              REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                              REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
                               INT_TYPE,
-                              INT_DATA_ARRAY_VIEW_TYPE,
-                              INT_CONST_DATA_ARRAY_VIEW_TYPE,
                               INDEX_TYPE >;
 
-  void updateConcentrations( real64 const temperature,
+  using RealType = REAL_TYPE;
+  using RealDataArrayView1d = typename Base::RealDataArrayView1d;
+  using RealConstDataArrayView1d = typename Base::RealConstDataArrayView1d;
+  using IntType = typename Base::IntType;
+  using IndexType = typename Base::IndexType;
+
+  using RealDataArrayView2d = REAL_DATA_ARRAY_2D_VIEW_TYPE;
+  using RealConstDataArrayView2d = REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE;
+
+  template< typename PARAMS_DATA >
+  static void updateConcentrations( RealType const temperature,
+                              PARAMS_DATA const & params,
                              RealConstDataArrayView1d & primarySpeciesTotalConcentration,
                              RealDataArrayView1d & primarySpeciesContentration,
-                             RealDataArrayView1d & secondarySpeciesConcentration ) const;
+                             RealDataArrayView1d & secondarySpeciesConcentration );
 private:
 
-  static constexpr integer m_maxNumIterations = MultiFluidConstants::maxNewtonIterations;
-  static constexpr real64 m_newtonTol = 1e-6;
+  static constexpr IntType m_maxNumIterations = 10;
+  static constexpr RealType m_newtonTol = 1e-6;
 
-  void assembleEquilibriumReactionSystem( real64 const temperature,
+  template< typename PARAMS_DATA >
+  static void setInitialGuess( RealConstDataArrayView1d & primarySpeciesTotalConcentration,
+                               RealDataArrayView1d & primarySpeciesConcentration );
+
+  template< typename PARAMS_DATA >
+  static void assembleEquilibriumReactionSystem( RealType const temperature,
                                           RealConstDataArrayView1d & primarySpeciesTotalConcentration,
                                           RealConstDataArrayView1d & primarySpeciesConcentration,
                                           RealDataArrayView1d & secondarySpeciesConcentration,
                                           RealDataArrayView2d & matrix,
-                                          RealDataArrayView1d & rhs ) const;
+                                          RealDataArrayView1d & rhs );
 
-  void computeSeondarySpeciesConcAndDerivative( real64 const temperature,
+  template< typename PARAMS_DATA >
+  static void computeSecondarySpeciesConcAndDerivative( RealType const temperature,
+                                                PARAMS_DATA const & params,
                                                 RealConstDataArrayView1d & log10PrimaryActCoeff,
                                                 RealConstDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
                                                 RealConstDataArrayView1d & log10SecActCoeff,
                                                 RealConstDataArrayView1d & dLog10SecActCoeff_dIonicStrength,
                                                 RealConstDataArrayView1d & primarySpeciesConcentration,
                                                 RealDataArrayView1d & secondarySpeciesConcentration,
-                                                RealDataArrayView2d & dLog10SecConc_dLog10PrimaryConc ) const;
+                                                RealDataArrayView2d & dLog10SecConc_dLog10PrimaryConc );
 
-  void computeTotalConcAndDerivative( real64 const temperature,
-                                      RealConstDataArrayView1d & primarySpeciesConcentration,
+  template< typename PARAMS_DATA >
+  static void computeTotalConcAndDerivative( RealType const temperature,
+PARAMS_DATA const & params,                                      RealConstDataArrayView1d & primarySpeciesConcentration,
                                       RealConstDataArrayView1d & secondarySpeciesConcentration,
                                       RealConstDataArrayView2d & dLog10SecConc_dLog10PrimaryConc,
                                       RealDataArrayView1d & totalConc,
-                                      RealDataArrayView2d & dTotalConc_dLog10PrimaryConc ) const;
+                                      RealDataArrayView2d & dTotalConc_dLog10PrimaryConc );
 
-  void updatePrimarySpeciesConcentrations( RealConstDataArrayView1d solution,
-                                           RealDataArrayView1d & primarySpeciesConcentration ) const;
+  template< typename PARAMS_DATA >
+  static void updatePrimarySpeciesConcentrations( RealConstDataArrayView1d solution,
+                                                  RealDataArrayView1d & primarySpeciesConcentration );
 
-  void setInitialGuess( RealConstDataArrayView1d & primarySpeciesTotalConcentration,
-                        RealDataArrayView1d & primarySpeciesConcentration ) const;
+
 
 
 };
