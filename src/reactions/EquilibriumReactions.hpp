@@ -31,11 +31,11 @@ public:
                               INT_TYPE,
                               INDEX_TYPE >;
 
-  using RealType = REAL_TYPE;
-  using RealDataArrayView1d = typename Base::RealDataArrayView1d;
-  using RealConstDataArrayView1d = typename Base::RealConstDataArrayView1d;
-  using IntType = typename Base::IntType;
-  using IndexType = typename Base::IndexType;
+  using typename Base::RealType;
+  using typename Base::RealDataArrayView1d;
+  using typename Base::RealConstDataArrayView1d;
+  using typename Base::IntType;
+  using typename Base::IndexType;
 
   using RealDataArrayView2d = REAL_DATA_ARRAY_2D_VIEW_TYPE;
   using RealConstDataArrayView2d = REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE;
@@ -76,7 +76,8 @@ private:
 
   template< typename PARAMS_DATA >
   static void computeTotalConcAndDerivative( RealType const temperature,
-PARAMS_DATA const & params,                                      RealConstDataArrayView1d & primarySpeciesConcentration,
+PARAMS_DATA const & params,                                      
+RealConstDataArrayView1d & primarySpeciesConcentration,
                                       RealConstDataArrayView1d & secondarySpeciesConcentration,
                                       RealConstDataArrayView2d & dLog10SecConc_dLog10PrimaryConc,
                                       RealDataArrayView1d & totalConc,
