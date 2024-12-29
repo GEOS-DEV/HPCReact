@@ -1,5 +1,6 @@
 
 #include "EquilibriumReactions.hpp"
+#include "common/macros.hpp"
 
 #include <iostream>
 //#include "lapack.h"
@@ -14,18 +15,19 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void EquilibriumReactions< REAL_TYPE,
-                           REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_DATA_ARRAY_2D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
-                           INT_TYPE,
-                           INDEX_TYPE
-                           >::updateConcentrations( RealType const temperature,
-                                                    PARAMS_DATA const &,
-                                                    RealConstDataArrayView1d & primarySpeciesTotalConcentration,
-                                                    RealDataArrayView1d & primarySpeciesConcentration,
-                                                    RealDataArrayView1d & secondarySpeciesConcentration )
+HPCREACT_HOST_DEVICE inline void
+EquilibriumReactions< REAL_TYPE,
+                      REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_DATA_ARRAY_2D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
+                      INT_TYPE,
+                      INDEX_TYPE
+                      >::updateConcentrations( RealType const temperature,
+                                               PARAMS_DATA const &,
+                                               RealConstDataArrayView1d & primarySpeciesTotalConcentration,
+                                               RealDataArrayView1d & primarySpeciesConcentration,
+                                               RealDataArrayView1d & secondarySpeciesConcentration )
 
 {
 
@@ -83,19 +85,20 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void EquilibriumReactions< REAL_TYPE,
-                           REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_DATA_ARRAY_2D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
-                           INT_TYPE,
-                           INDEX_TYPE
-                           >::assembleEquilibriumReactionSystem( RealType const temperature,
-                                                                 RealConstDataArrayView1d & primarySpeciesTotalConcentration,
-                                                                 RealConstDataArrayView1d & primarySpeciesConcentration,
-                                                                 RealDataArrayView1d & secondarySpeciesConcentration,
-                                                                 RealDataArrayView2d & matrix,
-                                                                 RealDataArrayView1d & rhs )
+HPCREACT_HOST_DEVICE inline void
+EquilibriumReactions< REAL_TYPE,
+                      REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_DATA_ARRAY_2D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
+                      INT_TYPE,
+                      INDEX_TYPE
+                      >::assembleEquilibriumReactionSystem( RealType const temperature,
+                                                            RealConstDataArrayView1d & primarySpeciesTotalConcentration,
+                                                            RealConstDataArrayView1d & primarySpeciesConcentration,
+                                                            RealDataArrayView1d & secondarySpeciesConcentration,
+                                                            RealDataArrayView2d & matrix,
+                                                            RealDataArrayView1d & rhs )
 {
   constexpr IndexType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies;
   constexpr IndexType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies;
@@ -163,22 +166,23 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void EquilibriumReactions< REAL_TYPE,
-                           REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_DATA_ARRAY_2D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
-                           INT_TYPE,
-                           INDEX_TYPE
-                           >::computeSecondarySpeciesConcAndDerivative( RealType const temperature,
-                                                                        PARAMS_DATA const & params,
-                                                                        RealConstDataArrayView1d & log10PrimaryActCoeff,
-                                                                        RealConstDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
-                                                                        RealConstDataArrayView1d & log10SecActCoeff,
-                                                                        RealConstDataArrayView1d & dLog10SecActCoeff_dIonicStrength,
-                                                                        RealConstDataArrayView1d & primarySpeciesConcentration,
-                                                                        RealDataArrayView1d & secondarySpeciesConcentration,
-                                                                        RealDataArrayView2d & dLog10SecConc_dLog10PrimaryConc )
+HPCREACT_HOST_DEVICE inline void
+EquilibriumReactions< REAL_TYPE,
+                      REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_DATA_ARRAY_2D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
+                      INT_TYPE,
+                      INDEX_TYPE
+                      >::computeSecondarySpeciesConcAndDerivative( RealType const temperature,
+                                                                   PARAMS_DATA const & params,
+                                                                   RealConstDataArrayView1d & log10PrimaryActCoeff,
+                                                                   RealConstDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
+                                                                   RealConstDataArrayView1d & log10SecActCoeff,
+                                                                   RealConstDataArrayView1d & dLog10SecActCoeff_dIonicStrength,
+                                                                   RealConstDataArrayView1d & primarySpeciesConcentration,
+                                                                   RealDataArrayView1d & secondarySpeciesConcentration,
+                                                                   RealDataArrayView2d & dLog10SecConc_dLog10PrimaryConc )
 {
   GEOS_UNUSED_VAR( temperature );
   constexpr IndexType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies;
@@ -217,20 +221,21 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void EquilibriumReactions< REAL_TYPE,
-                           REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_DATA_ARRAY_2D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
-                           INT_TYPE,
-                           INDEX_TYPE
-                           >::computeTotalConcAndDerivative( RealType const temperature,
-                                                             PARAMS_DATA const & params,
-                                                             RealConstDataArrayView1d & primarySpeciesConcentration,
-                                                             RealConstDataArrayView1d & secondarySpeciesConcentration,
-                                                             RealConstDataArrayView2d & dLog10SecConc_dLog10PrimaryConc,
-                                                             RealDataArrayView1d & totalConc,
-                                                             RealDataArrayView2d & dTotalConc_dLog10PrimaryConc )
+HPCREACT_HOST_DEVICE inline void
+EquilibriumReactions< REAL_TYPE,
+                      REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_DATA_ARRAY_2D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
+                      INT_TYPE,
+                      INDEX_TYPE
+                      >::computeTotalConcAndDerivative( RealType const temperature,
+                                                        PARAMS_DATA const & params,
+                                                        RealConstDataArrayView1d & primarySpeciesConcentration,
+                                                        RealConstDataArrayView1d & secondarySpeciesConcentration,
+                                                        RealConstDataArrayView2d & dLog10SecConc_dLog10PrimaryConc,
+                                                        RealDataArrayView1d & totalConc,
+                                                        RealDataArrayView2d & dTotalConc_dLog10PrimaryConc )
 {
   GEOS_UNUSED_VAR( temperature );
   constexpr IndexType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies;
@@ -264,16 +269,16 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void EquilibriumReactions< REAL_TYPE,
-                           REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_DATA_ARRAY_2D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
-                           INT_TYPE,
-                           INDEX_TYPE
-                           >::
-updatePrimarySpeciesConcentrations( RealConstDataArrayView1d solution,
-                                    RealDataArrayView1d & primarySpeciesConcentration )
+HPCREACT_HOST_DEVICE inline void
+EquilibriumReactions< REAL_TYPE,
+                      REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_DATA_ARRAY_2D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
+                      INT_TYPE,
+                      INDEX_TYPE
+                      >::updatePrimarySpeciesConcentrations( RealConstDataArrayView1d solution,
+                                                             RealDataArrayView1d & primarySpeciesConcentration )
 {
   constexpr IndexType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies;
   constexpr IndexType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies;
@@ -292,15 +297,16 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void EquilibriumReactions< REAL_TYPE,
-                           REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_DATA_ARRAY_2D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
-                           INT_TYPE,
-                           INDEX_TYPE
-                           >::setInitialGuess( RealConstDataArrayView1d & primarySpeciesTotalConcentration,
-                                               RealDataArrayView1d & primarySpeciesConcentration )
+HPCREACT_HOST_DEVICE inline void
+EquilibriumReactions< REAL_TYPE,
+                      REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                      REAL_DATA_ARRAY_2D_VIEW_TYPE,
+                      REAL_CONST_DATA_ARRAY_2D_VIEW_TYPE,
+                      INT_TYPE,
+                      INDEX_TYPE
+                      >::setInitialGuess( RealConstDataArrayView1d & primarySpeciesTotalConcentration,
+                                          RealDataArrayView1d & primarySpeciesConcentration )
 {
   for( IndexType i = 0; i < PARAMS_DATA::numPrimarySpecies; i++ )
   {
@@ -320,3 +326,5 @@ void EquilibriumReactions< REAL_TYPE,
 
 
 } // namespace hpcReact
+
+#include "common/macrosCleanup.hpp"

@@ -1,4 +1,5 @@
 #include "KineticReactions.hpp"
+#include "common/macros.hpp"
 
 namespace hpcReact
 {
@@ -9,16 +10,17 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void KineticReactions< REAL_TYPE,
-                       REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                       REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                       INT_TYPE,
-                       INDEX_TYPE
-                       >::computeReactionRates( RealType const & temperature,
-                                                PARAMS_DATA const & params,
-                                                RealConstDataArrayView1d & primarySpeciesConcentration,
-                                                RealConstDataArrayView1d & secondarySpeciesConcentration,
-                                                RealDataArrayView1d & reactionRates )
+HPCREACT_HOST_DEVICE inline void
+KineticReactions< REAL_TYPE,
+                  REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                  REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                  INT_TYPE,
+                  INDEX_TYPE
+                  >::computeReactionRates( RealType const & temperature,
+                                           PARAMS_DATA const & params,
+                                           RealConstDataArrayView1d & primarySpeciesConcentration,
+                                           RealConstDataArrayView1d & secondarySpeciesConcentration,
+                                           RealDataArrayView1d & reactionRates )
 {
   /// 1. Create local vectors
 
@@ -59,3 +61,5 @@ void KineticReactions< REAL_TYPE,
 }
 
 } // namespace hpcReact
+
+#include "common/macrosCleanup.hpp"

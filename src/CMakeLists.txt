@@ -1,5 +1,6 @@
 
 set( hpcReact_headers
+     common/macros.hpp
      common/CArrayWrapper.hpp
      reactions/EquilibriumReactions.hpp
      reactions/KineticReactions.hpp

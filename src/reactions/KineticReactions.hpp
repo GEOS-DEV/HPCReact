@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ReactionsBase.hpp"
+#include "common/macros.hpp"
 
 namespace hpcReact
 {
@@ -59,13 +60,16 @@ public:
   };
 
   template< typename PARAMS_DATA >
-  static void computeReactionRates( RealType const & temperature,
-                                    PARAMS_DATA const & params,
-                                    RealConstDataArrayView1d & primarySpeciesConcentration,
-                                    RealConstDataArrayView1d & secondarySpeciesConcentration,
-                                    RealDataArrayView1d & reactionRates );
+  static HPCREACT_HOST_DEVICE inline void
+  computeReactionRates( RealType const & temperature,
+                        PARAMS_DATA const & params,
+                        RealConstDataArrayView1d & primarySpeciesConcentration,
+                        RealConstDataArrayView1d & secondarySpeciesConcentration,
+                        RealDataArrayView1d & reactionRates );
 
 
 };
 
 } // namespace hpcReact
+
+#include "common/macrosCleanup.hpp"

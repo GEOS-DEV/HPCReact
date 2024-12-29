@@ -1,5 +1,7 @@
 #include "ReactionsBase.hpp"
 
+#include "common/macros.hpp"
+
 namespace hpcReact
 {
 
@@ -10,6 +12,7 @@ template< typename REAL_TYPE,
           typename INDEX_TYPE
           >
 template< typename PARAMS_DATA >
+HPCREACT_HOST_DEVICE inline
 void ReactionsBase< REAL_TYPE,
                     REAL_DATA_ARRAY_1D_VIEW_TYPE,
                     REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
@@ -60,6 +63,7 @@ template< typename REAL_TYPE,
           typename INDEX_TYPE
           >
 template< typename PARAMS_DATA >
+HPCREACT_HOST_DEVICE inline
 void ReactionsBase< REAL_TYPE,
                     REAL_DATA_ARRAY_1D_VIEW_TYPE,
                     REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
@@ -84,3 +88,5 @@ void ReactionsBase< REAL_TYPE,
 }
 
 }
+
+#include "common/macrosCleanup.hpp"

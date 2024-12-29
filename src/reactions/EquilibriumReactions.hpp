@@ -5,7 +5,7 @@
  */
 
 #include "ReactionsBase.hpp"
-
+#include "common/macros.hpp"
 
 namespace hpcReact
 {
@@ -52,40 +52,45 @@ private:
   static constexpr RealType m_newtonTol = 1e-6;
 
   template< typename PARAMS_DATA >
-  static void setInitialGuess( RealConstDataArrayView1d & primarySpeciesTotalConcentration,
-                               RealDataArrayView1d & primarySpeciesConcentration );
+  static HPCREACT_HOST_DEVICE inline void
+  setInitialGuess( RealConstDataArrayView1d & primarySpeciesTotalConcentration,
+                   RealDataArrayView1d & primarySpeciesConcentration );
 
   template< typename PARAMS_DATA >
-  static void assembleEquilibriumReactionSystem( RealType const temperature,
-                                                 RealConstDataArrayView1d & primarySpeciesTotalConcentration,
-                                                 RealConstDataArrayView1d & primarySpeciesConcentration,
-                                                 RealDataArrayView1d & secondarySpeciesConcentration,
-                                                 RealDataArrayView2d & matrix,
-                                                 RealDataArrayView1d & rhs );
+  static HPCREACT_HOST_DEVICE inline void
+  assembleEquilibriumReactionSystem( RealType const temperature,
+                                     RealConstDataArrayView1d & primarySpeciesTotalConcentration,
+                                     RealConstDataArrayView1d & primarySpeciesConcentration,
+                                     RealDataArrayView1d & secondarySpeciesConcentration,
+                                     RealDataArrayView2d & matrix,
+                                     RealDataArrayView1d & rhs );
 
   template< typename PARAMS_DATA >
-  static void computeSecondarySpeciesConcAndDerivative( RealType const temperature,
-                                                        PARAMS_DATA const & params,
-                                                        RealConstDataArrayView1d & log10PrimaryActCoeff,
-                                                        RealConstDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
-                                                        RealConstDataArrayView1d & log10SecActCoeff,
-                                                        RealConstDataArrayView1d & dLog10SecActCoeff_dIonicStrength,
-                                                        RealConstDataArrayView1d & primarySpeciesConcentration,
-                                                        RealDataArrayView1d & secondarySpeciesConcentration,
-                                                        RealDataArrayView2d & dLog10SecConc_dLog10PrimaryConc );
+  static HPCREACT_HOST_DEVICE inline void
+  computeSecondarySpeciesConcAndDerivative( RealType const temperature,
+                                            PARAMS_DATA const & params,
+                                            RealConstDataArrayView1d & log10PrimaryActCoeff,
+                                            RealConstDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
+                                            RealConstDataArrayView1d & log10SecActCoeff,
+                                            RealConstDataArrayView1d & dLog10SecActCoeff_dIonicStrength,
+                                            RealConstDataArrayView1d & primarySpeciesConcentration,
+                                            RealDataArrayView1d & secondarySpeciesConcentration,
+                                            RealDataArrayView2d & dLog10SecConc_dLog10PrimaryConc );
 
   template< typename PARAMS_DATA >
-  static void computeTotalConcAndDerivative( RealType const temperature,
-                                             PARAMS_DATA const & params,
-                                             RealConstDataArrayView1d & primarySpeciesConcentration,
-                                             RealConstDataArrayView1d & secondarySpeciesConcentration,
-                                             RealConstDataArrayView2d & dLog10SecConc_dLog10PrimaryConc,
-                                             RealDataArrayView1d & totalConc,
-                                             RealDataArrayView2d & dTotalConc_dLog10PrimaryConc );
+  static HPCREACT_HOST_DEVICE inline void
+  computeTotalConcAndDerivative( RealType const temperature,
+                                 PARAMS_DATA const & params,
+                                 RealConstDataArrayView1d & primarySpeciesConcentration,
+                                 RealConstDataArrayView1d & secondarySpeciesConcentration,
+                                 RealConstDataArrayView2d & dLog10SecConc_dLog10PrimaryConc,
+                                 RealDataArrayView1d & totalConc,
+                                 RealDataArrayView2d & dTotalConc_dLog10PrimaryConc );
 
   template< typename PARAMS_DATA >
-  static void updatePrimarySpeciesConcentrations( RealConstDataArrayView1d solution,
-                                                  RealDataArrayView1d & primarySpeciesConcentration );
+  static HPCREACT_HOST_DEVICE inline void
+  updatePrimarySpeciesConcentrations( RealConstDataArrayView1d solution,
+                                      RealDataArrayView1d & primarySpeciesConcentration );
 
 
 
@@ -93,3 +98,5 @@ private:
 
 
 } // namespace hpcReact
+
+#include "common/macrosCleanup.hpp"

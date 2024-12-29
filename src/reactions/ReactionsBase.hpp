@@ -1,6 +1,7 @@
 
-#ifndef REACTIONS_REACTIONSBASE_HPP
-#define REACTIONS_REACTIONSBASE_HPP
+#pragma once
+
+#include "common/macros.hpp"
 
 #include <cmath>
 
@@ -26,19 +27,21 @@ public:
 
 
   template< typename PARAMS_DATA >
-  static void computeLog10ActCoefBDotModel( REAL_TYPE const temperature,
-                                            REAL_TYPE const ionicStrength,
-                                            PARAMS_DATA const & params,
-                                            RealDataArrayView1d & log10PrimaryActCoeff,
-                                            RealDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
-                                            RealDataArrayView1d & log10SecActCoeff,
-                                            RealDataArrayView1d & dLog10SecActCoeff_dIonicStrength );
+  static HPCREACT_HOST_DEVICE void
+  computeLog10ActCoefBDotModel( REAL_TYPE const temperature,
+                                REAL_TYPE const ionicStrength,
+                                PARAMS_DATA const & params,
+                                RealDataArrayView1d & log10PrimaryActCoeff,
+                                RealDataArrayView1d & dLog10PrimaryActCoeff_dIonicStrength,
+                                RealDataArrayView1d & log10SecActCoeff,
+                                RealDataArrayView1d & dLog10SecActCoeff_dIonicStrength );
 
   template< typename PARAMS_DATA >
-  static void computeIonicStrength( PARAMS_DATA const & params,
-                                    RealConstDataArrayView1d const & primarySpeciesConcentration,
-                                    RealConstDataArrayView1d const & secondarySpeciesConcentration,
-                                    REAL_TYPE & ionicStrength );
+  static HPCREACT_HOST_DEVICE void
+  computeIonicStrength( PARAMS_DATA const & params,
+                        RealConstDataArrayView1d const & primarySpeciesConcentration,
+                        RealConstDataArrayView1d const & secondarySpeciesConcentration,
+                        REAL_TYPE & ionicStrength );
 
 
   template< int NUM_PRIMARY_SPECIES,
@@ -69,4 +72,5 @@ public:
 };
 
 } // namespace hpcReact
-#endif //REACTIONS_REACTIONSBASE_HPP
+
+#include "common/macrosCleanup.hpp"
