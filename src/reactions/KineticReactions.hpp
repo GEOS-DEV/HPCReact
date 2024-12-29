@@ -5,16 +5,16 @@
 namespace hpcReact
 {
 
-template< typename REAL_TYPE, 
+template< typename REAL_TYPE,
           typename REAL_DATA_ARRAY_1D_VIEW_TYPE,
           typename REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 class KineticReactions : public ReactionsBase< REAL_TYPE,
-                                                   REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                                                   REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                                                   INT_TYPE,
-                                                   INDEX_TYPE >
+                                               REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                                               REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                                               INT_TYPE,
+                                               INDEX_TYPE >
 {
 public:
 
@@ -31,9 +31,9 @@ public:
   using typename Base::IndexType;
 
 
-  static constexpr RealType RConst = 0;//constants::gasConstant;
+  static constexpr RealType RConst = 0; //constants::gasConstant;
 
-  template< int NUM_PRIMARY_SPECIES, 
+  template< int NUM_PRIMARY_SPECIES,
             int NUM_SECONDARY_SPECIES,
             int NUM_KINETIC_REACTIONS >
   struct ParamsData : Base::template ParamsData< NUM_PRIMARY_SPECIES, NUM_SECONDARY_SPECIES >

@@ -3,22 +3,22 @@
 namespace hpcReact
 {
 // function to  the reaction rate. Includes impact of temperature, concentration, surface area, volume fraction and porosity
-template< typename REAL_TYPE, 
+template< typename REAL_TYPE,
           typename REAL_DATA_ARRAY_1D_VIEW_TYPE,
           typename REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA >
-void KineticReactions< REAL_TYPE, 
-                           REAL_DATA_ARRAY_1D_VIEW_TYPE,
-                           REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
-                           INT_TYPE,
-                           INDEX_TYPE
-                           >::computeReactionRates( RealType const & temperature,
-                                    PARAMS_DATA const & params,
-                                                            RealConstDataArrayView1d & primarySpeciesConcentration,
-                                                            RealConstDataArrayView1d & secondarySpeciesConcentration,
-                                                            RealDataArrayView1d & reactionRates )
+void KineticReactions< REAL_TYPE,
+                       REAL_DATA_ARRAY_1D_VIEW_TYPE,
+                       REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
+                       INT_TYPE,
+                       INDEX_TYPE
+                       >::computeReactionRates( RealType const & temperature,
+                                                PARAMS_DATA const & params,
+                                                RealConstDataArrayView1d & primarySpeciesConcentration,
+                                                RealConstDataArrayView1d & secondarySpeciesConcentration,
+                                                RealDataArrayView1d & reactionRates )
 {
   /// 1. Create local vectors
 
@@ -59,5 +59,3 @@ void KineticReactions< REAL_TYPE,
 }
 
 } // namespace hpcReact
-
-

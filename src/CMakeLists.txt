@@ -1,6 +1,8 @@
 
 set( hpcReact_headers
      common/CArrayWrapper.hpp
+     reactions/EquilibriumReactions.hpp
+     reactions/KineticReactions.hpp
      reactions/ReactionsBase.hpp
      )
 
@@ -48,3 +50,8 @@ target_include_directories( hpcReact
 #                        EXCLUDES "blt/*" )
 
 add_subdirectory( reactions/unitTests )
+
+
+HPCReact_add_code_checks( PREFIX hpcReact
+                          UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
+                          EXCLUDES "blt/*" )

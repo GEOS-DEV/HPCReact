@@ -6,9 +6,7 @@
 using namespace hpcReact;
 
 TEST( testReactionsBase, testParamsInitialization )
-{
-
-}
+{}
 
 int main( int argc, char * * argv )
 {

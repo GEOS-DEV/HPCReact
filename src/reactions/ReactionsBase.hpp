@@ -9,13 +9,12 @@ namespace hpcReact
 
 
 
-
-template< typename REAL_TYPE, 
+template< typename REAL_TYPE,
           typename REAL_DATA_ARRAY_1D_VIEW_TYPE,
           typename REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE
-        >
+          >
 class ReactionsBase
 {
 public:
@@ -42,7 +41,7 @@ public:
                                     REAL_TYPE & ionicStrength );
 
 
-  template< int NUM_PRIMARY_SPECIES, 
+  template< int NUM_PRIMARY_SPECIES,
             int NUM_SECONDARY_SPECIES >
   struct ParamsData
   {
