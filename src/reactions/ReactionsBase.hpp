@@ -42,33 +42,6 @@ public:
                         RealConstDataArrayView1d const & primarySpeciesConcentration,
                         RealConstDataArrayView1d const & secondarySpeciesConcentration,
                         REAL_TYPE & ionicStrength );
-
-
-  template< int NUM_PRIMARY_SPECIES,
-            int NUM_SECONDARY_SPECIES >
-  struct ParamsData
-  {
-    using PARENT_TYPE = ReactionsBase;
-
-    static constexpr INT_TYPE numPrimarySpecies = NUM_PRIMARY_SPECIES;
-
-    static constexpr INT_TYPE numSecondarySpecies = NUM_SECONDARY_SPECIES;
-
-    REAL_TYPE m_ionSizePrimary[numPrimarySpecies];
-
-    REAL_TYPE m_ionSizeSec[numSecondarySpecies];
-
-    INT_TYPE m_chargePrimary[numPrimarySpecies];
-    INT_TYPE m_chargeSec[numSecondarySpecies];
-
-    REAL_TYPE m_DebyeHuckelA;
-    REAL_TYPE m_DebyeHuckelB;
-    REAL_TYPE m_WATEQBDot;
-
-    REAL_TYPE m_stoichMatrix[numSecondarySpecies][numPrimarySpecies];
-
-  };
-
 };
 
 } // namespace hpcReact

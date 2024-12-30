@@ -5,6 +5,8 @@ set( hpcReact_headers
      reactions/EquilibriumReactions.hpp
      reactions/KineticReactions.hpp
      reactions/ReactionsBase.hpp
+     reactions/ReactionsParameterData.hpp
+     reactions/ReactionsParameterDataPredefined.hpp
      )
 
 set( hpcReact_sources
