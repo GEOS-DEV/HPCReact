@@ -5,8 +5,28 @@
 
 using namespace hpcReact;
 
-TEST( testReactionsBase, testParamsInitialization )
+TEST( testEquilibriumReactions, setInitialGuess )
 {}
+
+
+TEST( testEquilibriumReactions, assembleEquilibriumReactionSystem )
+{}
+
+
+TEST( testEquilibriumReactions, computeSecondarySpeciesConcAndDerivative )
+{}
+
+
+TEST( testEquilibriumReactions, computeTotalConcAndDerivative )
+{}
+
+TEST( testEquilibriumReactions, updatePrimarySpeciesConcentrations )
+{}
+
+TEST( testEquilibriumReactions, updateConcentrations )
+{
+  
+}
 
 int main( int argc, char * * argv )
 {

@@ -16,9 +16,10 @@
  * @tparam NDIMS  The number of dimensions of the array.
  * @tparam DIMS   Parameter pack specifying the size of each dimension.
  */
-template< typename T, int NDIMS, int ... DIMS >
+template< typename T, int ... DIMS >
 struct CArrayWrapper
 {
+  static constexpr int ndims = sizeof...( DIMS );
   static_assert( false, "Unsupported number of dimensions" );
 };
 
@@ -31,8 +32,9 @@ struct CArrayWrapper
  * @tparam DIM0  The size of the single dimension.
  */
 template< typename T, int DIM0 >
-struct CArrayWrapper< T, 1, DIM0 >
+struct CArrayWrapper< T, DIM0 >
 {
+
   /**
    * @brief Read/write access to an element by index.
    * @param dim The index (must be in range [0, DIM0)).
@@ -76,7 +78,7 @@ struct CArrayWrapper< T, 1, DIM0 >
  * @tparam DIM1  The size of the second dimension.
  */
 template< typename T, int DIM0, int DIM1 >
-struct CArrayWrapper< T, 2, DIM0, DIM1 >
+struct CArrayWrapper< T, DIM0, DIM1 >
 {
   /**
    * @brief Read/write access to an element by 2D indices.
@@ -138,7 +140,7 @@ struct CArrayWrapper< T, 2, DIM0, DIM1 >
  * @tparam DIM2  The size of the third dimension.
  */
 template< typename T, int DIM0, int DIM1, int DIM2 >
-struct CArrayWrapper< T, 3, DIM0, DIM1, DIM2 >
+struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
 {
   /**
    * @brief Read/write access to an element by 3D indices.

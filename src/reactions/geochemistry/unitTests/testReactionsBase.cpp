@@ -86,9 +86,9 @@ TEST( testReactionsBase, testComputeIonicStrength )
   double const primarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
   double const secondarySpeciesConcentration[] = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0 };
 
-  typename ReactionsType::RealType const ionicStrength = testComputIonicStrengthHelper<ReactionsType>( chemicalReactionsParams,
-                                                                                        primarySpeciesConcentration,
-                                                                                        secondarySpeciesConcentration );
+  typename ReactionsType::RealType const ionicStrength = testComputIonicStrengthHelper< ReactionsType >( chemicalReactionsParams,
+                                                                                                         primarySpeciesConcentration,
+                                                                                                         secondarySpeciesConcentration );
 
   EXPECT_NEAR( ionicStrength, 52.0, 1.0e-12 );
 }
@@ -105,9 +105,9 @@ TEST( testReactionsBase, testComputeIonicStrengthVector )
 
   std::vector< double const > const primarySpeciesConcentration{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0 };
   std::vector< double const > const secondarySpeciesConcentration{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0 };
-  typename ReactionsType::RealType const ionicStrength = testComputIonicStrengthHelper<ReactionsType>( chemicalReactionsParams,
-                                                                                        primarySpeciesConcentration,
-                                                                                        secondarySpeciesConcentration );
+  typename ReactionsType::RealType const ionicStrength = testComputIonicStrengthHelper< ReactionsType >( chemicalReactionsParams,
+                                                                                                         primarySpeciesConcentration,
+                                                                                                         secondarySpeciesConcentration );
 
   EXPECT_NEAR( ionicStrength, 52.0, 1.0e-12 );
 
@@ -151,13 +151,13 @@ TEST( testReactionsBase, testComputeLog10ActCoefBDotModel )
   double dLog10SecActCoeff_dIonicStrength[11] = {0};
 
 
-  testComputeLog10ActCoefBDotModelHelper<ReactionsType>( chemicalReactionsParams, 
-                                          temperature,
-                                          ionicStrength,
-                                          log10PrimaryActCoeff,
-                                          dLog10PrimaryActCoeff_dIonicStrength,
-                                          log10SecActCoeff,
-                                          dLog10SecActCoeff_dIonicStrength );
+  testComputeLog10ActCoefBDotModelHelper< ReactionsType >( chemicalReactionsParams,
+                                                           temperature,
+                                                           ionicStrength,
+                                                           log10PrimaryActCoeff,
+                                                           dLog10PrimaryActCoeff_dIonicStrength,
+                                                           log10SecActCoeff,
+                                                           dLog10SecActCoeff_dIonicStrength );
 
 }
 
@@ -179,13 +179,13 @@ TEST( testReactionsBase, testComputeLog10ActCoefBDotModel_vector )
   std::vector< double > dLog10SecActCoeff_dIonicStrength( 11 );
 
 
-  testComputeLog10ActCoefBDotModelHelper<ReactionsType>( chemicalReactionsParams, 
-                                          temperature,
-                                          ionicStrength,
-                                          log10PrimaryActCoeff,
-                                          dLog10PrimaryActCoeff_dIonicStrength,
-                                          log10SecActCoeff,
-                                          dLog10SecActCoeff_dIonicStrength );
+  testComputeLog10ActCoefBDotModelHelper< ReactionsType >( chemicalReactionsParams,
+                                                           temperature,
+                                                           ionicStrength,
+                                                           log10PrimaryActCoeff,
+                                                           dLog10PrimaryActCoeff_dIonicStrength,
+                                                           log10SecActCoeff,
+                                                           dLog10SecActCoeff_dIonicStrength );
 
 }
 
