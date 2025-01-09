@@ -38,8 +38,6 @@ void ReactionsBase< REAL_TYPE,
                                                params.m_DebyeHuckelB /
                                                (1.0 + params.m_ionSizePrimary[i] * params.m_DebyeHuckelB * sqrt( ionicStrength )) /
                                                (1.0 + params.m_ionSizePrimary[i] * params.m_DebyeHuckelB * sqrt( ionicStrength )));
-//    log10PrimaryActCoeff[i] = 0;
-//    dLog10PrimaryActCoeff_dIonicStrength[i] = 0;
   }
   for( INDEX_TYPE i = 0; i < PARAMS_DATA::numSecondarySpecies; ++i )
   {
@@ -50,8 +48,6 @@ void ReactionsBase< REAL_TYPE,
                                            params.m_DebyeHuckelB /
                                            (1.0 + params.m_ionSizeSec[i] * params.m_DebyeHuckelB * sqrt( ionicStrength )) /
                                            (1.0 + params.m_ionSizeSec[i] * params.m_DebyeHuckelB * sqrt( ionicStrength )));
-//    log10SecActCoeff[i] = 0;
-//    dLog10SecActCoeff_dIonicStrength[i] = 0;
   }
 }
 

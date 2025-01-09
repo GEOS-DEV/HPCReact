@@ -52,10 +52,10 @@ KineticReactions< REAL_TYPE,
 
     for( int iPri = 0; iPri < PARAMS_DATA::numPrimarySpecies; ++iPri )
     {
-      saturationIndex += params.m_stoichMatrix[iRxn][iPri] * log10( primarySpeciesConcentration[iPri] );
-      saturationIndex += params.m_stoichMatrix[iRxn][iPri] * log10PrimaryActCoeff[iPri];
+      saturationIndex = saturationIndex 
+                      + params.m_stoichMatrix[iRxn][iPri] * log10( primarySpeciesConcentration[iPri] ) 
+                      + params.m_stoichMatrix[iRxn][iPri] * log10PrimaryActCoeff[iPri];
     }
-
     reactionRates[iRxn] = params.m_specificSurfaceArea * (1.0 - pow( 10, saturationIndex ) ) * params.m_reactionRateConstant[iRxn];
   }
 }

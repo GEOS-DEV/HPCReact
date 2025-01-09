@@ -2,9 +2,9 @@
 set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
-     reactions/EquilibriumReactions.hpp
-     reactions/KineticReactions.hpp
-     reactions/ReactionsBase.hpp
+     reactions/geochemistry/EquilibriumReactions.hpp
+     reactions/geochemistry/KineticReactions.hpp
+     reactions/geochemistry/ReactionsBase.hpp
      reactions/ReactionsParameterData.hpp
      reactions/ReactionsParameterDataPredefined.hpp
      )
@@ -52,7 +52,7 @@ target_include_directories( hpcReact
 # hpcReact_add_code_checks( PREFIX hpcReact
 #                        EXCLUDES "blt/*" )
 
-add_subdirectory( reactions/unitTests )
+add_subdirectory( reactions/geochemistry/unitTests )
 
 
 HPCReact_add_code_checks( PREFIX hpcReact
