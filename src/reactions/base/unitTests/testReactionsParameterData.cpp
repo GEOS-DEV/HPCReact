@@ -2,7 +2,7 @@
 #include "../ReactionsBase_impl.hpp"
 #include "MultiVector.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "../ReactionsParameterDataPredefined.hpp"
+#include "../GeochemicalReactionsParametersPredefined.hpp"
 
 #include <gtest/gtest.h>
 

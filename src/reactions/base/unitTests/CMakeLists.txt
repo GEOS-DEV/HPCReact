@@ -1,6 +1,6 @@
 # Specify list of tests
 set( testSourceFiles
-     testReactionsParameterData.cpp )
+     testGeochemicalReactionsParameters.cpp )
 
 set( dependencyList hpcReact gtest )
 

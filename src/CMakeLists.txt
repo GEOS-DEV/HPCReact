@@ -2,11 +2,12 @@
 set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
+     reactions/base/ReactionsParametersBase.hpp
      reactions/geochemistry/EquilibriumReactions.hpp
      reactions/geochemistry/KineticReactions.hpp
      reactions/geochemistry/ReactionsBase.hpp
-     reactions/ReactionsParameterData.hpp
-     reactions/ReactionsParameterDataPredefined.hpp
+     reactions/geochemistry/GeochemicalReactionsParameters.hpp
+     reactions/geochemistry/GeochemicalReactionsParametersPredefined.hpp
      )
 
 set( hpcReact_sources
