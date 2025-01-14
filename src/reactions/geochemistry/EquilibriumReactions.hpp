@@ -9,6 +9,8 @@
 
 namespace hpcReact
 {
+namespace geochemistry
+{
 
 template< typename REAL_TYPE,
           typename REAL_DATA_ARRAY_1D_VIEW_TYPE,
@@ -96,7 +98,7 @@ private:
 
 };
 
-
+} // namespace geochemistry
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

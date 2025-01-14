@@ -2,11 +2,12 @@
 #include "../ReactionsBase_impl.hpp"
 #include "MultiVector.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "../GeochemicalReactionsParametersPredefined.hpp"
+#include "../ParametersPredefined.hpp"
 
 #include <gtest/gtest.h>
 
 using namespace hpcReact;
+using namespace geochemistry;
 
 TEST( testReactionsBase, testParamsInitialization )
 {

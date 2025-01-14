@@ -9,7 +9,7 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           int NUM_PRIMARY_SPECIES,
           int NUM_SECONDARY_SPECIES >
-struct EquilibriumGeochemicalReactionsParameters
+struct EquilibriumParameters
 {
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
@@ -39,7 +39,7 @@ template< typename REAL_TYPE,
           int NUM_PRIMARY_SPECIES,
           int NUM_SECONDARY_SPECIES,
           int NUM_KINETIC_REACTIONS >
-struct KineticGeochemicalReactionsParameters
+struct KineticParameters
 {
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
@@ -72,7 +72,7 @@ template< typename REAL_TYPE,
           int NUM_PRIMARY_SPECIES,
           int NUM_SECONDARY_SPECIES,
           int NUM_KINETIC_REACTIONS >
-struct GeochemicalReactionsParameters
+struct Parameters
 {
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
@@ -104,12 +104,12 @@ struct GeochemicalReactionsParameters
   template< int ... PRIMARY_SPECIES, 
             int ... SECONDARY_SPECIES,
             int ... SPECIES_PERMUTATIONS >
-  constexpr EquilibriumGeochemicalReactionsParameters< REAL_TYPE, INT_TYPE, NUM_PRIMARY_SPECIES,  NUM_SECONDARY_SPECIES > 
+  constexpr EquilibriumParameters< REAL_TYPE, INT_TYPE, NUM_PRIMARY_SPECIES,  NUM_SECONDARY_SPECIES > 
   equilibriumReactionsParams_impl( std::integer_sequence< int, PRIMARY_SPECIES... >, 
                                    std::integer_sequence< int, SECONDARY_SPECIES... >,
                                    std::integer_sequence< int, SPECIES_PERMUTATIONS... > )
   {
-    return EquilibriumGeochemicalReactionsParameters< REAL_TYPE, INT_TYPE, NUM_PRIMARY_SPECIES,  NUM_SECONDARY_SPECIES >{
+    return EquilibriumParameters< REAL_TYPE, INT_TYPE, NUM_PRIMARY_SPECIES,  NUM_SECONDARY_SPECIES >{
       {m_ionSizePrimary[ PRIMARY_SPECIES ]...},
       {m_ionSizeSec[ SECONDARY_SPECIES ]...},
       {m_chargePrimary[ PRIMARY_SPECIES ]...},
@@ -122,7 +122,7 @@ struct GeochemicalReactionsParameters
     };
   }
 
-  constexpr EquilibriumGeochemicalReactionsParameters< REAL_TYPE, INT_TYPE, NUM_PRIMARY_SPECIES,  NUM_SECONDARY_SPECIES > 
+  constexpr EquilibriumParameters< REAL_TYPE, INT_TYPE, NUM_PRIMARY_SPECIES,  NUM_SECONDARY_SPECIES > 
   equilibriumReactions()
   {
     return equilibriumReactionsParams_impl( std::make_integer_sequence< int, NUM_PRIMARY_SPECIES >{}, 

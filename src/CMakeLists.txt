@@ -6,8 +6,8 @@ set( hpcReact_headers
      reactions/geochemistry/EquilibriumReactions.hpp
      reactions/geochemistry/KineticReactions.hpp
      reactions/geochemistry/ReactionsBase.hpp
-     reactions/geochemistry/GeochemicalReactionsParameters.hpp
-     reactions/geochemistry/GeochemicalReactionsParametersPredefined.hpp
+     reactions/geochemistry/Parameters.hpp
+     reactions/geochemistry/ParametersPredefined.hpp
      )
 
 set( hpcReact_sources

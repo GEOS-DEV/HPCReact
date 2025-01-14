@@ -1,13 +1,14 @@
 #pragma once
 
-#include "GeochemicalReactionsParameters.hpp"
+#include "Parameters.hpp"
 
 namespace hpcReact
 {
-
+namespace geochemistry
+{
 
 constexpr
-GeochemicalReactionsParameters< double, int, 7, 11, 2 > chemicalReactionsParams =
+Parameters< double, int, 7, 11, 2 > chemicalReactionsParams =
 {
   // m_ionSizePrimary
   { 9.00, 4.00, 6.00, 4.00, 3.00, 8.00, 4.00 },
@@ -54,5 +55,5 @@ GeochemicalReactionsParameters< double, int, 7, 11, 2 > chemicalReactionsParams 
   1.0
 };
 
-
+} // namespace geochemistry
 } // namespace hpcReact

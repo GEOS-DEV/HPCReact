@@ -3,6 +3,9 @@
 
 namespace hpcReact
 {
+namespace geochemistry
+{
+
 // function to  the reaction rate. Includes impact of temperature, concentration, surface area, volume fraction and porosity
 template< typename REAL_TYPE,
           typename REAL_DATA_ARRAY_1D_VIEW_TYPE,
@@ -60,6 +63,7 @@ KineticReactions< REAL_TYPE,
   }
 }
 
+} // namespace geochemistry
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

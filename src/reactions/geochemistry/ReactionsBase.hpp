@@ -7,7 +7,8 @@
 
 namespace hpcReact
 {
-
+namespace geochemistry
+{
 
 
 template< typename REAL_TYPE,
@@ -44,6 +45,7 @@ public:
                         REAL_TYPE & ionicStrength );
 };
 
+} // namespace geochemistry
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"
