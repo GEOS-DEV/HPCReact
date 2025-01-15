@@ -5,7 +5,7 @@
 
 namespace hpcReact
 {
-namespace geochemistry
+namespace liquidElectrolyteBatteryChemistry
 {
 
 template< typename REAL_TYPE,

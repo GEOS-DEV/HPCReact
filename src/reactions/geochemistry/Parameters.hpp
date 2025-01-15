@@ -3,7 +3,8 @@
 
 namespace hpcReact
 {
-
+namespace geochemistry
+{
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
@@ -131,5 +132,5 @@ struct Parameters
   }
 };
 
-
-}
+} // namespace geochemistry
+} // namespace hpcReact
