@@ -25,25 +25,44 @@ KineticReactions< REAL_TYPE,
                                            RealConstDataArrayView1d & secondarySpeciesConcentration,
                                            RealDataArrayView1d & reactionRates )
 {
-  for( int iRxn = 0; iRxn < PARAMS_DATA::numKineticReactions; iRxn++ )
+  for( IntType i = 0; i < PARAMS_DATA::numPrimarySpecies; ++i )
   {
-    RealType const forwardRateConstant = params.m_reactionRateConstant[iRxn] * exp( -params.m_activationEnergy[iRxn] / ( constants::R * temperature ) );
-    RealType const reverseRateConstant = params.equilibriumConstant[iRxn] / forwardRateConstant;
-
-    for( int iPri = 0; iPri < PARAMS_DATA::numPrimarySpecies; ++iPri )
+    reactionRates[i] = 0.0;
+    for( IntType r=0; r<PARAMS_DATA::numKineticReactions; ++r )
     {
-      RealType const stoichiometricCoefficient = params.m_stoichiometricMatrix[iRxn][iPri];
-      RealType const primarySpeciesConcentration = primarySpeciesConcentration[iPri];
-      RealType const secondarySpeciesConcentration = secondarySpeciesConcentration[iPri];
+      RealType const forwardRateConstant = params.m_reactionRateConstant[r] * exp( -params.m_activationEnergy[r] / ( constants::R * temperature ) );
+      RealType const reverseRateConstant = params.equilibriumConstant[r] / forwardRateConstant;
+      RealType const s_ir = params.m_stoichiometricMatrix[r][i];
 
-      if( stoichiometricCoefficient < 0.0 )
+      RealType productConcPlus = 1.0;
+      RealType productConcMinus = 1.0;
+      bool productConcPlusFlag = false;
+      bool productConcMinusFlag = false;
+      for( IntType j = 0; j < PARAMS_DATA::numPrimarySpecies; ++j )
       {
-        reactionRates[iPri] = reactionRates[iRxn] + stoichiometricCoefficient * forwardRateConstant * primarySpeciesConcentration;
+        RealType const s_jr = params.m_stoichiometricMatrix[r][j];
+        if( s_jr < 0.0 )
+        {
+          productConcPlus *= pow( primarySpeciesConcentration[j], -s_jr );
+          productConcPlusFlag = true;
+        }
+        else if( s_jr > 0.0 )
+        {
+          productConcMinus *= pow( primarySpeciesConcentration[j], s_jr );
+          productConcMinusFlag = true;
+        }
       }
-      else if( stoichiometricCoefficient > 0.0 )
+
+      RealType reactionRate_n = 0.0;
+      if( productConcPlusFlag )
       {
-        reactionRates[iPri] = reactionRates[iRxn] - stoichiometricCoefficient * reverseRateConstant * primarySpeciesConcentration;
+        reactionRate_n += forwardRateConstant * productConcPlus;
       }
+      if( productConcMinusFlag )
+      {
+        reactionRate_n -= reverseRateConstant * productConcMinus;
+      }
+      reactionRates[i] += s_ir * reactionRate_n;
     }
   }
 }

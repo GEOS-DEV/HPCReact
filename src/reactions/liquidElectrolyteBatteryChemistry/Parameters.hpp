@@ -29,7 +29,7 @@ struct KineticParameters
   RealType m_equilibriumConstant[numKineticReactions];
   CArrayWrapper< RealType, numKineticReactions, numPrimarySpecies>  m_stoichiometricMatrix[numKineticReactions][numPrimarySpecies];
 
-  RealType m_reactionRateConstant[numKineticReactions];
+  RealType m_rateConstant[numKineticReactions];
 };
 
 
