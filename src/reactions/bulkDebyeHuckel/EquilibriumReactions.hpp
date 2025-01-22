@@ -9,7 +9,7 @@
 
 namespace hpcReact
 {
-namespace geochemistry
+namespace bulkGeneric
 {
 
 template< typename REAL_TYPE,
@@ -98,7 +98,7 @@ private:
 
 };
 
-} // namespace geochemistry
+} // namespace bulkGeneric
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

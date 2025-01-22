@@ -7,7 +7,7 @@
 
 namespace hpcReact
 {
-namespace geochemistry
+namespace bulkGeneric
 {
 
 
@@ -45,7 +45,7 @@ public:
                         REAL_TYPE & ionicStrength );
 };
 
-} // namespace geochemistry
+} // namespace bulkGeneric
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

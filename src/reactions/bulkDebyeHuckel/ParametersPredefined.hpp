@@ -4,7 +4,7 @@
 
 namespace hpcReact
 {
-namespace geochemistry
+namespace bulkGeneric
 {
 
 constexpr
@@ -55,5 +55,5 @@ Parameters< double, int, 7, 11, 2 > chemicalReactionsParams =
   1.0
 };
 
-} // namespace geochemistry
+} // namespace bulkGeneric
 } // namespace hpcReact

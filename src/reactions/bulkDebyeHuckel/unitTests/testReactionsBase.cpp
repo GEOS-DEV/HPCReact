@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 
 using namespace hpcReact;
-using namespace geochemistry;
+using namespace bulkGeneric;
 
 TEST( testReactionsBase, testParamsInitialization )
 {

@@ -4,7 +4,7 @@
 
 namespace hpcReact
 {
-namespace geochemistry
+namespace bulkGeneric
 {
 
 template< typename REAL_TYPE,
@@ -85,7 +85,7 @@ void ReactionsBase< REAL_TYPE,
   }
 }
 
-} // namespace geochemistry
+} // namespace bulkGeneric
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

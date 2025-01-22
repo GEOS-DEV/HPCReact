@@ -5,7 +5,7 @@
 
 namespace hpcReact
 {
-namespace geochemistry
+namespace bulkDebyeHuckel
 {
 
 template< typename REAL_TYPE,
@@ -44,7 +44,7 @@ public:
 
 };
 
-} // namespace geochemistry
+} // namespace bulkGeneric
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

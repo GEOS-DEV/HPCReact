@@ -3,7 +3,7 @@
 
 namespace hpcReact
 {
-namespace geochemistry
+namespace bulkGeneric
 {
 
 template< typename REAL_TYPE,
@@ -132,5 +132,5 @@ struct Parameters
   }
 };
 
-} // namespace geochemistry
+} // namespace bulkGeneric
 } // namespace hpcReact

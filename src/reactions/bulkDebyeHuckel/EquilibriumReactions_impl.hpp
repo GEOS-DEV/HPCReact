@@ -6,7 +6,7 @@
 //#include "lapack.h"
 namespace hpcReact
 {
-namespace geochemistry
+namespace bulkGeneric
 {
 
 template< typename REAL_TYPE,
@@ -326,7 +326,7 @@ EquilibriumReactions< REAL_TYPE,
 
 }
 
-} // namespace geochemistry
+} // namespace bulkGeneric
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"
