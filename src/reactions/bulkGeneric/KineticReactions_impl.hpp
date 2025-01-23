@@ -1,9 +1,12 @@
 #include "KineticReactions.hpp"
+#include "common/constants.hpp"
 #include "common/macros.hpp"
+
+#include <cmath>
 
 namespace hpcReact
 {
-namespace bulkDebyeHuckel
+namespace bulkGeneric
 {
 
 // function to  the reaction rate. Includes impact of temperature, concentration, surface area, volume fraction and porosity
@@ -21,8 +24,7 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE
                   >::computeReactionRates( RealType const & temperature,
                                            PARAMS_DATA const & params,
-                                           RealConstDataArrayView1d & primarySpeciesConcentration,
-                                           RealConstDataArrayView1d & secondarySpeciesConcentration,
+                                           RealConstDataArrayView1d const & primarySpeciesConcentration,
                                            RealDataArrayView1d & reactionRates )
 {
   for( IntType i = 0; i < PARAMS_DATA::numPrimarySpecies; ++i )
@@ -30,8 +32,8 @@ KineticReactions< REAL_TYPE,
     reactionRates[i] = 0.0;
     for( IntType r=0; r<PARAMS_DATA::numKineticReactions; ++r )
     {
-      RealType const forwardRateConstant = params.m_reactionRateConstant[r] * exp( -params.m_activationEnergy[r] / ( constants::R * temperature ) );
-      RealType const reverseRateConstant = params.equilibriumConstant[r] / forwardRateConstant;
+      RealType const forwardRateConstant = params.m_rateConstant[r] * exp( -params.m_activationEnergy[r] / ( constants::R * temperature ) );
+      RealType const reverseRateConstant = params.m_equilibriumConstant[r] / forwardRateConstant;
       RealType const s_ir = params.m_stoichiometricMatrix[r][i];
 
       RealType productConcPlus = 1.0;

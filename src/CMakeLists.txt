@@ -3,9 +3,7 @@ set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
      reactions/base/ReactionsParametersBase.hpp
-     reactions/bulkGeneric/EquilibriumReactions.hpp
      reactions/bulkGeneric/KineticReactions.hpp
-     reactions/bulkGeneric/ReactionsBase.hpp
      reactions/bulkGeneric/Parameters.hpp
      reactions/bulkGeneric/ParametersPredefined.hpp
      )
@@ -53,6 +51,7 @@ target_include_directories( hpcReact
 # hpcReact_add_code_checks( PREFIX hpcReact
 #                        EXCLUDES "blt/*" )
 
+add_subdirectory( reactions/bulkDebyeHuckel/unitTests )
 add_subdirectory( reactions/bulkGeneric/unitTests )
 
 

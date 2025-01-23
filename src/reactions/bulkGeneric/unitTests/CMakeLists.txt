@@ -1,6 +1,7 @@
 # Specify list of tests
 set( testSourceFiles
-     testReactionsBase.cpp )
+     testKineticReactions.cpp
+     )
 
 set( dependencyList hpcReact gtest )
 
