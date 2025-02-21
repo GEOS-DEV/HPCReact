@@ -1,9 +1,11 @@
 #pragma once
 
+#include "common/macros.hpp"
 
-#include "ShivaMacros.hpp"
+#include<utility>
 
-namespace shiva
+
+namespace hpcReact
 {
 #if defined(HPCREACT_USE_DEVICE)
   #if defined(HPCREACT_USE_CUDA)
@@ -112,6 +114,7 @@ void genericKernelWrapper( int const N, DATA_TYPE * const hostData, LAMBDA && fu
 #if defined(HPCREACT_USE_DEVICE)
   DATA_TYPE * deviceData;
   deviceMalloc( &deviceData, N * sizeof(DATA_TYPE) );
+  deviceMemCpy( deviceData, hostData, N * sizeof(DATA_TYPE), cudaMemcpyHostToDevice );
   genericKernel <<< 1, 1 >>> ( std::forward< LAMBDA >( func ), deviceData );
   deviceDeviceSynchronize();
   deviceMemCpy( hostData, deviceData, N * sizeof(DATA_TYPE), cudaMemcpyDeviceToHost );
@@ -128,7 +131,7 @@ void genericKernelWrapper( int const N, DATA_TYPE * const hostData, LAMBDA && fu
  * @param data The data pointer to deallocate.
  */
 template< typename DATA_TYPE >
-HPCREACT_CONSTEXPR_HOSTDEVICE_FORCEINLINE void deallocateData( DATA_TYPE * data )
+HPCREACT_HOST_DEVICE void deallocateData( DATA_TYPE * data )
 {
 #if defined(HPCREACT_USE_DEVICE)
   deviceFree( data );
@@ -138,4 +141,4 @@ HPCREACT_CONSTEXPR_HOSTDEVICE_FORCEINLINE void deallocateData( DATA_TYPE * data 
 }
 
 } // namespace pmpl
-} // namespace shiva
+} // namespace hpcReact

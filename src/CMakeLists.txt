@@ -53,6 +53,7 @@ target_include_directories( hpcReact
 
 add_subdirectory( reactions/bulkDebyeHuckel/unitTests )
 add_subdirectory( reactions/bulkGeneric/unitTests )
+add_subdirectory( common/unitTests )
 
 
 HPCReact_add_code_checks( PREFIX hpcReact
