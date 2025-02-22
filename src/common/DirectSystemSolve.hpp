@@ -1,5 +1,5 @@
+#pragma once
 #include "macros.hpp"
-
 #include<cmath>
 
 namespace hpcReact

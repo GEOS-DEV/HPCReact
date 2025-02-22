@@ -2,6 +2,7 @@
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
 #include "common/macros.hpp"
+#include "common/DirectSystemSolve.hpp"
 
 #include <cmath>
 #include <string>
@@ -26,7 +27,7 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE
                   >::computeReactionRates_impl( RealType const & ,//temperature,
                                                 PARAMS_DATA const & params,
-                                                ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
+                                                ARRAY_1D_TO_CONST const & speciesConcentration,
                                                 ARRAY_1D & reactionRates,
                                                 ARRAY_2D & reactionRatesDerivatives )
 {
@@ -58,7 +59,7 @@ KineticReactions< REAL_TYPE,
     {
 
       RealType const s_ri = params.stoichiometricMatrix( r, i );
-      RealType const productTerm_i = primarySpeciesConcentration[i] > 1e-100 ? pow( primarySpeciesConcentration[i], abs(s_ri) ) : 0.0;
+      RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], abs(s_ri) ) : 0.0;
       
       if( s_ri < 0.0 )
       {
@@ -78,7 +79,7 @@ KineticReactions< REAL_TYPE,
           {
             if( i==j )
             {
-              dProductConcForward_dC[j] *= -s_ri * pow( primarySpeciesConcentration[i], -s_ri-1 );
+              dProductConcForward_dC[j] *= -s_ri * pow( speciesConcentration[i], -s_ri-1 );
               dProductConcReverse_dC[j] = 0.0;
             }
             else
@@ -93,7 +94,7 @@ KineticReactions< REAL_TYPE,
           {  
             if( i==j )
             {
-              dProductConcReverse_dC[j] *= s_ri * pow( primarySpeciesConcentration[i], s_ri-1 );
+              dProductConcReverse_dC[j] *= s_ri * pow( speciesConcentration[i], s_ri-1 );
               dProductConcForward_dC[j] = 0.0;
             }
             else
@@ -150,45 +151,114 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE
                   >::computeSpeciesRates_impl( RealType const & temperature,
                                            PARAMS_DATA const & params,
-                                           ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
-                                           ARRAY_1D & primarySpeciesRates,
-                                           ARRAY_2D & primarySpeciesRatesDerivatives )
+                                           ARRAY_1D_TO_CONST const & speciesConcentration,
+                                           ARRAY_1D & speciesRates,
+                                           ARRAY_2D & speciesRatesDerivatives )
 {
   RealType reactionRates[PARAMS_DATA::numReactions] = { 0.0 };
   CArrayWrapper< double, PARAMS_DATA::numReactions, PARAMS_DATA::numSpecies > reactionRatesDerivatives;
 
   if constexpr ( !CALCULATE_DERIVATIVES )
   {
-    HPCREACT_UNUSED_VAR(primarySpeciesRatesDerivatives);
+    HPCREACT_UNUSED_VAR(speciesRatesDerivatives);
   }
 
-  computeReactionRates< PARAMS_DATA >( temperature, params, primarySpeciesConcentration, reactionRates, reactionRatesDerivatives );
+  computeReactionRates< PARAMS_DATA >( temperature, params, speciesConcentration, reactionRates, reactionRatesDerivatives );
 
   for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
   {
-    primarySpeciesRates[i] = 0.0;
+    speciesRates[i] = 0.0;
     if constexpr ( CALCULATE_DERIVATIVES )
     {
       for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
       {
-        primarySpeciesRatesDerivatives( i, j ) = 0.0;
+        speciesRatesDerivatives( i, j ) = 0.0;
       }
     }
     for( IntType r=0; r<PARAMS_DATA::numReactions; ++r )
     {
       RealType const s_ir = params.stoichiometricMatrix( r, i );
-      primarySpeciesRates[i] += s_ir * reactionRates[r];
+      speciesRates[i] += s_ir * reactionRates[r];
       if constexpr ( CALCULATE_DERIVATIVES )
       {
         for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
         {
-          primarySpeciesRatesDerivatives( i, j ) += s_ir * reactionRatesDerivatives( r, j );
+          speciesRatesDerivatives( i, j ) += s_ir * reactionRatesDerivatives( r, j );
         }
       }
     }
   }
 }
 
+template< typename REAL_TYPE,
+          typename INT_TYPE,
+          typename INDEX_TYPE >
+template< typename PARAMS_DATA, 
+          typename ARRAY_1D,
+          typename ARRAY_1D_TO_CONST, 
+          typename ARRAY_2D > 
+HPCREACT_HOST_DEVICE inline void
+KineticReactions< REAL_TYPE,
+                  INT_TYPE,
+                  INDEX_TYPE
+                  >::timeStep( 
+                    RealType const dt,
+                    RealType const & temperature,
+                    PARAMS_DATA const & params,
+                    ARRAY_1D_TO_CONST const & speciesConcentration_n,
+                    ARRAY_1D & speciesConcentration,
+                    ARRAY_1D & speciesRates,
+                    ARRAY_2D & speciesRatesDerivatives )
+{
+//  constexpr int numReactions = PARAMS_DATA::numReactions;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies;
+
+
+
+
+  REAL_TYPE residualNorm = 0.0;
+  for( int k=0; k<10; ++k )
+  {
+    // printf( "iteration %2d: \n", k );
+
+    computeSpeciesRates( temperature, 
+                         params, 
+                         speciesConcentration, 
+                         speciesRates,
+                         speciesRatesDerivatives );
+
+    double residual[numSpecies] = { 0.0 };
+    double deltaPrimarySpeciesConcentration[numSpecies] = { 0.0 };
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      residual[i] = -(speciesConcentration[i] - speciesConcentration_n[i] - dt * speciesRates[i]);
+      for( int j = 0; j < numSpecies; ++j )
+      {
+        speciesRatesDerivatives( i, j ) = - dt * speciesRatesDerivatives( i, j );
+      }
+      speciesRatesDerivatives( i, i ) += 1.0;
+    }
+
+    residualNorm = 0.0;
+    for( int j = 0; j < numSpecies; ++j )
+    {
+      residualNorm += residual[j] * residual[j];
+    }
+    residualNorm = sqrt( residualNorm );
+    if( residualNorm < 1.0e-8 )
+    {
+      break;
+    }
+
+    solveNxN_pivoted<double,numSpecies>( speciesRatesDerivatives.data, residual, deltaPrimarySpeciesConcentration );
+
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      speciesConcentration[i] += deltaPrimarySpeciesConcentration[i];
+    }
+
+  }
+}
 } // namespace bulkGeneric
 } // namespace hpcReact
 

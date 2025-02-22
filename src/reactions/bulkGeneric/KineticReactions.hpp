@@ -28,13 +28,13 @@ public:
   static HPCREACT_HOST_DEVICE inline void
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
-                        ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
+                        ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & reactionRatesDerivatives )
   { 
     computeReactionRates_impl< PARAMS_DATA, true >( temperature, 
                                                          params, 
-                                                         primarySpeciesConcentration, 
+                                                         speciesConcentration, 
                                                          reactionRates, 
                                                          reactionRatesDerivatives );
   }
@@ -45,13 +45,13 @@ public:
   static HPCREACT_HOST_DEVICE inline void
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
-                        ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
+                        ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates)
   { 
     REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions][PARAMS_DATA::numSpecies] = { 0.0 };
     computeReactionRates_impl< PARAMS_DATA, false >( temperature, 
                                                           params, 
-                                                          primarySpeciesConcentration, 
+                                                          speciesConcentration, 
                                                           reactionRates, 
                                                           reactionRatesDerivatives );
   }
@@ -64,15 +64,15 @@ public:
   static HPCREACT_HOST_DEVICE inline void
   computeSpeciesRates( RealType const & temperature,
                        PARAMS_DATA const & params,
-                       ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
+                       ARRAY_1D_TO_CONST const & speciesConcentration,
                        ARRAY_1D & speciesRates,
-                       ARRAY_2D & primarySpeciesRatesDerivatives )
+                       ARRAY_2D & speciesRatesDerivatives )
   {
     computeSpeciesRates_impl< PARAMS_DATA, true >( temperature, 
                                                         params, 
-                                                        primarySpeciesConcentration, 
+                                                        speciesConcentration, 
                                                         speciesRates, 
-                                                        primarySpeciesRatesDerivatives );
+                                                        speciesRatesDerivatives );
   }
 
   template< typename PARAMS_DATA,
@@ -81,16 +81,29 @@ public:
   static HPCREACT_HOST_DEVICE inline void
   computeSpeciesRates( RealType const & temperature,
                        PARAMS_DATA const & params,
-                       ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
+                       ARRAY_1D_TO_CONST const & speciesConcentration,
                        ARRAY_1D & speciesRates )
   {
-    double primarySpeciesRatesDerivatives;
+    double speciesRatesDerivatives;
     computeSpeciesRates_impl< PARAMS_DATA, false >( temperature, 
                                                          params, 
-                                                         primarySpeciesConcentration, 
+                                                         speciesConcentration, 
                                                          speciesRates, 
-                                                         primarySpeciesRatesDerivatives );
+                                                         speciesRatesDerivatives );
   }
+
+  template< typename PARAMS_DATA,
+  typename ARRAY_1D,
+  typename ARRAY_1D_TO_CONST,
+  typename ARRAY_2D >
+  static HPCREACT_HOST_DEVICE void
+  timeStep(                     RealType const dt,
+    RealType const & temperature,
+            PARAMS_DATA const & params,
+            ARRAY_1D_TO_CONST const & speciesConcentration_n,
+            ARRAY_1D & speciesConcentration,
+            ARRAY_1D & speciesRates,
+            ARRAY_2D & speciesRatesDerivatives );
 
 
 private:
@@ -99,10 +112,10 @@ private:
             typename ARRAY_1D_TO_CONST, 
             typename ARRAY_1D, 
             typename ARRAY_2D >
-  static HPCREACT_HOST_DEVICE inline void
+  static HPCREACT_HOST_DEVICE void
   computeReactionRates_impl( RealType const & temperature,
                         PARAMS_DATA const & params,
-                        ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
+                        ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & reactionRatesDerivatives );
 
@@ -111,12 +124,12 @@ private:
             typename ARRAY_1D_TO_CONST, 
             typename ARRAY_1D, 
             typename ARRAY_2D > 
-  static HPCREACT_HOST_DEVICE inline void
+  static HPCREACT_HOST_DEVICE void
   computeSpeciesRates_impl( RealType const & temperature,
                             PARAMS_DATA const & params,
-                            ARRAY_1D_TO_CONST const & primarySpeciesConcentration,
+                            ARRAY_1D_TO_CONST const & speciesConcentration,
                             ARRAY_1D & speciesRates,
-                            ARRAY_2D & primarySpeciesRatesDerivatives );
+                            ARRAY_2D & speciesRatesDerivatives );
 
 };
 
