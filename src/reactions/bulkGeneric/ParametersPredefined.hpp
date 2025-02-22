@@ -134,5 +134,29 @@ um1Params =
   }, 
   um1Constants };
 
+
+  constexpr 
+  EquilibriumKineticsModelConstants< double, int, int, 2 > 
+  simpleTestRateConstants = 
+  {
+    { 1.0, 1.0 },
+    { 1.0, 0.5 },
+    { 1.0, 0.5 },
+  };
+  
+  constexpr 
+  ReactionsParameters< double, int, int, EquilibriumKineticsModelConstants, 5, 2 > 
+  simpleTestRateParams = 
+  { 
+    { 
+      { 
+        { -2,  1,  1,  0,  0 },
+        {  0,  0, -1, -1,  2 }
+      }
+    }, 
+    simpleTestRateConstants };
+
+
+
 } // namespace bulkGeneric
 } // namespace hpcReact

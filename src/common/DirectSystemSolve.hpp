@@ -1,10 +1,17 @@
 #include "macros.hpp"
 
 #include<cmath>
+
+namespace hpcReact
+{
 template< typename REAL_TYPE, int N >
 HPCREACT_HOST_DEVICE void solveNxN_pivoted(REAL_TYPE A[N][N], REAL_TYPE b[N], REAL_TYPE x[N]) 
 {
-    int pivot[3] = {0, 1, 2};  // Row index tracker
+    int pivot[N] = {0, 1, 2};  // Row index tracker
+    for (int i = 0; i < N; i++) 
+    {
+        pivot[i] = i;
+    }
 
     // **Step 1: Forward Elimination with Pivoting**
     for (int k = 0; k < N-1; k++) 
@@ -42,8 +49,14 @@ HPCREACT_HOST_DEVICE void solveNxN_pivoted(REAL_TYPE A[N][N], REAL_TYPE b[N], RE
     }
 
     // **Step 2: Back-Substitution**
-    x[2] = b[pivot[2]] / A[pivot[2]][2];
-    x[1] = (b[pivot[1]] - A[pivot[1]][2] * x[2]) / A[pivot[1]][1];
-    x[0] = (b[pivot[0]] - A[pivot[0]][1] * x[1] - A[pivot[0]][2] * x[2]) / A[pivot[0]][0];
+    for (int i = N - 1; i >= 0; --i) {
+        x[i] = b[pivot[i]];
+        for (int j = i + 1; j < N; j++) {
+            x[i] -= A[pivot[i]][j] * x[j];
+        }
+        x[i] /= A[pivot[i]][i]; // Normalize
 }
 
+}
+
+} // namespace hpcReact
