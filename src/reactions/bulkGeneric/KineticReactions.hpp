@@ -2,6 +2,12 @@
 
 #include "common/macros.hpp"
 
+/** @file KineticReactions.hpp
+ *  @brief Header file for the KineticReactions class.
+ *  @author HPC-REACT Team
+ *  @date 2023
+ */
+
 namespace hpcReact
 {
 namespace bulkGeneric
@@ -21,6 +27,9 @@ public:
   using IntType = INT_TYPE;
   using IndexType = INDEX_TYPE;
 
+  /**
+   * @copydoc KineticReactions::computeReactionRates_impl()
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D,
@@ -107,6 +116,36 @@ public:
 
 
 private:
+
+  /**
+   * @brief Compute the reaction rates for a given set of species concentrations.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam CALCULATE_DERIVATIVES Whether to calculate the derivatives of the reaction rates with respect to the species concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_1D The type of the array of reaction rates.
+   * @tparam ARRAY_2D The type of the array of reaction rates derivatives.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param speciesConcentration The array of species concentrations.
+   * @param reactionRates The array of reaction rates.
+   * @param reactionRatesDerivatives The array of reaction rates derivatives.
+   * @details 
+   *   This function computes the reaction rates for a given set of reactions.
+   *   If CALCULATE_DERIVATIVES is true, it also computes the derivatives of the reaction rates with respect to the species concentrations.
+   * 
+   * The expression for the reaction rate ( \f$ \dot{R}_r \f$ ) for reaction \f$ r \f$  is given by:
+   *  \f[
+          \dot{R}_r = k^f_{r} \prod_{ \mathclap{ \substack{ i = 1,...,N_s \\ \nu_{ri} < 0 } } } [C_i]^{-\nu_{ri}} 
+                    - k^r_{r} \prod_{ \mathclap{ \substack{ i = 1,...,N_s \\ \nu_{ri} > 0 } } } [C_i]^{\nu_{ri}}
+   *  \f]
+   * 
+   * The expression for the derivative of the reaction rate ( \f$ \frac{d\dot{R}_r}{dC_i} \f$ ) for reaction \f$ r \f$  is given by:
+   *  \f[
+   *    \frac{\partial \dot{R}_r}{ \partial [C]_i } = 
+   *      k^f_{r} \left( -\nu_{ri} [C_i]^{-\nu_{ri}-1 } \prod_{ \mathclap{ \substack{ j = 1,...,N_s \\ \nu_{rj} < 0, j \ne i } } } [C_j]^{-\nu_{rj}} \right )
+   *    - k^r_{r} \left(  \nu_{ri} [C_i]^{ \nu_{ri}-1 }  \prod_{ \mathclap{ \substack{ j = 1,...,N_s \\ \nu_{rj} > 0, j \ne i } } } [C_j]^{\nu_{rj}} \right )
+   *  \f]
+   */
   template< typename PARAMS_DATA, 
             bool CALCULATE_DERIVATIVES, 
             typename ARRAY_1D_TO_CONST, 

@@ -54,8 +54,9 @@ target_include_directories( hpcReact
 add_subdirectory( reactions/bulkDebyeHuckel/unitTests )
 add_subdirectory( reactions/bulkGeneric/unitTests )
 add_subdirectory( common/unitTests )
-
+add_subdirectory( docs )
 
 HPCReact_add_code_checks( PREFIX hpcReact
                           UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
                           EXCLUDES "blt/*" )
+

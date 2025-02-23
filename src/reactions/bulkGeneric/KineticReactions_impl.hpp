@@ -8,10 +8,17 @@
 #include <string>
 #include <iostream>
 
+/** @file KineticReactions_impl.hpp
+ *  @brief Header file for the KineticReactions implementation.
+ *  @author HPC-REACT Team
+ *  @date 2023
+ */
+
 namespace hpcReact
 {
 namespace bulkGeneric
 {
+
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
@@ -37,7 +44,7 @@ KineticReactions< REAL_TYPE,
     HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
   }
 
-
+  // loop over each reaction
   for( IntType r=0; r<PARAMS_DATA::numReactions; ++r )
   {
     reactionRates[r] = 0.0;
