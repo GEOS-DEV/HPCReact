@@ -59,6 +59,7 @@ KineticReactions< REAL_TYPE,
     {
       RealType productConcForward = 0.0;
       RealType productConcReverse = 0.0;
+
       // build the products for the forward and reverse reaction rates
       for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
       {
@@ -73,14 +74,27 @@ KineticReactions< REAL_TYPE,
           productConcReverse += s_ri * speciesConcentration[i];
         }
       }
+      
       reactionRates[r] = forwardRateConstant * exp( productConcForward ) 
                        - reverseRateConstant * exp( productConcReverse );
 
       if constexpr ( CALCULATE_DERIVATIVES )
       {
-        for( IntType j=0; j<PARAMS_DATA::numSpecies; ++j )
+        for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
         {
-          reactionRatesDerivatives( r, j ) = 0.0;
+          RealType const s_ri = params.stoichiometricMatrix( r, i );
+          if( s_ri < 0.0 )
+          {
+            reactionRatesDerivatives( r, i ) = forwardRateConstant * exp( productConcForward ) * (-s_ri);
+          }
+          else if( s_ri > 0.0 )
+          {
+            reactionRatesDerivatives( r, i ) = - reverseRateConstant * exp( productConcReverse ) * s_ri;
+          }
+          else
+          {
+            reactionRatesDerivatives( r, i ) = 0.0;
+          }
         }
       }
     }
