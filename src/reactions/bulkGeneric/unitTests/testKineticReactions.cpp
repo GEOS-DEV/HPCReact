@@ -9,43 +9,71 @@
 using namespace hpcReact;
 using namespace hpcReact::bulkGeneric;
 
-// TEST( bulkGeneric, test_computeReactionRates )
-// {
-//   using KineticReactionsType = KineticReactions< double, 
-//                                                  double * const,
-//                                                  double const * const, 
-//                                                  int, 
-//                                                  int >;
 
-//   double const temperature = 298.15;
-//   double speciesConcentration[6] = { 0.01, 0.01, 0.01, 0.01, 0.01, 1.0 };
-//   double speciesRates[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-  
-//   KineticReactionsType::computeReactionRates( temperature, 
-//                                               bicarbonateBuffer, 
-//                                               speciesConcentration, 
-//                                               speciesRates );
+template< typename REAL_TYPE,
+          bool LOGE_CONCENTRATION >
+void computeReactionRatesTest()
+{
+  using KineticReactionsType = KineticReactions< REAL_TYPE, 
+                                                 int, 
+                                                 int,
+                                                 LOGE_CONCENTRATION >;
 
-//   printf( "speciesRates = {%8.4e, %8.4e, %8.4e, %8.4e, %8.4e, %8.4e }\n", 
-//           speciesRates[0],
-//           speciesRates[1],
-//           speciesRates[2],
-//           speciesRates[3],
-//           speciesRates[4],
-//           speciesRates[5] );
-//   // EXPECT_NEAR( speciesRates[0], 0.0, 1.0e-8 );
-//   // EXPECT_NEAR( speciesRates[1], 0.0, 1.0e-8 );
-//   // EXPECT_NEAR( speciesRates[2], 0.0, 1.0e-8 );
-//   // EXPECT_NEAR( speciesRates[3], 0.0, 1.0e-8 );
-//   // EXPECT_NEAR( speciesRates[4], 0.0, 1.0e-8 );
-  
-// }
+  constexpr int numSpecies = decltype(simpleTestRateParams)::numSpecies;
+  constexpr int numReactions = decltype(simpleTestRateParams)::numReactions;
+
+  double const temperature = 298.15;
+  double speciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+  double speciesRates[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+  CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
+
+  if constexpr ( LOGE_CONCENTRATION )
+  {
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      speciesConcentration[i] = log( speciesConcentration[i] );
+    }
+  }
+
+  KineticReactionsType::computeReactionRates( temperature,
+                                              simpleTestRateParams,
+                                              speciesConcentration,
+                                              speciesRates,
+                                              reactionRatesDerivatives );
+
+  EXPECT_NEAR( speciesRates[0], 1.0, 1.0e-8 );
+  EXPECT_NEAR( speciesRates[1], 0.25, 1.0e-8 );
+  EXPECT_NEAR( speciesRates[2], 0.0, 1.0e-8 );
+  EXPECT_NEAR( speciesRates[3], 0.0, 1.0e-8 );
+  EXPECT_NEAR( speciesRates[4], 0.0, 1.0e-8 );
+
+  EXPECT_NEAR( reactionRatesDerivatives(0,0),  2.0, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(0,1), -0.5, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(0,2),  0.0, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(0,3),  0.0, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(0,4),  0.0, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(1,0),  0.0, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(1,1),  0.0, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(1,2),  0.5, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(1,3),  0.25, 1.0e-8 );
+  EXPECT_NEAR( reactionRatesDerivatives(1,4),  0.0, 1.0e-8 );
+
+}
+
+
+TEST( bulkGeneric, computeReactionRatesTest )
+{
+  computeReactionRatesTest< double, false >();
+  computeReactionRatesTest< double, true >();
+}
+
 
 TEST( bulkGeneric, test_computeReactionRatesIntegral )
 {
   using KineticReactionsType = KineticReactions< double, 
                                                  int, 
-                                                 int >;
+                                                 int,
+                                                 false >;
 
   double const temperature = 298.15;
   double speciesConcentration[] = { 1.0, 0.0, 0.5, 1.0, 0.0 };
@@ -56,7 +84,7 @@ TEST( bulkGeneric, test_computeReactionRatesIntegral )
 //  constexpr int numReactions = decltype(simpleTestRateParams)::numReactions;
 
 
-  double time = 0.0;
+//  double time = 0.0;
   for( int t = 0; t < 10; ++t )
   {
     CArrayWrapper<double,5,5> speciesRateDerivatives;
@@ -142,16 +170,16 @@ TEST( bulkGeneric, test_computeReactionRatesIntegral )
 
     }
 
-    time += dt;
+//    time += dt;
 //    if( i % 10 == 0 )
     {
-      printf( " time : residual = %4.1f : % 8.4e { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n", 
-              time, residualNorm,
-              speciesConcentration[0],
-              speciesConcentration[1],
-              speciesConcentration[2],
-              speciesConcentration[3],
-              speciesConcentration[4] );
+      // printf( " time : residual = %4.1f : % 8.4e { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n", 
+      //         time, residualNorm,
+      //         speciesConcentration[0],
+      //         speciesConcentration[1],
+      //         speciesConcentration[2],
+      //         speciesConcentration[3],
+      //         speciesConcentration[4] );
     }
   }
 
@@ -167,7 +195,8 @@ TEST( bulkGeneric, test_timeStep )
 {
   using KineticReactionsType = KineticReactions< double, 
                                                  int, 
-                                                 int >;
+                                                 int,
+                                                 false >;
 
   double const temperature = 298.15;
   double speciesConcentration[] = { 1.0, 0.0, 0.5, 1.0, 0.0 };
@@ -177,7 +206,7 @@ TEST( bulkGeneric, test_timeStep )
   constexpr int numSpecies = decltype(simpleTestRateParams)::numSpecies;
 
 
-  double time = 0.0;
+//  double time = 0.0;
   for( int t = 0; t < 10; ++t )
   {
     CArrayWrapper<double,numSpecies,numSpecies> speciesRateDerivatives;
@@ -197,16 +226,16 @@ TEST( bulkGeneric, test_timeStep )
                                     speciesRates,
                                     speciesRateDerivatives );
 
-    time += dt;
+//    time += dt;
     
     {
-      printf( " time = %4.1f { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n", 
-              time,
-              speciesConcentration[0],
-              speciesConcentration[1],
-              speciesConcentration[2],
-              speciesConcentration[3],
-              speciesConcentration[4] );
+      // printf( " time = %4.1f { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n", 
+      //         time,
+      //         speciesConcentration[0],
+      //         speciesConcentration[1],
+      //         speciesConcentration[2],
+      //         speciesConcentration[3],
+      //         speciesConcentration[4] );
     }
   }
 

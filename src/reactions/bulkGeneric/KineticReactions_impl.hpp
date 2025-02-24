@@ -22,7 +22,8 @@ namespace bulkGeneric
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA, 
           bool CALCULATE_DERIVATIVES,
           typename ARRAY_1D_TO_CONST, 
@@ -31,7 +32,8 @@ template< typename PARAMS_DATA,
 HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
-                  INDEX_TYPE
+                  INDEX_TYPE,
+                  LOGE_CONCENTRATION
                   >::computeReactionRates_impl( RealType const & ,//temperature,
                                                 PARAMS_DATA const & params,
                                                 ARRAY_1D_TO_CONST const & speciesConcentration,
@@ -47,93 +49,122 @@ KineticReactions< REAL_TYPE,
   // loop over each reaction
   for( IntType r=0; r<PARAMS_DATA::numReactions; ++r )
   {
+    // set reaction rate to zero
     reactionRates[r] = 0.0;
+    // get/calculate the forward and reverse rate constants for this reaction
     RealType const forwardRateConstant = params.rateConstantForward(r) ;//* exp( -params.m_activationEnergy[r] / ( constants::R * temperature ) );
     RealType const reverseRateConstant = params.rateConstantReverse(r) ;
 
-    RealType productConcForward = 1.0;
-    RealType productConcReverse = 1.0;
-
-    RealType dProductConcForward_dC[PARAMS_DATA::numSpecies];
-    RealType dProductConcReverse_dC[PARAMS_DATA::numSpecies];
-    for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+    if constexpr ( LOGE_CONCENTRATION )
     {
-      dProductConcForward_dC[i] = 1.0;
-      dProductConcReverse_dC[i] = 1.0;
-    }
-
-    for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
-    {
-
-      RealType const s_ri = params.stoichiometricMatrix( r, i );
-      RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], abs(s_ri) ) : 0.0;
-      
-      if( s_ri < 0.0 )
+      RealType productConcForward = 0.0;
+      RealType productConcReverse = 0.0;
+      // build the products for the forward and reverse reaction rates
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
       {
-        productConcForward *= productTerm_i;
-      }
-      else if( s_ri > 0.0 )
-      {
-        productConcReverse *= productTerm_i;
-      }
-      
-      if constexpr ( CALCULATE_DERIVATIVES )
-      {
-
+        RealType const s_ri = params.stoichiometricMatrix( r, i );
+        
         if( s_ri < 0.0 )
         {
-          for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
-          {
-            if( i==j )
-            {
-              dProductConcForward_dC[j] *= -s_ri * pow( speciesConcentration[i], -s_ri-1 );
-              dProductConcReverse_dC[j] = 0.0;
-            }
-            else
-            {
-              dProductConcForward_dC[j] *= productTerm_i;
-            }
-          }
+          productConcForward += (-s_ri) * speciesConcentration[i];
         }
         else if( s_ri > 0.0 )
         {
-          for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
-          {  
-            if( i==j )
-            {
-              dProductConcReverse_dC[j] *= s_ri * pow( speciesConcentration[i], s_ri-1 );
-              dProductConcForward_dC[j] = 0.0;
-            }
-            else
-            {
-              dProductConcReverse_dC[j] *= productTerm_i;
-            }
-          }
+          productConcReverse += s_ri * speciesConcentration[i];
         }
-        else
+      }
+      reactionRates[r] = forwardRateConstant * exp( productConcForward ) 
+                       - reverseRateConstant * exp( productConcReverse );
+
+      if constexpr ( CALCULATE_DERIVATIVES )
+      {
+        for( IntType j=0; j<PARAMS_DATA::numSpecies; ++j )
         {
-          dProductConcForward_dC[i] = 0.0;
-          dProductConcReverse_dC[i] = 0.0;
+          reactionRatesDerivatives( r, j ) = 0.0;
         }
       }
     }
-
-    
-    reactionRates[r] = forwardRateConstant * productConcForward - reverseRateConstant * productConcReverse;
-//    printf( " kf, kr, reactionRates[%2d] = % 8.4e, % 8.4e, % 8.4e\n", r, forwardRateConstant, reverseRateConstant, reactionRates[r] );
-
-
-    if constexpr( CALCULATE_DERIVATIVES )
+    else
     {
+      // variables used to build the product terms for the forward and reverse reaction rates
+      RealType productConcForward = 1.0;
+      RealType productConcReverse = 1.0;
+
+      RealType dProductConcForward_dC[PARAMS_DATA::numSpecies];
+      RealType dProductConcReverse_dC[PARAMS_DATA::numSpecies];
       for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
       {
-        reactionRatesDerivatives( r, i ) = forwardRateConstant * dProductConcForward_dC[i] - reverseRateConstant * dProductConcReverse_dC[i];
-//        printf( " dR%ddC%d = % 3.1f * %3.2f - %3.1f * % 3.2f = % 3.2f \n", r, i, forwardRateConstant, dProductConcForward_dC[i], reverseRateConstant, dProductConcReverse_dC[i], reactionRatesDerivatives( r, i ) );
+        dProductConcForward_dC[i] = 1.0;
+        dProductConcReverse_dC[i] = 1.0;
       }
-    }
 
+      // build the products for the forward and reverse reaction rates
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+      {
 
-  }
+        RealType const s_ri = params.stoichiometricMatrix( r, i );
+        RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], abs(s_ri) ) : 0.0;
+        
+        if( s_ri < 0.0 )
+        {
+          productConcForward *= productTerm_i;
+        }
+        else if( s_ri > 0.0 )
+        {
+          productConcReverse *= productTerm_i;
+        }
+        
+        if constexpr ( CALCULATE_DERIVATIVES )
+        {
+
+          if( s_ri < 0.0 )
+          {
+            for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
+            {
+              if( i==j )
+              {
+                dProductConcForward_dC[j] *= -s_ri * pow( speciesConcentration[i], -s_ri-1 );
+                dProductConcReverse_dC[j] = 0.0;
+              }
+              else
+              {
+                dProductConcForward_dC[j] *= productTerm_i;
+              }
+            }
+          }
+          else if( s_ri > 0.0 )
+          {
+            for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
+            {  
+              if( i==j )
+              {
+                dProductConcReverse_dC[j] *= s_ri * pow( speciesConcentration[i], s_ri-1 );
+                dProductConcForward_dC[j] = 0.0;
+              }
+              else
+              {
+                dProductConcReverse_dC[j] *= productTerm_i;
+              }
+            }
+          }
+          else
+          {
+            dProductConcForward_dC[i] = 0.0;
+            dProductConcReverse_dC[i] = 0.0;
+          }
+        }
+      }
+      reactionRates[r] = forwardRateConstant * productConcForward - reverseRateConstant * productConcReverse;
+
+      if constexpr( CALCULATE_DERIVATIVES )
+      {
+        for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+        {
+          reactionRatesDerivatives( r, i ) = forwardRateConstant * dProductConcForward_dC[i] - reverseRateConstant * dProductConcReverse_dC[i];
+        }
+      }
+    } // end of if constexpr ( LOGE_CONCENTRATION )
+  } // end of loop over reactions
 }
 
 
@@ -146,7 +177,8 @@ KineticReactions< REAL_TYPE,
 // function to  the reaction rate. Includes impact of temperature, concentration, surface area, volume fraction and porosity
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA, 
           bool CALCULATE_DERIVATIVES,
           typename ARRAY_1D_TO_CONST, 
@@ -155,7 +187,8 @@ template< typename PARAMS_DATA,
 HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
-                  INDEX_TYPE
+                  INDEX_TYPE,
+                  LOGE_CONCENTRATION
                   >::computeSpeciesRates_impl( RealType const & temperature,
                                            PARAMS_DATA const & params,
                                            ARRAY_1D_TO_CONST const & speciesConcentration,
@@ -199,7 +232,8 @@ KineticReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA, 
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST, 
@@ -207,7 +241,8 @@ template< typename PARAMS_DATA,
 HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
-                  INDEX_TYPE
+                  INDEX_TYPE,
+                  LOGE_CONCENTRATION
                   >::timeStep( 
                     RealType const dt,
                     RealType const & temperature,

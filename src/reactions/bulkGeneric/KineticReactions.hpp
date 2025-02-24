@@ -15,15 +15,13 @@ namespace bulkGeneric
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          bool LOGE_CONCENTRATION >
 class KineticReactions
 {
 public:
 
   using RealType = REAL_TYPE;
-  // using RealDataArrayView1d = REAL_DATA_ARRAY_1D_VIEW_TYPE;
-  // using RealConstDataArrayView1d = REAL_CONST_DATA_ARRAY_1D_VIEW_TYPE;
-  // using RealDataArrayView2d = REAL_DATA_ARRAY_2D_VIEW_TYPE;
   using IntType = INT_TYPE;
   using IndexType = INDEX_TYPE;
 
@@ -57,7 +55,7 @@ public:
                         ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates)
   { 
-    REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions][PARAMS_DATA::numSpecies] = { 0.0 };
+    REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions][PARAMS_DATA::numSpecies] = { {0.0} };
     computeReactionRates_impl< PARAMS_DATA, false >( temperature, 
                                                           params, 
                                                           speciesConcentration, 
@@ -93,7 +91,7 @@ public:
                        ARRAY_1D_TO_CONST const & speciesConcentration,
                        ARRAY_1D & speciesRates )
   {
-    double speciesRatesDerivatives;
+    char speciesRatesDerivatives;
     computeSpeciesRates_impl< PARAMS_DATA, false >( temperature, 
                                                          params, 
                                                          speciesConcentration, 
