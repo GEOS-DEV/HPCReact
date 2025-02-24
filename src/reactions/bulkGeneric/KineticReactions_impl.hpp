@@ -256,15 +256,13 @@ HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
                   INDEX_TYPE,
-                  LOGE_CONCENTRATION
-                  >::timeStep( 
-                    RealType const dt,
-                    RealType const & temperature,
-                    PARAMS_DATA const & params,
-                    ARRAY_1D_TO_CONST const & speciesConcentration_n,
-                    ARRAY_1D & speciesConcentration,
-                    ARRAY_1D & speciesRates,
-                    ARRAY_2D & speciesRatesDerivatives )
+                  LOGE_CONCENTRATION >::timeStep( RealType const dt,
+                                                  RealType const & temperature,
+                                                  PARAMS_DATA const & params,
+                                                  ARRAY_1D_TO_CONST const & speciesConcentration_n,
+                                                  ARRAY_1D & speciesConcentration,
+                                                  ARRAY_1D & speciesRates,
+                                                  ARRAY_2D & speciesRatesDerivatives )
 {
 //  constexpr int numReactions = PARAMS_DATA::numReactions;
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
@@ -285,15 +283,42 @@ KineticReactions< REAL_TYPE,
 
     double residual[numSpecies] = { 0.0 };
     double deltaPrimarySpeciesConcentration[numSpecies] = { 0.0 };
+
+    // form residual and Jacobian
     for( int i = 0; i < numSpecies; ++i )
     {
-      residual[i] = -(speciesConcentration[i] - speciesConcentration_n[i] - dt * speciesRates[i]);
+
+
+      RealType nonLogC;
+      RealType nonLogC_n;
+      if constexpr( LOGE_CONCENTRATION )
+      {
+        nonLogC = exp( speciesConcentration[i] );
+        nonLogC_n = exp( speciesConcentration_n[i] );
+      }
+      else
+      {
+        nonLogC = speciesConcentration[i];
+        nonLogC_n = speciesConcentration_n[i];
+      }
+      residual[i] = -(nonLogC - nonLogC_n - dt * speciesRates[i]);
+
+
       for( int j = 0; j < numSpecies; ++j )
       {
         speciesRatesDerivatives( i, j ) = - dt * speciesRatesDerivatives( i, j );
       }
-      speciesRatesDerivatives( i, i ) += 1.0;
+      if constexpr( LOGE_CONCENTRATION )
+      {
+        speciesRatesDerivatives( i, i ) += nonLogC;
+      }
+      else
+      {
+        speciesRatesDerivatives( i, i ) += 1.0;
+      }
     }
+
+
 
     residualNorm = 0.0;
     for( int j = 0; j < numSpecies; ++j )
@@ -301,16 +326,39 @@ KineticReactions< REAL_TYPE,
       residualNorm += residual[j] * residual[j];
     }
     residualNorm = sqrt( residualNorm );
-    if( residualNorm < 1.0e-8 )
+    if( residualNorm < 1.0e-14 )
     {
       break;
     }
+
+
+//     printf( "residual = { ");
+//     for( int i = 0; i < numSpecies; ++i )
+//     {
+//       printf( " %g, ", residual[i] );
+//     }
+//     printf( "}\n" );
+
+//     printf( "Jacobian = { \n" );
+//     for( int i = 0; i < numSpecies; ++i )
+//     {
+//       printf( " { ");
+//       for( int j = 0; j < numSpecies; ++j )
+//       {
+//         printf( " %g ", speciesRatesDerivatives( i, j ) );
+// //        printf( " %g ", speciesRatesDerivatives( i, j ) / exp(speciesConcentration[j]) );
+//         if( j < numSpecies-1 ) { printf( ", " ); }
+//       }
+//       printf( "}, \n" );
+//     }
+//     printf( "}\n" );
 
     solveNxN_pivoted<double,numSpecies>( speciesRatesDerivatives.data, residual, deltaPrimarySpeciesConcentration );
 
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] += deltaPrimarySpeciesConcentration[i];
+//      printf( "species %2d: concentration = %e, residual = %e, delta = %e \n", i, speciesConcentration[i], residual[i], deltaPrimarySpeciesConcentration[i] );
+      speciesConcentration[i] = speciesConcentration[i] + deltaPrimarySpeciesConcentration[i];
     }
 
   }

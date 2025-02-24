@@ -2,6 +2,7 @@
 #include "../KineticReactions_impl.hpp"
 #include "../ParametersPredefined.hpp"
 #include "common/DirectSystemSolve.hpp"
+#include "common/macros.hpp"
 
 #include <gtest/gtest.h>
 
@@ -10,216 +11,215 @@ using namespace hpcReact;
 using namespace hpcReact::bulkGeneric;
 
 
+//******************************************************************************
 template< typename REAL_TYPE,
-          bool LOGE_CONCENTRATION >
-void computeReactionRatesTest()
+          bool LOGE_CONCENTRATION,
+          typename PARAMS_DATA >
+void computeReactionRatesTest( PARAMS_DATA const & params,
+                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
+                               REAL_TYPE const (&expectedReactionRates)[PARAMS_DATA::numReactions],
+                               REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions][PARAMS_DATA::numSpecies] )
 {
   using KineticReactionsType = KineticReactions< REAL_TYPE, 
                                                  int, 
                                                  int,
                                                  LOGE_CONCENTRATION >;
 
-  constexpr int numSpecies = decltype(simpleTestRateParams)::numSpecies;
-  constexpr int numReactions = decltype(simpleTestRateParams)::numReactions;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies;
+  constexpr int numReactions = PARAMS_DATA::numReactions;
 
   double const temperature = 298.15;
-  double speciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
-  double speciesRates[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-  CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
+  double speciesConcentration[numSpecies];
 
   if constexpr ( LOGE_CONCENTRATION )
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = log( speciesConcentration[i] );
+      speciesConcentration[i] = log( initialSpeciesConcentration[i] );
+    }
+  }
+  else
+  {
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      speciesConcentration[i] = initialSpeciesConcentration[i];
     }
   }
 
-  KineticReactionsType::computeReactionRates( temperature,
-                                              simpleTestRateParams,
+  double reactionRates[numReactions] = { 0.0 };
+  CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
+
+
+KineticReactionsType::computeReactionRates( temperature,
+                                              params,
                                               speciesConcentration,
-                                              speciesRates,
+                                              reactionRates,
                                               reactionRatesDerivatives );
 
-  EXPECT_NEAR( speciesRates[0], 1.0, 1.0e-8 );
-  EXPECT_NEAR( speciesRates[1], 0.25, 1.0e-8 );
-  EXPECT_NEAR( speciesRates[2], 0.0, 1.0e-8 );
-  EXPECT_NEAR( speciesRates[3], 0.0, 1.0e-8 );
-  EXPECT_NEAR( speciesRates[4], 0.0, 1.0e-8 );
-
-
-  if constexpr ( LOGE_CONCENTRATION )
+  for( int r=0; r<numReactions; ++r )
   {
-    for( int i = 0; i < numReactions; ++i )
-    {
-      for( int j = 0; j < numSpecies; ++j )
-      {
-        reactionRatesDerivatives( i, j ) = reactionRatesDerivatives( i, j ) * exp( -speciesConcentration[j] );
-      }
-    }
+    EXPECT_NEAR( reactionRates[r], expectedReactionRates[r], 1.0e-8 );
   }
 
-  EXPECT_NEAR( reactionRatesDerivatives(0,0),  2.0, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(0,1), -0.5, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(0,2),  0.0, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(0,3),  0.0, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(0,4),  0.0, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(1,0),  0.0, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(1,1),  0.0, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(1,2),  0.5, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(1,3),  0.25, 1.0e-8 );
-  EXPECT_NEAR( reactionRatesDerivatives(1,4),  0.0, 1.0e-8 );
-
+  for( int r = 0; r < numReactions; ++r )
+  {
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      if constexpr ( LOGE_CONCENTRATION )
+      {
+        reactionRatesDerivatives( r, i ) = reactionRatesDerivatives( r, i ) * exp( -speciesConcentration[i] );
+      }
+      EXPECT_NEAR( reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], 1.0e-8 );
+    }
+  }
 }
 
 
+//******************************************************************************
 TEST( bulkGeneric, computeReactionRatesTest )
 {
-//  computeReactionRatesTest< double, false >();
-  computeReactionRatesTest< double, true >();
+  double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+  double const expectedReactionRates[] = { 1.0, 0.25 };
+  double const expectedReactionRatesDerivatives[][5] = { { 2.0, -0.5, 0.0, 0.0, 0.0 },
+                                                          { 0.0, 0.0, 0.5, 0.25, 0.0 } };
+  computeReactionRatesTest< double, false >( simpleTestRateParams,
+                                             initialSpeciesConcentration,
+                                             expectedReactionRates,
+                                             expectedReactionRatesDerivatives );
+  computeReactionRatesTest< double, true >( simpleTestRateParams,
+                                            initialSpeciesConcentration,
+                                            expectedReactionRates,
+                                            expectedReactionRatesDerivatives );
 }
 
 
-TEST( bulkGeneric, test_computeReactionRatesIntegral )
+
+
+
+//******************************************************************************
+template< typename REAL_TYPE,
+          bool LOGE_CONCENTRATION,
+          typename PARAMS_DATA >
+void computeSpeciesRatesTest( PARAMS_DATA const & params,
+                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
+                               REAL_TYPE const (&expectedSpeciesRates)[PARAMS_DATA::numSpecies],
+                               REAL_TYPE const (&expectedSpeciesRatesDerivatives)[PARAMS_DATA::numSpecies][PARAMS_DATA::numSpecies] )
 {
-  using KineticReactionsType = KineticReactions< double, 
+
+  using KineticReactionsType = KineticReactions< REAL_TYPE, 
                                                  int, 
                                                  int,
-                                                 false >;
+                                                 LOGE_CONCENTRATION >;
+
+  constexpr int numSpecies = PARAMS_DATA::numSpecies;
 
   double const temperature = 298.15;
-  double speciesConcentration[] = { 1.0, 0.0, 0.5, 1.0, 0.0 };
-  double speciesRates[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-
-  constexpr double dt = 2.0;
-  constexpr int numSpecies = decltype(simpleTestRateParams)::numSpecies;
-//  constexpr int numReactions = decltype(simpleTestRateParams)::numReactions;
-
-
-//  double time = 0.0;
-  for( int t = 0; t < 10; ++t )
+  double speciesConcentration[numSpecies];
+  double speciesRates[numSpecies] = { 0.0 };
+  CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
+  
+  if constexpr ( LOGE_CONCENTRATION )
   {
-    CArrayWrapper<double,5,5> speciesRateDerivatives;
-    double speciesConcentration_n[] = { speciesConcentration[0], 
-                                               speciesConcentration[1], 
-                                               speciesConcentration[2], 
-                                               speciesConcentration[3], 
-                                               speciesConcentration[4] };
-
-
-
-    double residualNorm = 0.0;
-    for( int k=0; k<10; ++k )
+    for( int i = 0; i < numSpecies; ++i )
     {
-      // printf( "iteration %2d: \n", k );
-
-      KineticReactionsType::computeSpeciesRates( temperature, 
-                                                 simpleTestRateParams, 
-                                                 speciesConcentration, 
-                                                 speciesRates,
-                                                 speciesRateDerivatives );
-
-      double residual[numSpecies] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-      double deltaPrimarySpeciesConcentration[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-
-      for( int i = 0; i < numSpecies; ++i )
-      {
-        residual[i] = -(speciesConcentration[i] - speciesConcentration_n[i] - dt * speciesRates[i]);
-        for( int j = 0; j < numSpecies; ++j )
-        {
-          speciesRateDerivatives( i, j ) = - dt * speciesRateDerivatives( i, j );
-        }
-        speciesRateDerivatives( i, i ) += 1.0;
-      }
-
-      residualNorm = 0.0;
-      for( int j = 0; j < numSpecies; ++j )
-      {
-        residualNorm += residual[j] * residual[j];
-      }
-      residualNorm = sqrt( residualNorm );
-      // printf( "     residual = { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e } -> ||% 8.4e||\n", 
-      //         residual[0],
-      //         residual[1],
-      //         residual[2],
-      //         residual[3],
-      //         residual[4],
-      //         residualNorm );
-      if( residualNorm < 1.0e-8 )
-      {
-        break;
-      }
-      // printf(    "dR/dC :\n" );
-      // for( int i = 0; i < numSpecies; ++i )
-      // {
-      //   printf( "                | % 6.3g, % 6.3g, % 6.3g, % 6.3g, % 6.3g |\n", 
-      //           speciesRateDerivatives( i, 0 ),
-      //           speciesRateDerivatives( i, 1 ),
-      //           speciesRateDerivatives( i, 2 ),
-      //           speciesRateDerivatives( i, 3 ),
-      //           speciesRateDerivatives( i, 4 ) );
-      // }
-
-      solveNxN_pivoted<double,numSpecies>( speciesRateDerivatives.data, residual, deltaPrimarySpeciesConcentration );
-
-      // printf( "       deltaC = { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n", 
-      //   deltaPrimarySpeciesConcentration[0],
-      //   deltaPrimarySpeciesConcentration[1],
-      //   deltaPrimarySpeciesConcentration[2],
-      //   deltaPrimarySpeciesConcentration[3],
-      //   deltaPrimarySpeciesConcentration[4] );
-      for( int i = 0; i < numSpecies; ++i )
-      {
-        speciesConcentration[i] += deltaPrimarySpeciesConcentration[i];
-      }
-      // printf( "        C_k+1 = { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n\n", 
-      //   speciesConcentration[0],
-      //   speciesConcentration[1],
-      //   speciesConcentration[2],
-      //   speciesConcentration[3],
-      //   speciesConcentration[4] );
-
-
-    }
-
-//    time += dt;
-//    if( i % 10 == 0 )
-    {
-      // printf( " time : residual = %4.1f : % 8.4e { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n", 
-      //         time, residualNorm,
-      //         speciesConcentration[0],
-      //         speciesConcentration[1],
-      //         speciesConcentration[2],
-      //         speciesConcentration[3],
-      //         speciesConcentration[4] );
+      speciesConcentration[i] = log( initialSpeciesConcentration[i] );
     }
   }
+  else
+  {
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      speciesConcentration[i] = initialSpeciesConcentration[i];
+    }  
+  }
 
-  EXPECT_NEAR( speciesConcentration[0], 3.92138294e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[1], 3.03930853e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[2], 5.05945481e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[3], 7.02014628e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[4], 5.95970745e-01, 1.0e-4 );
+  KineticReactionsType::computeSpeciesRates( temperature,
+                                             params,
+                                              speciesConcentration,
+                                              speciesRates,
+                                              speciesRatesDerivatives );
 
+
+  for( int r=0; r<numSpecies; ++r )
+  {
+    EXPECT_NEAR( speciesRates[r], expectedSpeciesRates[r], 1.0e-8 );
+  }
+
+  for( int i = 0; i < numSpecies; ++i )
+  {
+    for( int j = 0; j < numSpecies; ++j )
+    {
+      if constexpr ( LOGE_CONCENTRATION )
+      {
+        speciesRatesDerivatives( i, j ) = speciesRatesDerivatives( i, j ) * exp( -speciesConcentration[j] );
+      }
+      EXPECT_NEAR( speciesRatesDerivatives( i, j ), expectedSpeciesRatesDerivatives[i][j], 1.0e-8 );
+    }
+  }
 }
 
-TEST( bulkGeneric, test_timeStep )
+TEST( bulkGeneric, computeSpeciesRatesTest )
+{
+  double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+  double const expectedSpeciesRates[5] = { -2.0, 1.0, 0.75, -0.25, 0.5 };
+  double const expectedSpeciesRatesDerivatives[5][5] = { { -4.0,  1.0,  0.0,   0.0, 0.0 }, 
+                                                         {  2.0, -0.5,  0.0,   0.0, 0.0 }, 
+                                                         {  2.0, -0.5, -0.5, -0.25, 0.0 }, 
+                                                         {  0.0,  0.0, -0.5, -0.25, 0.0 }, 
+                                                         {  0.0,  0.0,  1.0,   0.5, 0.0 } };
+
+  computeSpeciesRatesTest< double, false >( simpleTestRateParams,
+                                             initialSpeciesConcentration,
+                                             expectedSpeciesRates,
+                                             expectedSpeciesRatesDerivatives );
+
+  computeSpeciesRatesTest< double, true >( simpleTestRateParams,
+                                              initialSpeciesConcentration,
+                                              expectedSpeciesRates,
+                                              expectedSpeciesRatesDerivatives );
+ 
+}
+
+//******************************************************************************
+template< typename REAL_TYPE,
+          bool LOGE_CONCENTRATION,
+          typename PARAMS_DATA >
+void timeStepTest( PARAMS_DATA const & params,
+                   REAL_TYPE const dt,
+                   int const numSteps,
+                   REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
+                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies],
+                   REAL_TYPE const (&expectedSpeciesRates)[PARAMS_DATA::numSpecies],
+                   REAL_TYPE const (&expectedSpeciesRatesDerivatives)[PARAMS_DATA::numSpecies][PARAMS_DATA::numSpecies] )
 {
   using KineticReactionsType = KineticReactions< double, 
                                                  int, 
                                                  int,
-                                                 false >;
+                                                 LOGE_CONCENTRATION >;
 
+  constexpr int numSpecies = PARAMS_DATA::numSpecies;
   double const temperature = 298.15;
-  double speciesConcentration[] = { 1.0, 0.0, 0.5, 1.0, 0.0 };
+
+  double speciesConcentration[numSpecies];
+  if constexpr ( LOGE_CONCENTRATION )
+  {
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      speciesConcentration[i] = log( initialSpeciesConcentration[i] );
+    }
+  }
+  else
+  {
+    for( int i = 0; i < numSpecies; ++i )
+    {
+      speciesConcentration[i] = initialSpeciesConcentration[i];
+    }  
+  }
+
   double speciesRates[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
 
-  constexpr double dt = 2.0;
-  constexpr int numSpecies = decltype(simpleTestRateParams)::numSpecies;
-
-
-//  double time = 0.0;
-  for( int t = 0; t < 10; ++t )
+  double time = 0.0;
+  for( int t = 0; t < numSteps; ++t )
   {
     CArrayWrapper<double,numSpecies,numSpecies> speciesRateDerivatives;
     double speciesConcentration_n[] = { speciesConcentration[0], 
@@ -232,115 +232,66 @@ TEST( bulkGeneric, test_timeStep )
 
     KineticReactionsType::timeStep( dt, 
                                     temperature, 
-                                    simpleTestRateParams, 
+                                    params, 
                                     speciesConcentration_n, 
                                     speciesConcentration, 
                                     speciesRates,
                                     speciesRateDerivatives );
 
-//    time += dt;
-    
-    {
-      // printf( " time = %4.1f { % 8.4e, % 8.4e, % 8.4e, % 8.4e, % 8.4e }\n", 
-      //         time,
-      //         speciesConcentration[0],
-      //         speciesConcentration[1],
-      //         speciesConcentration[2],
-      //         speciesConcentration[3],
-      //         speciesConcentration[4] );
-    }
+    time += dt;
   }
 
-  EXPECT_NEAR( speciesConcentration[0], 3.92138294e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[1], 3.03930853e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[2], 5.05945481e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[3], 7.02014628e-01, 1.0e-4 );
-  EXPECT_NEAR( speciesConcentration[4], 5.95970745e-01, 1.0e-4 );
+  HPCREACT_UNUSED_VAR( expectedSpeciesRates );
+  HPCREACT_UNUSED_VAR( expectedSpeciesConcentrations);
+  HPCREACT_UNUSED_VAR( expectedSpeciesRatesDerivatives );
+  EXPECT_NEAR( time, dt*numSteps, 1.0e-8 );
 
+  for( int i = 0; i < numSpecies; ++i )
+  {
+    if constexpr ( LOGE_CONCENTRATION )
+    {
+      speciesConcentration[i] = exp( speciesConcentration[i] );
+    }
+    EXPECT_NEAR( speciesConcentration[i], expectedSpeciesConcentrations[i], 1.0e-4 );
+
+    // if constexpr ( LOGE_CONCENTRATION )
+    // {
+    //   speciesRatesDerivatives( i, j ) = speciesRatesDerivatives( i, j ) * exp( -speciesConcentration[j] );
+    // }
+    // EXPECT_NEAR( speciesRatesDerivatives( i, j ), expectedSpeciesRatesDerivatives[i][j], 1.0e-8 );
+
+    
+  }
 }
 
+TEST( bulkGeneric, testTimeStep )
+{
+  double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+  double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };
+  double const expectedSpeciesRates[5] = { -2.0, 1.0, 0.75, -0.25, 0.5 };
+  double const expectedSpeciesRatesDerivatives[5][5] = { { -4.0,  1.0,  0.0,   0.0, 0.0 }, 
+                                                         {  2.0, -0.5,  0.0,   0.0, 0.0 }, 
+                                                         {  2.0, -0.5, -0.5, -0.25, 0.0 }, 
+                                                         {  0.0,  0.0, -0.5, -0.25, 0.0 }, 
+                                                         {  0.0,  0.0,  1.0,   0.5, 0.0 } };
 
+  timeStepTest< double, false >( simpleTestRateParams,
+                                 2.0,
+                                 10,
+                                 initialSpeciesConcentration,
+                                 expectedSpeciesConcentrations,
+                                 expectedSpeciesRates,
+                                 expectedSpeciesRatesDerivatives );
 
-
-// TEST( bulkGeneric, test_computeReactionRates_ultramafic )
-// {
-//   using KineticReactionsType = KineticReactions< double, 
-//                                                  int, 
-//                                                  int >;
-
-//   double const temperature = 298.15;
-//   constexpr int numPrimarySpecies = decltype(um1Params)::numSpecies;
-//   constexpr double minConc = 1.0e-6;
-//   //                                                        C02     H2CO3        H+     HCO3-    CO3^2-   Mg2SiO4      Mg2+      SiO2     MgCO3       H20
-//   double speciesConcentration[numPrimarySpecies] = { 10.0,     0.1,  minConc,  minConc, minConc,      20.0,  minConc,  minConc,  minConc,      1.0 };
-//   double speciesRates[numPrimarySpecies] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-//   CArrayWrapper<double,5,5> derivatives;
-//   constexpr double dt0 = 1.0e-14;
-
-//   double time = 0.0;
-//   for( int i = 0; i < 1; ++i )
-//   {
-//     KineticReactionsType::computeSpeciesRates( temperature, 
-//                                                 um1Params, 
-//                                                 speciesConcentration, 
-//                                                 speciesRates,
-//                                                 derivatives );
-
-
-//     double dt = dt0;
-// //     for( int j = 0; j < numPrimarySpecies; ++j )
-// //     {
-// //       double const delta = dt * speciesRates[j];
-// //       if( speciesConcentration[j] + delta < minConc )
-// //       {
-// //         double dtCut = ( - speciesConcentration[j] ) / speciesRates[j];
-// // //        printf( "speciesRates[%d], speciesConcentration[%d], dtCut = % 8.4e, % 12.8e, % 12.8e\n", j, j, speciesRates[j], speciesConcentration[j], dtCut );
-// //         if( dtCut < dt )
-// //         {
-// //           dt = dtCut;
-// //         } 
-// //       }
-// //     }
-// //    printf( "dt = % 12.8e\n", dt );
-
-//     for( int j = 0; j < numPrimarySpecies; ++j )
-//     {
-//       speciesConcentration[j] += dt * speciesRates[j];
-//     }
-//     time += dt;
-//       if( i == 0 )
-//       {         
-//         //       0         1         2         3         4         5         6         7         8         9
-//         //       01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-//         //                 *         *         *         *         *         *         *         *         *         *         *
-//         printf( "      time        C02     H2CO3        H+     HCO3-    CO3^2-   Mg2SiO4      Mg2+      SiO2     MgCO3       H20\n");
-//       }
-//     if( i % 10000000 == 1 )
-//     {
-
-
-//         // printf( "           " );
-//         // for( int j = 0; j < numPrimarySpecies; ++j )
-//         // {
-//         //   printf( " % 6.2e", speciesRates[j] );
-//         // }
-//         // printf( "\n" );
-
-
-
-//         printf( " % 6.2e ", time );
-//         for( int j = 0; j < numPrimarySpecies; ++j )
-//         {
-//           printf( " % 6.2e", speciesConcentration[j] );
-//         }
-//         printf( "\n" );
-
-//     }
-//   }
-
-
-
-// }
+  // ln(c) as the primary variable results in a singular system.
+  // timeStepTest< double, true >( simpleTestRateParams,
+  //                               2.0,
+  //                               10,
+  //                               initialSpeciesConcentration,
+  //                               expectedSpeciesConcentrations,
+  //                               expectedSpeciesRates,
+  //                               expectedSpeciesRatesDerivatives );
+}
 
 int main( int argc, char * * argv )
 {
