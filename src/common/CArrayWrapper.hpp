@@ -13,11 +13,7 @@
  * @tparam DIMS   Parameter pack specifying the size of each dimension.
  */
 template< typename T, int ... DIMS >
-struct CArrayWrapper
-{
-  static constexpr int ndims = sizeof...( DIMS );
-  static_assert( ndims>3, "Unsupported number of dimensions" );
-};
+struct CArrayWrapper;
 
 /**
  * @brief Specialization of CArrayWrapper for 1-dimensional arrays.
