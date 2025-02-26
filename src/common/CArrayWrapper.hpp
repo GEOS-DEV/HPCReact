@@ -1,10 +1,6 @@
 #pragma once
+#include "macros.hpp"
 
-#if defined( __CUDACC__ ) || defined( __HIPCC__ )
-#define HPCREACT_HOST_DEVICE __host__ __device__
-#else
-#define HPCREACT_HOST_DEVICE
-#endif
 
 /**
  * @brief A generic wrapper for C-style arrays of varying dimensionality.
@@ -197,5 +193,3 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
   T data[DIM0][DIM1][DIM2];
 };
 
-
-#undef HPCREACT_HOST_DEVICE

@@ -1,6 +1,6 @@
+#pragma once
 
-#ifndef HPCREACT_MACROS_HPP
-#define HPCREACT_MACROS_HPP
+
 
 #if defined( __CUDACC__ ) || defined( __HIPCC__ )
 #define HPCREACT_USE_DEVICE
@@ -20,4 +20,3 @@
 /// unused.
 #define HPCREACT_UNUSED_VAR( ... ) (void)( __VA_ARGS__ )
 
-#endif // HPCREACT_MACROS_HPP

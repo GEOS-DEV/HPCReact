@@ -3,6 +3,8 @@
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
 
+#include<stdexcept>
+#include<string>
 
 namespace hpcReact
 {

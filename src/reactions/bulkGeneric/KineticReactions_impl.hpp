@@ -1,3 +1,5 @@
+#pragma once 
+
 #include "KineticReactions.hpp"
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"

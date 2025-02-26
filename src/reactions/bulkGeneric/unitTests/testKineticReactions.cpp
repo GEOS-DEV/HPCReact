@@ -76,7 +76,7 @@ KineticReactionsType::computeReactionRates( temperature,
 
 
 //******************************************************************************
-TEST( bulkGeneric, computeReactionRatesTest )
+TEST( testKineticReactions, computeReactionRatesTest )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedReactionRates[] = { 1.0, 0.25 };
@@ -158,7 +158,7 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
   }
 }
 
-TEST( bulkGeneric, computeSpeciesRatesTest )
+TEST( testKineticReactions, computeSpeciesRatesTest )
 {
   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesRates[5] = { -2.0, 1.0, 0.75, -0.25, 0.5 };
@@ -264,7 +264,7 @@ void timeStepTest( PARAMS_DATA const & params,
   }
 }
 
-TEST( bulkGeneric, testTimeStep )
+TEST( testKineticReactions, testTimeStep )
 {
   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };

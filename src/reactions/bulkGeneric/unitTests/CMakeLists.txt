@@ -1,5 +1,6 @@
 # Specify list of tests
 set( testSourceFiles
+     testEquilibriumReactions.cpp
      testKineticReactions.cpp
      )
 

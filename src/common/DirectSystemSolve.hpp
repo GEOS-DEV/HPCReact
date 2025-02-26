@@ -1,15 +1,17 @@
 #pragma once
+
 #include "macros.hpp"
 #include<cmath>
 
 namespace hpcReact
 {
 template< typename REAL_TYPE, int N >
-HPCREACT_HOST_DEVICE void solveNxN_pivoted(REAL_TYPE A[N][N], REAL_TYPE b[N], REAL_TYPE x[N]) 
+HPCREACT_HOST_DEVICE 
+void solveNxN_pivoted(REAL_TYPE A[N][N], REAL_TYPE b[N], REAL_TYPE x[N]) 
 {
 
   
-  int pivot[N] = {0, 1, 2};  // Row index tracker
+  int pivot[N];  // Row index tracker
   for (int i = 0; i < N; i++) 
   {
     pivot[i] = i;
