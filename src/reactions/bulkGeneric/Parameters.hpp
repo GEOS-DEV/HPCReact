@@ -3,15 +3,13 @@
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
 
-#include<stdexcept>
-#include<string>
+#include <stdexcept>
+#include <string>
 
 namespace hpcReact
 {
 namespace bulkGeneric
 {
-
-
 
 
 
@@ -54,25 +52,25 @@ struct EquilibriumKineticsModelConstants
       // Count the number of valid inputs
       int const numSpecified = (K > 0.0) + (kf > 0.0) + (kr > 0.0);
 
-      if (numSpecified < 2)
+      if( numSpecified < 2 )
       {
-          throw std::runtime_error("Error: At least two values must be specified for reaction " + std::to_string(i));
+        throw std::runtime_error( "Error: At least two values must be specified for reaction " + std::to_string( i ));
       }
-      else if (numSpecified == 2)
+      else if( numSpecified == 2 )
       {
-          if (K < 0.0)       { K = kf / kr; }
-          else if (kf < 0.0) { kf = K * kr; }
-          else if (kr < 0.0) { kr = kf / K; }
+        if( K < 0.0 )       { K = kf / kr; }
+        else if( kf < 0.0 ) { kf = K * kr; }
+        else if( kr < 0.0 ) { kr = kf / K; }
       }
       else // numSpecified == 3
       {
         RealType const absDiff = abs( K - ( kf / kr ) );
-        RealType const effectiveMagnitude = max(abs(K), abs(kf/kr));
-        RealType const tolerance = effectiveMagnitude * pow(10,-num_digits);
-          if ( absDiff > tolerance ) // Tolerance for floating point precision
-          {
-              throw std::runtime_error("Error: Inconsistent equilibrium relation for reaction " + std::to_string(i));
-          }
+        RealType const effectiveMagnitude = max( abs( K ), abs( kf/kr ));
+        RealType const tolerance = effectiveMagnitude * pow( 10, -num_digits );
+        if( absDiff > tolerance )    // Tolerance for floating point precision
+        {
+          throw std::runtime_error( "Error: Inconsistent equilibrium relation for reaction " + std::to_string( i ));
+        }
       }
     }
   }
@@ -91,7 +89,7 @@ struct EquilibriumKineticsModelConstants
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
-          template < typename, typename, typename, int > typename RATE_CONSTANTS_TYPE,
+          template< typename, typename, typename, int > typename RATE_CONSTANTS_TYPE,
           int NUM_SPECIES,
           int NUM_REACTIONS >
 struct ReactionsParameters
@@ -101,16 +99,16 @@ struct ReactionsParameters
   using RateConstantType = RATE_CONSTANTS_TYPE< REAL_TYPE, INT_TYPE, INDEX_TYPE, NUM_REACTIONS >;
   static constexpr IntType numSpecies = NUM_SPECIES;
   static constexpr IntType numReactions = NUM_REACTIONS;
-  
+
 
   static_assert( std::is_same_v< REAL_TYPE, typename RateConstantType::RealType >, "RealType of RATE_CONSTANTS_TYPE is inconsistent" );
   static_assert( std::is_same_v< INT_TYPE, typename RateConstantType::IntType >, "IntType of RATE_CONSTANTS_TYPE is inconsistent" );
   static_assert( numReactions == RateConstantType::numReactions, "numReactions of RATE_CONSTANTS_TYPE is inconsistent" );
 
   RealType stoichiometricMatrix( int const r, int const i ) const { return m_base.m_stoichiometricMatrix[r][i]; }
-  RealType equilibriumConstant( int const r ) const { return m_rateConstants.equilibriumConstant(r); }
-  RealType rateConstantForward( int const r ) const { return m_rateConstants.rateConstantForward(r); }
-  RealType rateConstantReverse( int const r ) const { return m_rateConstants.rateConstantReverse(r); }
+  RealType equilibriumConstant( int const r ) const { return m_rateConstants.equilibriumConstant( r ); }
+  RealType rateConstantForward( int const r ) const { return m_rateConstants.rateConstantForward( r ); }
+  RealType rateConstantReverse( int const r ) const { return m_rateConstants.rateConstantReverse( r ); }
 
   ParametersBase< REAL_TYPE, INT_TYPE, INT_TYPE, NUM_SPECIES, NUM_REACTIONS > m_base;
   RateConstantType m_rateConstants;
@@ -118,7 +116,6 @@ struct ReactionsParameters
   //  RealType (&m_stoichiometricMatrix)[numReactions][numSpecies] = m_base.m_stoichiometricMatrix;
 
 };
-
 
 
 

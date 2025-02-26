@@ -19,4 +19,3 @@
 /// This macro is used to ignore warnings that that a variable is
 /// unused.
 #define HPCREACT_UNUSED_VAR( ... ) (void)( __VA_ARGS__ )
-

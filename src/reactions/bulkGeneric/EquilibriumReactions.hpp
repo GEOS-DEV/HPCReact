@@ -5,7 +5,7 @@
 #include "common/DirectSystemSolve.hpp"
 #include <cmath>
 
-#include<stdio.h>
+#include <stdio.h>
 
 
 namespace hpcReact
@@ -32,16 +32,16 @@ public:
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeResidualAndJacobian( RealType const & temperature,
-                                    PARAMS_DATA const & params,
-                                    ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                    ARRAY_1D_TO_CONST2 const & xi,
-                                    ARRAY_1D & residual,
-                                    ARRAY_2D & jacobian )
+                              PARAMS_DATA const & params,
+                              ARRAY_1D_TO_CONST const & speciesConcentration0,
+                              ARRAY_1D_TO_CONST2 const & xi,
+                              ARRAY_1D & residual,
+                              ARRAY_2D & jacobian )
   {
     HPCREACT_UNUSED_VAR( temperature );
     constexpr int numSpecies = PARAMS_DATA::numSpecies;
     constexpr int numReactions = PARAMS_DATA::numReactions;
-    
+
     // initialize the species concentration
     RealType speciesConcentration[numSpecies];
     for( IndexType i=0; i<numSpecies; ++i )
@@ -52,7 +52,7 @@ public:
         speciesConcentration[i] += params.stoichiometricMatrix( r, i ) * xi[r];
       }
     }
-    
+
     // loop over reactions
     for( IndexType a=0; a<numReactions; ++a )
     {
@@ -90,7 +90,7 @@ public:
         }
       }
       // compute the residual for this reaction
-     residual[a] = forwardProduct - Keq * reverseProduct;
+      residual[a] = forwardProduct - Keq * reverseProduct;
 //     printf( "residual[%d] = %g - %g * %g = %g\n", a, forwardProduct, Keq, reverseProduct, residual[a] );
 
       // Finish the derivatives of the product terms with respect to xi
@@ -108,14 +108,14 @@ public:
 
 
   template< typename PARAMS_DATA,
-  typename ARRAY_1D,
-  typename ARRAY_1D_TO_CONST >
-  static HPCREACT_HOST_DEVICE 
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST >
+  static HPCREACT_HOST_DEVICE
   void
   enforceEquilibrium( RealType const & temperature,
-                                    PARAMS_DATA const & params,
-                                    ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                    ARRAY_1D & speciesConcentration )
+                      PARAMS_DATA const & params,
+                      ARRAY_1D_TO_CONST const & speciesConcentration0,
+                      ARRAY_1D & speciesConcentration )
   {
     HPCREACT_UNUSED_VAR( temperature );
     constexpr int numSpecies = PARAMS_DATA::numSpecies;
@@ -124,7 +124,7 @@ public:
     double xi[numReactions] = { 0.0 };
     double dxi[numReactions] = { 0.0 };
     CArrayWrapper< double, numReactions, numReactions > jacobian;
-  
+
     REAL_TYPE residualNorm = 0.0;
     for( int k=0; k<10; ++k )
     {
@@ -134,7 +134,7 @@ public:
                                   xi,
                                   residual,
                                   jacobian );
-      
+
       residualNorm = 0.0;
       for( int j = 0; j < numSpecies; ++j )
       {
@@ -146,7 +146,7 @@ public:
         break;
       }
 
-      solveNxN_pivoted<double,numReactions>( jacobian.data, residual, dxi );
+      solveNxN_pivoted< double, numReactions >( jacobian.data, residual, dxi );
 
       // solve for the change in xi
       for( IndexType r=0; r<numReactions; ++r )

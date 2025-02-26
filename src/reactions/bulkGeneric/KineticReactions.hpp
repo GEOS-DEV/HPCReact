@@ -38,12 +38,12 @@ public:
                         ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & reactionRatesDerivatives )
-  { 
-    computeReactionRates_impl< PARAMS_DATA, true >( temperature, 
-                                                         params, 
-                                                         speciesConcentration, 
-                                                         reactionRates, 
-                                                         reactionRatesDerivatives );
+  {
+    computeReactionRates_impl< PARAMS_DATA, true >( temperature,
+                                                    params,
+                                                    speciesConcentration,
+                                                    reactionRates,
+                                                    reactionRatesDerivatives );
   }
 
   template< typename PARAMS_DATA,
@@ -53,14 +53,14 @@ public:
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
                         ARRAY_1D_TO_CONST const & speciesConcentration,
-                        ARRAY_1D & reactionRates)
-  { 
+                        ARRAY_1D & reactionRates )
+  {
     REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions][PARAMS_DATA::numSpecies] = { {0.0} };
-    computeReactionRates_impl< PARAMS_DATA, false >( temperature, 
-                                                          params, 
-                                                          speciesConcentration, 
-                                                          reactionRates, 
-                                                          reactionRatesDerivatives );
+    computeReactionRates_impl< PARAMS_DATA, false >( temperature,
+                                                     params,
+                                                     speciesConcentration,
+                                                     reactionRates,
+                                                     reactionRatesDerivatives );
   }
 
 
@@ -75,11 +75,11 @@ public:
                        ARRAY_1D & speciesRates,
                        ARRAY_2D & speciesRatesDerivatives )
   {
-    computeSpeciesRates_impl< PARAMS_DATA, true >( temperature, 
-                                                        params, 
-                                                        speciesConcentration, 
-                                                        speciesRates, 
-                                                        speciesRatesDerivatives );
+    computeSpeciesRates_impl< PARAMS_DATA, true >( temperature,
+                                                   params,
+                                                   speciesConcentration,
+                                                   speciesRates,
+                                                   speciesRatesDerivatives );
   }
 
   template< typename PARAMS_DATA,
@@ -92,20 +92,20 @@ public:
                        ARRAY_1D & speciesRates )
   {
     char speciesRatesDerivatives;
-    computeSpeciesRates_impl< PARAMS_DATA, false >( temperature, 
-                                                         params, 
-                                                         speciesConcentration, 
-                                                         speciesRates, 
-                                                         speciesRatesDerivatives );
+    computeSpeciesRates_impl< PARAMS_DATA, false >( temperature,
+                                                    params,
+                                                    speciesConcentration,
+                                                    speciesRates,
+                                                    speciesRatesDerivatives );
   }
 
   template< typename PARAMS_DATA,
-  typename ARRAY_1D,
-  typename ARRAY_1D_TO_CONST,
-  typename ARRAY_2D >
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
-  timeStep(                     RealType const dt,
-    RealType const & temperature,
+  timeStep( RealType const dt,
+            RealType const & temperature,
             PARAMS_DATA const & params,
             ARRAY_1D_TO_CONST const & speciesConcentration_n,
             ARRAY_1D & speciesConcentration,
@@ -127,40 +127,42 @@ private:
    * @param speciesConcentration The array of species concentrations.
    * @param reactionRates The array of reaction rates.
    * @param reactionRatesDerivatives The array of reaction rates derivatives.
-   * @details 
+   * @details
    *   This function computes the reaction rates for a given set of reactions.
    *   If CALCULATE_DERIVATIVES is true, it also computes the derivatives of the reaction rates with respect to the species concentrations.
-   * 
+   *
    * The expression for the reaction rate ( \f$ \dot{R}_r \f$ ) for reaction \f$ r \f$  is given by:
    *  \f[
-          \dot{R}_r = k^f_{r} \prod_{ \mathclap{ \substack{ i = 1,...,N_s \\ \nu_{ri} < 0 } } } [C_i]^{-\nu_{ri}} 
+          \dot{R}_r = k^f_{r} \prod_{ \mathclap{ \substack{ i = 1,...,N_s \\ \nu_{ri} < 0 } } } [C_i]^{-\nu_{ri}}
                     - k^r_{r} \prod_{ \mathclap{ \substack{ i = 1,...,N_s \\ \nu_{ri} > 0 } } } [C_i]^{\nu_{ri}}
    *  \f]
-   * 
+   *
    * The expression for the derivative of the reaction rate ( \f$ \frac{d\dot{R}_r}{dC_i} \f$ ) for reaction \f$ r \f$  is given by:
    *  \f[
-   *    \frac{\partial \dot{R}_r}{ \partial [C]_i } = 
-   *      k^f_{r} \left( -\nu_{ri} [C_i]^{-\nu_{ri}-1 } \prod_{ \mathclap{ \substack{ j = 1,...,N_s \\ \nu_{rj} < 0, j \ne i } } } [C_j]^{-\nu_{rj}} \right )
-   *    - k^r_{r} \left(  \nu_{ri} [C_i]^{ \nu_{ri}-1 }  \prod_{ \mathclap{ \substack{ j = 1,...,N_s \\ \nu_{rj} > 0, j \ne i } } } [C_j]^{\nu_{rj}} \right )
+   *    \frac{\partial \dot{R}_r}{ \partial [C]_i } =
+   *      k^f_{r} \left( -\nu_{ri} [C_i]^{-\nu_{ri}-1 } \prod_{ \mathclap{ \substack{ j = 1,...,N_s \\ \nu_{rj} < 0, j \ne i } } }
+   * [C_j]^{-\nu_{rj}} \right )
+   *    - k^r_{r} \left(  \nu_{ri} [C_i]^{ \nu_{ri}-1 }  \prod_{ \mathclap{ \substack{ j = 1,...,N_s \\ \nu_{rj} > 0, j \ne i } } }
+   * [C_j]^{\nu_{rj}} \right )
    *  \f]
    */
-  template< typename PARAMS_DATA, 
-            bool CALCULATE_DERIVATIVES, 
-            typename ARRAY_1D_TO_CONST, 
-            typename ARRAY_1D, 
+  template< typename PARAMS_DATA,
+            bool CALCULATE_DERIVATIVES,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeReactionRates_impl( RealType const & temperature,
-                        PARAMS_DATA const & params,
-                        ARRAY_1D_TO_CONST const & speciesConcentration,
-                        ARRAY_1D & reactionRates,
-                        ARRAY_2D & reactionRatesDerivatives );
+                             PARAMS_DATA const & params,
+                             ARRAY_1D_TO_CONST const & speciesConcentration,
+                             ARRAY_1D & reactionRates,
+                             ARRAY_2D & reactionRatesDerivatives );
 
-  template< typename PARAMS_DATA, 
-            bool CALCULATE_DERIVATIVES, 
-            typename ARRAY_1D_TO_CONST, 
-            typename ARRAY_1D, 
-            typename ARRAY_2D > 
+  template< typename PARAMS_DATA,
+            bool CALCULATE_DERIVATIVES,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D,
+            typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeSpeciesRates_impl( RealType const & temperature,
                             PARAMS_DATA const & params,

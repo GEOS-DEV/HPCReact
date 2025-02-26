@@ -16,15 +16,15 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void computeResidualAndJacobianTest( PARAMS_DATA const & params,
-                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                               REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions],
-                               REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions][PARAMS_DATA::numReactions] )
+                                     REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
+                                     REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions],
+                                     REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions][PARAMS_DATA::numReactions] )
 {
-  using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE, 
-                                                 int, 
-                                                 int,
-                                                 false,
-                                                 false >;
+  using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
+                                                         int,
+                                                         int,
+                                                         false,
+                                                         false >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
   constexpr int numReactions = PARAMS_DATA::numReactions;
@@ -32,7 +32,7 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
   double const temperature = 298.15;
   double speciesConcentration[numSpecies];
 
-  if constexpr ( LOGE_CONCENTRATION )
+  if constexpr( LOGE_CONCENTRATION )
   {
     for( int i = 0; i < numSpecies; ++i )
     {
@@ -53,11 +53,11 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
 
 
   EquilibriumReactionsType::computeResidualAndJacobian( temperature,
-                                                  params,
-                                                  speciesConcentration,
-                                                  xi,
-                                                  residual,
-                                                  jacobian );
+                                                        params,
+                                                        speciesConcentration,
+                                                        xi,
+                                                        residual,
+                                                        jacobian );
 
   for( int r=0; r<numReactions; ++r )
   {
@@ -80,11 +80,11 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedResiduals[] = { 1.0, 0.5 };
   double const expectedJacobian[2][2] = { { -4.5, 0 },
-                                         { 1.0,  -1.5 } };
+    { 1.0, -1.5 } };
   computeResidualAndJacobianTest< double, false >( simpleTestRateParams,
-                                             initialSpeciesConcentration,
-                                             expectedResiduals,
-                                             expectedJacobian );
+                                                   initialSpeciesConcentration,
+                                                   expectedResiduals,
+                                                   expectedJacobian );
 }
 
 
@@ -93,21 +93,21 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void testEnforceEquilibrium( PARAMS_DATA const & params,
-                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                               REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies] )
+                             REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
+                             REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies] )
 {
-  using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE, 
-                                                 int, 
-                                                 int,
-                                                 false,
-                                                 false >;
+  using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
+                                                         int,
+                                                         int,
+                                                         false,
+                                                         false >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
 
   double const temperature = 298.15;
   double speciesConcentration[numSpecies];
 
-  if constexpr ( LOGE_CONCENTRATION )
+  if constexpr( LOGE_CONCENTRATION )
   {
     for( int i = 0; i < numSpecies; ++i )
     {
@@ -123,9 +123,9 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
   }
 
   EquilibriumReactionsType::enforceEquilibrium( temperature,
-                                                  params,
-                                                  initialSpeciesConcentration,
-                                                  speciesConcentration );
+                                                params,
+                                                initialSpeciesConcentration,
+                                                speciesConcentration );
 
   for( int r=0; r<numSpecies; ++r )
   {
@@ -141,11 +141,9 @@ TEST( testEquilibriumReactions, testEnforceEquilibrium )
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };
   testEnforceEquilibrium< double, false >( simpleTestRateParams,
-                                             initialSpeciesConcentration,
-                                             expectedSpeciesConcentrations );
+                                           initialSpeciesConcentration,
+                                           expectedSpeciesConcentrations );
 }
-
-
 
 
 

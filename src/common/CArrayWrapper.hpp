@@ -192,4 +192,3 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
   /// The underlying 3D C-style array of size DIM0 x DIM1 x DIM2.
   T data[DIM0][DIM1][DIM2];
 };
-
