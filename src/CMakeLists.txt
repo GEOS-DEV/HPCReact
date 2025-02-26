@@ -52,7 +52,6 @@ target_include_directories( hpcReact
 # hpcReact_add_code_checks( PREFIX hpcReact
 #                        EXCLUDES "blt/*" )
 
-#add_subdirectory( reactions/bulkDebyeHuckel/unitTests )
 add_subdirectory( reactions/bulkGeneric/unitTests )
 add_subdirectory( common/unitTests )
 add_subdirectory( docs )
