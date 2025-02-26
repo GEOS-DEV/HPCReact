@@ -20,7 +20,7 @@ fi
 echo "Using package manager: $PACKAGE_MANAGER"
 
 if [ "$PACKAGE_MANAGER" == "apt" ]; then
-    apt-get install libblas-dev liblapack-dev
+    apt update && apt-get install -y libblas-dev liblapack-dev
 elif [ "$PACKAGE_MANAGER" == "yum" ]; then
     yum install -y blas lapack
 fi
