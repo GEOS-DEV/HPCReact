@@ -33,16 +33,16 @@ else
   ENABLE_COVERAGE=OFF
 fi
 
-SHIVA_BUILD_DIR=/tmp/build
-SHIVA_INSTALL_DIR=/tmp/install
+HPCREACT_BUILD_DIR=/tmp/build
+HPCREACT_INSTALL_DIR=/tmp/install
 or_die python3 scripts/config-build.py \
                -hc ${HOST_CONFIG} \
                -bt ${CMAKE_BUILD_TYPE} \
-               -bp ${SHIVA_BUILD_DIR} \
-               -ip ${SHIVA_INSTALL_DIR}\
+               -bp ${HPCREACT_BUILD_DIR} \
+               -ip ${HPCREACT_INSTALL_DIR}\
                -DENABLE_COVERAGE:BOOL=${ENABLE_COVERAGE}
 
-or_die cd ${SHIVA_BUILD_DIR}
+or_die cd ${HPCREACT_BUILD_DIR}
 
 # Code style check
 if [[ "$*" == *--test-code-style* ]]; then
