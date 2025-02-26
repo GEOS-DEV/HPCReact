@@ -16,7 +16,7 @@ template< typename T, int ... DIMS >
 struct CArrayWrapper
 {
   static constexpr int ndims = sizeof...( DIMS );
-  static_assert( false, "Unsupported number of dimensions" );
+  static_assert( ndims>3, "Unsupported number of dimensions" );
 };
 
 /**
