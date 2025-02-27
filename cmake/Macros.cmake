@@ -1,4 +1,4 @@
-macro(HPCReact_add_code_checks)
+macro(hpcReact_add_code_checks)
 
     set(options)
     set(singleValueArgs PREFIX UNCRUSTIFY_CFG_FILE )
@@ -69,4 +69,4 @@ macro(HPCReact_add_code_checks)
                                      RUNNER ctest -E 'blt_gtest_smoke|testCppCheck|testClangTidy|testUncrustifyCheck|testDoxygenCheck|testCppCheck|testClangTidy'
                                      SOURCE_DIRECTORIES ${PROJECT_SOURCE_DIR}/src )
     endif()
-endmacro(HPCReact_add_code_checks)
+endmacro(hpcReact_add_code_checks)

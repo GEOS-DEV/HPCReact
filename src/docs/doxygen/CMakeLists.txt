@@ -1,2 +1,2 @@
-blt_add_doxygen_target( hpcreact_doxygen )
+blt_add_doxygen_target( hpcReact_doxygen )
 

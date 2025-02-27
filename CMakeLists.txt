@@ -15,7 +15,7 @@ endif()
 
 if( NOT is_submodule )
     message( "not a submodule")
-    project( HPCReact LANGUAGES CXX C )
+    project( hpcReact LANGUAGES CXX C )
 
     set( BLT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/cmake/blt CACHE PATH "" )
     set( BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard" FORCE )

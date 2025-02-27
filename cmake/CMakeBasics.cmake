@@ -6,6 +6,7 @@ else()
 
 endif()
 
+option( ENABLE_COVERAGE "Enable coverage" OFF )
 #set( SHIVA_BUILD_OBJ_LIBS OFF CACHE BOOL "" )
 
 

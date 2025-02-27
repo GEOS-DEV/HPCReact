@@ -2,7 +2,7 @@
 env
 
 BUILD_DIR=${GITHUB_WORKSPACE}
-BUILD_DIR_MOUNT_POINT=/tmp/HPCReact
+BUILD_DIR_MOUNT_POINT=/tmp/hpcReact
 
 
 if [[ -z "${NPROC}" ]]; then
@@ -12,7 +12,7 @@ fi
 # We need to keep track of the building container (hence the `CONTAINER_NAME`)
 # so we can extract the data from it later (if needed). Another solution would have been to use a mount point,
 # but that would not have solved the problem for the TPLs (we would require extra action to copy them to the mount point).
-CONTAINER_NAME=hpcreact_build
+CONTAINER_NAME=hpcReact_build
 
 docker run \
   --rm \

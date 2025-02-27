@@ -89,8 +89,8 @@ fi
 
 if [[ "$*" == *--code-coverage* ]]; then
   or_die make -j ${NPROC} VERBOSE=1
-  or_die make hpcreact_coverage
-  cp -r ${HPCREACT_BUILD_DIR}/hpcreact_coverage.info.cleaned /tmp/HPCReact/hpcreact_coverage.info.cleaned
+  or_die make hpcReact_coverage
+  cp -r ${HPCREACT_BUILD_DIR}/hpcReact_coverage.info.cleaned /tmp/hpcReact/hpcReact_coverage.info.cleaned
 fi
 
 
