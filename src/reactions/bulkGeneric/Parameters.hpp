@@ -64,8 +64,8 @@ struct EquilibriumKineticsModelConstants
       }
       else // numSpecified == 3
       {
-        RealType const absDiff = abs( K - ( kf / kr ) );
-        RealType const effectiveMagnitude = max( abs( K ), abs( kf/kr ));
+        RealType const absDiff = fabs( K - ( kf / kr ) );
+        RealType const effectiveMagnitude = max( fabs( K ), fabs( kf/kr ));
         RealType const tolerance = effectiveMagnitude * pow( 10, -num_digits );
         if( absDiff > tolerance )    // Tolerance for floating point precision
         {

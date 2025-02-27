@@ -120,7 +120,7 @@ KineticReactions< REAL_TYPE,
       {
 
         RealType const s_ri = params.stoichiometricMatrix( r, i );
-        RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], abs( s_ri ) ) : 0.0;
+        RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], fabs( s_ri ) ) : 0.0;
 
         if( s_ri < 0.0 )
         {

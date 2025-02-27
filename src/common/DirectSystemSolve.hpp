@@ -22,7 +22,7 @@ void solveNxN_pivoted( REAL_TYPE A[N][N], REAL_TYPE b[N], REAL_TYPE x[N] )
   {
     // **Find Pivot Row**
     int max_row = k;
-    REAL_TYPE max_val = abs( A[pivot[k]][k] );
+    REAL_TYPE max_val = fabs( A[pivot[k]][k] );
     for( int i = k + 1; i < N; i++ )
     {
       if( fabs( A[pivot[i]][k] ) > max_val )
