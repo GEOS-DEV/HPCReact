@@ -87,11 +87,11 @@ fi
 
 
 
-# if [[ "$*" == *--code-coverage* ]]; then
-#   or_die make -j ${NPROC} VERBOSE=1
-#   or_die make shiva_coverage
-#   cp -r ${SHIVA_BUILD_DIR}/shiva_coverage.info.cleaned /tmp/Shiva/shiva_coverage.info.cleaned
-# fi
+if [[ "$*" == *--code-coverage* ]]; then
+  or_die make -j ${NPROC} VERBOSE=1
+  or_die make hpcreact_coverage
+  cp -r ${HPCREACT_BUILD_DIR}/hpcreact_coverage.info.cleaned /tmp/HPCReact/hpcreact_coverage.info.cleaned
+fi
 
 
 if [[ "$*" == *--build-exe* ]]; then
