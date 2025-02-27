@@ -136,7 +136,7 @@ public:
                                   jacobian );
 
       residualNorm = 0.0;
-      for( int j = 0; j < numSpecies; ++j )
+      for( int j = 0; j < numReactions; ++j )
       {
         residualNorm += residual[j] * residual[j];
       }
