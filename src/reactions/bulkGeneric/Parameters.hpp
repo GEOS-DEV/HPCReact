@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace hpcReact
 {
@@ -62,7 +63,7 @@ EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReacti
   m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies]... },
   m_equilibriumConstant{ equilibriumConstant[R]... }
   {}
-  
+
 #if defined(__GNUC__) || defined(__clang__)
   #pragma GCC diagnostic pop
 #elif defined(_MSC_VER)
