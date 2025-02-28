@@ -82,7 +82,7 @@ TEST( testKineticReactions, computeReactionRatesTest )
   double const expectedReactionRates[] = { 1.0, 0.25 };
   double const expectedReactionRatesDerivatives[][5] = { { 2.0, -0.5, 0.0, 0.0, 0.0 },
     { 0.0, 0.0, 0.5, 0.25, 0.0 } };
-  computeReactionRatesTest< double, false >( simpleTestRateParams,
+  computeReactionRatesTest< double, false >( simpleTestRateParams.kineticReactionsParameters(),
                                              initialSpeciesConcentration,
                                              expectedReactionRates,
                                              expectedReactionRatesDerivatives );
