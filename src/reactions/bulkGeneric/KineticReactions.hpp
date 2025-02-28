@@ -175,4 +175,5 @@ private:
 } // namespace bulkGeneric
 } // namespace hpcReact
 
+#include "KineticReactions_impl.hpp"
 #include "common/macrosCleanup.hpp"

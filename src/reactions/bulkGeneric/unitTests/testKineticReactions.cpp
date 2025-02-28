@@ -1,5 +1,5 @@
 
-#include "../KineticReactions_impl.hpp"
+#include "../KineticReactions.hpp"
 #include "../ParametersPredefined.hpp"
 #include "common/DirectSystemSolve.hpp"
 #include "common/macros.hpp"

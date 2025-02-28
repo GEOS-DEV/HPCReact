@@ -14,7 +14,6 @@ namespace bulkGeneric
 
 
 
-
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
@@ -32,10 +31,10 @@ struct EquilibriumReactionsParameters
   constexpr
   EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
                                   RealType const (&equilibriumConstant)[numReactions] ):
-    EquilibriumReactionsParameters( stoichiometricMatrix, 
-                                    equilibriumConstant, 
-                                    std::make_index_sequence<NUM_REACTIONS>(), 
-                                    std::make_index_sequence<NUM_REACTIONS*NUM_SPECIES>() )
+    EquilibriumReactionsParameters( stoichiometricMatrix,
+                                    equilibriumConstant,
+                                    std::make_index_sequence< NUM_REACTIONS >(),
+                                    std::make_index_sequence< NUM_REACTIONS *NUM_SPECIES >() )
   {}
 
 
@@ -45,30 +44,18 @@ struct EquilibriumReactionsParameters
   RealType m_stoichiometricMatrix[numReactions][numSpecies];
   RealType m_equilibriumConstant[numReactions];
 
-  private:
-#if defined(__GNUC__) || defined(__clang__)
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wmissing-braces"
-#elif defined(_MSC_VER)
-  #pragma warning(push)
-  #pragma warning(disable : 4351)  // MSVC equivalent of missing-braces warning
-#endif
-
-template< std::size_t ... R, std::size_t ... RxS >
-constexpr
-EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
-                                RealType const (&equilibriumConstant)[numReactions],
-                                std::index_sequence<R...>,
-                                std::index_sequence<RxS...> ):
-  m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies]... },
-  m_equilibriumConstant{ equilibriumConstant[R]... }
-  {}
-
-#if defined(__GNUC__) || defined(__clang__)
-  #pragma GCC diagnostic pop
-#elif defined(_MSC_VER)
-  #pragma warning(pop)
-#endif
+private:
+  HPCREACT_NO_MISSING_BRACES (
+    template< std::size_t ... R, std::size_t ... RxS >
+    constexpr
+    EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
+                                    RealType const (&equilibriumConstant)[numReactions],
+                                    std::index_sequence< R... >,
+                                    std::index_sequence< RxS... > ) :
+      m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies] ... },
+    m_equilibriumConstant{ equilibriumConstant[R] ... }
+    {}
+    );
 };
 
 
@@ -87,13 +74,13 @@ struct KineticReactionsParameters
   static constexpr IndexType numReactions = NUM_REACTIONS;
 
   KineticReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
-                                  RealType const (&rateConstantForward)[numReactions],
-                                  RealType const (&rateConstantReverse)[numReactions] ):
-    KineticReactionsParameters( stoichiometricMatrix, 
-                                rateConstantForward, 
+                              RealType const (&rateConstantForward)[numReactions],
+                              RealType const (&rateConstantReverse)[numReactions] ):
+    KineticReactionsParameters( stoichiometricMatrix,
+                                rateConstantForward,
                                 rateConstantReverse,
-                                std::make_index_sequence<NUM_REACTIONS>(), 
-                                std::make_index_sequence<NUM_REACTIONS*NUM_SPECIES>() )
+                                std::make_index_sequence< NUM_REACTIONS >(),
+                                std::make_index_sequence< NUM_REACTIONS *NUM_SPECIES >() )
   {}
 
 
@@ -106,29 +93,20 @@ struct KineticReactionsParameters
   RealType m_rateConstantForward[numReactions];
   RealType m_rateConstantReverse[numReactions];
 
-    private:
-#if defined(__GNUC__) || defined(__clang__)
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wmissing-braces"
-#elif defined(_MSC_VER)
-  #pragma warning(push)
-  #pragma warning(disable : 4351)  // MSVC equivalent of missing-braces warning
-#endif
-template< std::size_t ... R, std::size_t ... RxS >
-KineticReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
-                            RealType const (&rateConstantForward)[numReactions],
-                            RealType const (&rateConstantReverse)[numReactions],
-                            std::index_sequence<R...>,
-                            std::index_sequence<RxS...> ):
-  m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies]... },
-  m_rateConstantForward{ rateConstantForward[R]... },
-  m_rateConstantReverse{ rateConstantReverse[R]... }
-  {}
-#if defined(__GNUC__) || defined(__clang__)
-  #pragma GCC diagnostic pop
-#elif defined(_MSC_VER)
-  #pragma warning(pop)
-#endif
+private:
+  HPCREACT_NO_MISSING_BRACES(
+    template< std::size_t ... R, std::size_t ... RxS >
+    KineticReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
+                                RealType const (&rateConstantForward)[numReactions],
+                                RealType const (&rateConstantReverse)[numReactions],
+                                std::index_sequence< R... >,
+                                std::index_sequence< RxS... > ) :
+      m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies] ... },
+    m_rateConstantForward{ rateConstantForward[R] ... },
+    m_rateConstantReverse{ rateConstantReverse[R] ... }
+    {}
+    )
+
 };
 
 
@@ -146,14 +124,14 @@ struct MixedReactionsParameters
   static constexpr IndexType numReactions = NUM_REACTIONS;
 
   constexpr
-  EquilibriumReactionsParameters< RealType, IntType, IndexType, numSpecies, numReactions > 
+  EquilibriumReactionsParameters< RealType, IntType, IndexType, numSpecies, numReactions >
   equilibriumReactionsParameters() const
   {
     return {m_stoichiometricMatrix, m_equilibriumConstant};
   }
 
   constexpr
-  KineticReactionsParameters< RealType, IntType, IndexType, numSpecies, numReactions > 
+  KineticReactionsParameters< RealType, IntType, IndexType, numSpecies, numReactions >
   kineticReactionsParameters() const
   {
     return {m_stoichiometricMatrix, m_rateConstantForward, m_rateConstantReverse};
@@ -204,8 +182,6 @@ struct MixedReactionsParameters
   RealType m_rateConstantForward[numReactions];
   RealType m_rateConstantReverse[numReactions];
 };
-
-
 
 
 

@@ -19,3 +19,26 @@
 /// This macro is used to ignore warnings that that a variable is
 /// unused.
 #define HPCREACT_UNUSED_VAR( ... ) (void)( __VA_ARGS__ )
+
+
+#if defined( __clang__ )
+#define HPCREACT_NO_MISSING_BRACES( ... ) \
+        _Pragma("clang diagnostic push") \
+        _Pragma("clang diagnostic ignored \"-Wmissing-braces\"") \
+        __VA_ARGS__ \
+        _Pragma("clang diagnostic pop")
+#elif defined(__GNUC__)
+#define HPCREACT_NO_MISSING_BRACES( ... ) \
+        _Pragma("GCC diagnostic push") \
+        _Pragma("GCC diagnostic ignored \"-Wmissing-braces\"") \
+        __VA_ARGS__ \
+        _Pragma("GCC diagnostic pop")
+#elif defined(_MSC_VER)
+#define HPCREACT_NO_MISSING_BRACES( ... ) \
+        __pragma(warning(push)) \
+        __pragma(warning(disable : 4351)) \
+        __VA_ARGS__ \
+        __pragma(warning(pop))
+#else
+#define HPCREACT_NO_MISSING_BRACES( ... ) __VA_ARGS__ // No-op for unknown compilers
+#endif
