@@ -37,6 +37,7 @@ target_include_directories( hpcReact
                             $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
                             $<INSTALL_INTERFACE:include> )
 
+blt_print_target_properties( TARGET hpcReact )
 # install( FILES ${hpcReact_headers} 
 #          DESTINATION include )
 
