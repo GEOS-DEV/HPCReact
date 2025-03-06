@@ -150,12 +150,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
 
   for( int r=0; r<numSpecies; ++r )
   {
-    printf( "%18.12e\n", speciesConcentration[r] );
-  }
-
-  for( int r=0; r<numSpecies; ++r )
-  {
-    EXPECT_NEAR( speciesConcentration[r], expectedSpeciesConcentrations[r], 1.0e-8 );
+    EXPECT_NEAR( speciesConcentration[r], expectedSpeciesConcentrations[r], 1.0e-8 * expectedSpeciesConcentrations[r] );
   }
 
 }
@@ -212,31 +207,25 @@ TEST( testEquilibriumReactions, testCarbonateSystem )
   };
 
   double const expectedSpeciesConcentrations[18] =
-  { 9.884330823068e+06, // OH-
-    4.217710930333e-04, // CO2
-    2.114046643682e-01, // CO3-2
-    1.640757112486e-01, // H2CO3
-    1.341448126749e-08, // CaHCO3+
-    1.953088434753e-07, // CaCO3
-    3.224784300154e-07, // CaSO4
-    1.447573069249e-02, // CaCl+
-    2.253393830438e-02, // CaCl2
-    1.692550572351e-06, // MgSO4
-    4.520203771797e-03, // NaSO4-
-    9.884331245975e+06, // H+
-    9.764456680183e-05, // HCO3-
-    1.689799801383e-03, // Ca+2
-    2.757778119920e-02, // SO4-2
-    1.830456392699e+00, // Cl-
-    1.649830744943e-02, // Mg+2
-    1.085479796228e+00 // Na+1
+  { 2.327841695586879e-11, // OH-
+    3.745973700632716e-01, // CO2
+    3.956656978189456e-11, // CO3-2
+    9.629355924567627e-04, // H2CO3
+    6.739226982791492e-05, // CaHCO3+
+    1.065032288527957e-09, // CaCO3
+    5.298329882666738e-03, // CaSO4
+    5.844517547638333e-03, // CaCl+
+    1.277319392670652e-02, // CaCl2
+    6.618125707964991e-03, // MgSO4
+    1.769217213462983e-02, // NaSO4-
+    4.396954721488358e-04, // H+
+    3.723009698453808e-04, // HCO3-
+    1.471656530812871e-02, // Ca+2
+    2.491372274738741e-03, // SO4-2
+    1.858609094598949e+00, // Cl-
+    9.881874292035110e-03, // Mg+2
+    1.072307827865370e+00 // Na+1
   };
-
-  // std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
-  // testEnforceEquilibrium< double, 0 >( carbonateSystem.equilibriumReactionsParameters(),
-  //                                          initialSpeciesConcentration,
-  //                                          expectedSpeciesConcentrations );
-
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
   testEnforceEquilibrium< double, 2 >( carbonateSystem.equilibriumReactionsParameters(),

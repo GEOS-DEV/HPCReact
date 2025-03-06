@@ -68,6 +68,9 @@ EquilibriumReactions< REAL_TYPE,
 
     RealType forwardProduct = 1.0;
     RealType reverseProduct = 1.0;
+
+    // these actually only hold the derivatives of the single concentration term for the product...not the full product.
+    // it will have to be multiplied by the product itself to get the derivative of the product.
     RealType dForwardProduct_dxi[numReactions] = {0.0};
     RealType dReverseProduct_dxi[numReactions] = {0.0};
     // loop over species
@@ -98,15 +101,15 @@ EquilibriumReactions< REAL_TYPE,
     // compute the residual for this reaction
     if constexpr( RESIDUAL_FORM == 0 )
     {
-      residual[a] = forwardProduct - Keq * reverseProduct;
+      residual[a] = Keq * forwardProduct - reverseProduct;
     }
     else if constexpr( RESIDUAL_FORM == 1 )
     {
-      residual[a] = 1.0 - Keq * reverseProduct / forwardProduct;
+      residual[a] = 1.0 -  reverseProduct / ( forwardProduct * Keq );
     }
     else if constexpr( RESIDUAL_FORM == 2 )
     {
-      residual[a] = log( Keq * reverseProduct / forwardProduct );
+      residual[a] = log( reverseProduct / ( forwardProduct * Keq ) );
     }
     //     printf( "residual[%d] = %g - %g * %g = %g\n", a, forwardProduct, Keq, reverseProduct, residual[a] );
 
@@ -117,20 +120,25 @@ EquilibriumReactions< REAL_TYPE,
       // printf( "(%d) dReverseProduct_dxi[%d] = %f\n", a, b, dReverseProduct_dxi[b] );
       // printf( "Keq = %f\n", Keq );
 
-      dForwardProduct_dxi[b] *= forwardProduct;
-      dReverseProduct_dxi[b] *= reverseProduct;
 
       if constexpr( RESIDUAL_FORM == 0 )
       {
-        jacobian( a, b ) = dForwardProduct_dxi[b] - Keq * dReverseProduct_dxi[b];
+        dForwardProduct_dxi[b] *= forwardProduct;
+        dReverseProduct_dxi[b] *= reverseProduct;
+        jacobian( a, b ) = Keq * dForwardProduct_dxi[b] - dReverseProduct_dxi[b];
       }
       else if constexpr( RESIDUAL_FORM == 1 )
       {
-        jacobian( a, b ) =  -Keq * ( dReverseProduct_dxi[b] / forwardProduct - dForwardProduct_dxi[b] * reverseProduct / ( forwardProduct * forwardProduct ) );
+        dForwardProduct_dxi[b] *= forwardProduct;
+        dReverseProduct_dxi[b] *= reverseProduct;
+        jacobian( a, b ) =  -1/Keq * ( dReverseProduct_dxi[b] / forwardProduct - dForwardProduct_dxi[b] * reverseProduct / ( forwardProduct * forwardProduct ) );
       }
       else if constexpr( RESIDUAL_FORM == 2 )
       {
-        jacobian( a, b ) = -dForwardProduct_dxi[b] / forwardProduct + dReverseProduct_dxi[b] / reverseProduct;
+        // printf( "(%d) dForwardProduct_dxi[%d] = %f\n", a, b, dForwardProduct_dxi[b] );
+        // printf( "(%d) dReverseProduct_dxi[%d] = %f\n", a, b, dReverseProduct_dxi[b] );
+        jacobian( a, b ) = -dForwardProduct_dxi[b] + dReverseProduct_dxi[b];
+//        printf( " jacobian( a, b ) = %g + %g = %g\n", -dForwardProduct_dxi[b], dReverseProduct_dxi[b], jacobian( a, b ) );
       }
     }
   }
@@ -162,7 +170,7 @@ EquilibriumReactions< REAL_TYPE,
   CArrayWrapper< double, numReactions, numReactions > jacobian;
 
   REAL_TYPE residualNorm = 0.0;
-  for( int k=0; k<100; ++k )
+  for( int k=0; k<30; ++k )
   {
     computeResidualAndJacobian( temperature,
                                 params,
@@ -178,7 +186,7 @@ EquilibriumReactions< REAL_TYPE,
     }
     residualNorm = sqrt( residualNorm );
     printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
-    if( residualNorm < 1.0e-14 )
+    if( residualNorm < 1.0e-12 )
     {
       printf( " converged\n" );
       break;
@@ -213,26 +221,28 @@ EquilibriumReactions< REAL_TYPE,
         printf( "},\n" );
       }
       printf( " }\n" );
-    }
 
-    int numNonSymmetric = 0;
-    for( int i=0; i<numReactions; ++i )
-    {
-      for( int j=i; j<numReactions; ++j )
+      int numNonSymmetric = 0;
+      for( int i=0; i<numReactions; ++i )
       {
-        if( fabs( jacobian( i, j ) - jacobian( j, i ) ) > 0.5 * ( jacobian( i, j ) + jacobian( j, i ) )*1.0e-14 )
+        for( int j=i; j<numReactions; ++j )
         {
-          ++numNonSymmetric;
-          printf( "jacobian not symmetric: i = %d, j = %d, jacobian(i,j) = %g, jacobian(j,i) = %g\n", i, j, jacobian( i, j ), jacobian( j, i ) );
+          if( fabs( jacobian( i, j ) - jacobian( j, i ) ) > 0.5 * ( jacobian( i, j ) + jacobian( j, i ) )*1.0e-14 )
+          {
+            ++numNonSymmetric;
+            printf( "jacobian not symmetric: i = %d, j = %d, jacobian(i,j) = %g, jacobian(j,i) = %g\n", i, j, jacobian( i, j ), jacobian( j, i ) );
+          }
         }
       }
-    }
-    if( numNonSymmetric > 0 )
-    {
-      printf( "numNonSymmetric = %d\n", numNonSymmetric );
+      if( numNonSymmetric > 0 )
+      {
+        printf( "numNonSymmetric = %d\n", numNonSymmetric );
+      }
+
+      printf( " is J PD = %d\n", isPositiveDefinite< double, numReactions >( jacobian.data ) );
+
     }
 
-    printf( " is J PD = %d\n", isPositiveDefinite< double, numReactions >( jacobian.data ) );
 
     // solve for the change in xi
     solveNxN_Cholesky< double, numReactions >( jacobian.data, residual, dxi );

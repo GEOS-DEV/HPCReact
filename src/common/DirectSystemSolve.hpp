@@ -25,7 +25,7 @@ bool isPositiveDefinite( REAL_TYPE const (&A)[N][N] )
   {
     // Compute determinant of k-th leading principal minor using Gaussian elimination
     if( temp[k][k] <= 0 )
-      return false;                    // Must be positive
+      return false; // Must be positive
 
     for( int i = k + 1; i < N; i++ )
     {
@@ -63,19 +63,19 @@ void solveNxN_Cholesky( REAL_TYPE const (&A)[N][N], REAL_TYPE const (&b)[N], REA
   }
 
   // **Forward Substitution: Solve L y = b**
-  REAL_TYPE y[N];
+  //REAL_TYPE y[N];
   for( int i = 0; i < N; i++ )
   {
-    y[i] = b[i];
+    x[i] = b[i];
     for( int j = 0; j < i; j++ )
-      y[i] -= L[i][j] * y[j];
-    y[i] /= L[i][i];
+      x[i] -= L[i][j] * x[j];
+    x[i] /= L[i][i];
   }
 
   // **Backward Substitution: Solve L^T x = y**
   for( int i = N - 1; i >= 0; i-- )
   {
-    x[i] = y[i];
+//    x[i] = y[i];
     for( int j = i + 1; j < N; j++ )
       x[i] -= L[j][i] * x[j];
     x[i] /= L[i][i];
@@ -102,9 +102,13 @@ void solveNxN_Cholesky( symmetricMatrix< REAL_TYPE, int, N > const & A,
         sum += L( i, k ) * L( j, k );
       }
       if( i == j )
+      {
         L( i, j ) = sqrt( A( i, i ) - sum );
+      }
       else
+      {
         L( i, j ) = (A( i, j ) - sum) / L[j][j];
+      }
     }
   }
 
@@ -114,7 +118,9 @@ void solveNxN_Cholesky( symmetricMatrix< REAL_TYPE, int, N > const & A,
   {
     y[i] = b[i];
     for( int j = 0; j < i; j++ )
+    {
       y[i] -= L( i, j ) * y[j];
+    }
     y[i] /= L( i, i );
   }
 
@@ -123,7 +129,9 @@ void solveNxN_Cholesky( symmetricMatrix< REAL_TYPE, int, N > const & A,
   {
     x[i] = y[i];
     for( int j = i + 1; j < N; j++ )
+    {
       x[i] -= L( j, i ) * x[j];
+    }
     x[i] /= L( i, i );
   }
 }
