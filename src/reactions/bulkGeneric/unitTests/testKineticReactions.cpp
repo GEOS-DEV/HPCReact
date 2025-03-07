@@ -80,7 +80,8 @@ TEST( testKineticReactions, computeReactionRatesTest )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedReactionRates[] = { 1.0, 0.25 };
-  double const expectedReactionRatesDerivatives[][5] = { { 2.0, -0.5, 0.0, 0.0, 0.0 },
+  double const expectedReactionRatesDerivatives[][5] = 
+  { { 2.0, -0.5, 0.0, 0.0, 0.0 },
     { 0.0, 0.0, 0.5, 0.25, 0.0 } };
   computeReactionRatesTest< double, false >( simpleTestRateParams.kineticReactionsParameters(),
                                              initialSpeciesConcentration,
@@ -264,8 +265,8 @@ void timeStepTest( PARAMS_DATA const & params,
 
 TEST( testKineticReactions, testTimeStep )
 {
-  double const initialSpeciesConcentration[5] = { 0.9, 1.0e-16, 0.5, 0.9, 1.0e-16 };
-  double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };
+  double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+  double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01, 7.02014627734060e-01, 5.95970744531880e-01 };
   double const expectedSpeciesRates[5] = { -2.0, 1.0, 0.75, -0.25, 0.5 };
   double const expectedSpeciesRatesDerivatives[5][5] = { { -4.0, 1.0, 0.0, 0.0, 0.0 },
     {  2.0, -0.5, 0.0, 0.0, 0.0 },
@@ -273,22 +274,22 @@ TEST( testKineticReactions, testTimeStep )
     {  0.0, 0.0, -0.5, -0.25, 0.0 },
     {  0.0, 0.0, 1.0, 0.5, 0.0 } };
 
-  // timeStepTest< double, false >( simpleTestRateParams,
-  //                                2.0,
-  //                                10,
-  //                                initialSpeciesConcentration,
-  //                                expectedSpeciesConcentrations,
-  //                                expectedSpeciesRates,
-  //                                expectedSpeciesRatesDerivatives );
+  timeStepTest< double, false >( simpleTestRateParams,
+                                 2.0,
+                                 10,
+                                 initialSpeciesConcentration,
+                                 expectedSpeciesConcentrations,
+                                 expectedSpeciesRates,
+                                 expectedSpeciesRatesDerivatives );
 
 //  ln(c) as the primary variable results in a singular system.
-  timeStepTest< double, true >( simpleTestRateParams,
-                                2.0,
-                                10,
-                                initialSpeciesConcentration,
-                                expectedSpeciesConcentrations,
-                                expectedSpeciesRates,
-                                expectedSpeciesRatesDerivatives );
+  // timeStepTest< double, true >( simpleTestRateParams,
+  //                               2.0,
+  //                               10,
+  //                               initialSpeciesConcentration,
+  //                               expectedSpeciesConcentrations,
+  //                               expectedSpeciesRates,
+  //                               expectedSpeciesRatesDerivatives );
 }
 
 int main( int argc, char * * argv )

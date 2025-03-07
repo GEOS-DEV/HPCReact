@@ -1,3 +1,5 @@
+#include "common/printers.hpp"
+
 #include <iostream>
 
 
@@ -245,20 +247,24 @@ EquilibriumReactions< REAL_TYPE,
 
 
     // solve for the change in xi
-    solveNxN_Cholesky< double, numReactions >( jacobian.data, residual, dxi );
+    for( int r=0; r<numReactions; ++r )
+    {
+      dxi[r] = 0.0;
+      residual[r] = -residual[r];
+    }
+    if constexpr( RESIDUAL_FORM == 2 )
+    {
+      solveNxN_Cholesky< double, numReactions >( jacobian.data, residual, dxi );
+    }
+    else
+    {
+      solveNxN_pivoted< double, numReactions >( jacobian.data, residual, dxi );
+    }
 
     if constexpr( debugPrinting )
     {
-      printf( "dxi = { " );
-      for( int i=0; i<numReactions; ++i )
-      {
-        printf( "%18.12g", dxi[i] );
-        if( i < numReactions-1 )
-        {
-          printf( ", " );
-        }
-      }
-      printf( " }\n" );
+      print( xi, "xi", 12 );
+      print( dxi, "dxi", 12 );
     }
 
     // scaling
@@ -271,25 +277,21 @@ EquilibriumReactions< REAL_TYPE,
       {
         dc += params.stoichiometricMatrix( r, i ) * dxi[r];
         cn += params.stoichiometricMatrix( r, i ) * xi[r];
-        if( cn-dc < 1.0e-30 )
+      }
+      if( cn+dc < 1.0e-30 )
+      {
+        REAL_TYPE const fscale = ( 1.0e-30 - cn ) / (dc);
+        if( fscale < scale )
         {
-          REAL_TYPE const fscale = ( 1.0e-30 - cn ) / (-dc);
-          if( fscale < scale )
-          {
-            scale = 0.99*fscale;
-          }
+          scale = 0.9*fscale;
+          //printf( "i, cn, dc, scale = %d, %18.12g %18.12g %18.12g\n", i, cn, dc, scale );
         }
       }
     }
 
-    if constexpr( debugPrinting )
-    {
-      printf( "scale = %18.12g\n", scale );
-    }
-
     for( IndexType r=0; r<numReactions; ++r )
     {
-      xi[r] -= scale * dxi[r];
+      xi[r] += scale * dxi[r];
     }
 
 

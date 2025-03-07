@@ -54,16 +54,16 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
                                                         residual,
                                                         jacobian );
 
-  printf( "R = | %8.4g %8.4g |\n", residual[0], residual[1] );
+//  printf( "R = { %8.4g, %8.4g }\n", residual[0], residual[1] );
   for( int r=0; r<numReactions; ++r )
   {
     EXPECT_NEAR( residual[r], expectedResidual[r], 1.0e-8 );
   }
 
-  HPCREACT_UNUSED_VAR( expectedJacobian );
-  printf( "J = | %8.4g %8.4g |\n    | %8.4g %8.4g |\n\n",
-          jacobian( 0, 0 ), jacobian( 0, 1 ),
-          jacobian( 1, 0 ), jacobian( 1, 1 ) );
+  // HPCREACT_UNUSED_VAR( expectedJacobian );
+  // printf( "J = { { %8.4g, %8.4g },\n    { %8.4g %8.4g } }\n\n",
+  //         jacobian( 0, 0 ), jacobian( 0, 1 ),
+  //         jacobian( 1, 0 ), jacobian( 1, 1 ) );
   for( int a = 0; a < numReactions; ++a )
   {
     for( int b = 0; b < numReactions; ++b )
@@ -75,47 +75,47 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
 
 
 //******************************************************************************
-// TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
-// {
-//   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
+{
+  double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
 
-//   std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
-//   {
-//   double const expectedResiduals[] = { 1.0, 0.5 };
-//   double const expectedJacobian[2][2] =
-//   { { -4.5, 1.0e-16 },
-//     { 1.0, -1.5 } };
-//   computeResidualAndJacobianTest< double, 0 >( simpleTestRateParams,
-//                                                    initialSpeciesConcentration,
-//                                                    expectedResiduals,
-//                                                    expectedJacobian );
-//   }
+  std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
+  {
+  double const expectedResiduals[] = { 1.0, 0.5 };
+  double const expectedJacobian[2][2] =
+  { { -4.5, 1.0e-16 },
+    { 1.0, -1.5 } };
+  computeResidualAndJacobianTest< double, 0 >( simpleTestRateParams,
+                                                   initialSpeciesConcentration,
+                                                   expectedResiduals,
+                                                   expectedJacobian );
+  }
 
-//   {
-//   std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
-//   double const expectedResiduals[] = { 1.0, 1.0 };
-//   double const expectedJacobian[2][2] =
-//   { { -0.5,1.0e-16 },
-//     { 4.0e-32,-8.0e-16 } };
-//   computeResidualAndJacobianTest< double, 1 >( simpleTestRateParams,
-//                                                    initialSpeciesConcentration,
-//                                                    expectedResiduals,
-//                                                    expectedJacobian );
-//   }
+  {
+  std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
+  double const expectedResiduals[] = { 1.0, 1.0 };
+  double const expectedJacobian[2][2] =
+  { { -0.5,1.0e-16 },
+    { 4.0e-32,-8.0e-16 } };
+  computeResidualAndJacobianTest< double, 1 >( simpleTestRateParams,
+                                                   initialSpeciesConcentration,
+                                                   expectedResiduals,
+                                                   expectedJacobian );
+  }
 
-//   {
-//   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-//   double const expectedResiduals[] = { -37.534508668465, -72.989575795250 };
-//   double const expectedJacobian[2][2] =
-//   { { 1.0e16,-2.0 },
-//     { -2.0,4.0e16 } };
-//   computeResidualAndJacobianTest< double, 2 >( simpleTestRateParams,
-//                                                initialSpeciesConcentration,
-//                                                expectedResiduals,
-//                                                expectedJacobian );
-//   }
+  {
+  std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
+  double const expectedResiduals[] = { -37.534508668465, -72.989575795250 };
+  double const expectedJacobian[2][2] =
+  { { 1.0e16,-2.0 },
+    { -2.0,4.0e16 } };
+  computeResidualAndJacobianTest< double, 2 >( simpleTestRateParams,
+                                               initialSpeciesConcentration,
+                                               expectedResiduals,
+                                               expectedJacobian );
+  }
 
-// }
+}
 
 
 //******************************************************************************
@@ -150,35 +150,36 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
 
   for( int r=0; r<numSpecies; ++r )
   {
+//    printf( "c[%d] = %22.14e\n", r, speciesConcentration[r] );
     EXPECT_NEAR( speciesConcentration[r], expectedSpeciesConcentrations[r], 1.0e-8 * expectedSpeciesConcentrations[r] );
   }
 
 }
 
 
-// //******************************************************************************
-// TEST( testEquilibriumReactions, testEnforceEquilibrium )
-// {
-//   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
-//   double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };
+//******************************************************************************
+TEST( testEquilibriumReactions, testEnforceEquilibrium )
+{
+  double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+  double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };
 
-//   std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
-//   testEnforceEquilibrium< double, 0 >( simpleTestRateParams.equilibriumReactionsParameters(),
-//                                            initialSpeciesConcentration,
-//                                            expectedSpeciesConcentrations );
+  std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
+  testEnforceEquilibrium< double, 0 >( simpleTestRateParams.equilibriumReactionsParameters(),
+                                           initialSpeciesConcentration,
+                                           expectedSpeciesConcentrations );
 
-//   // std::cout<<std::endl;
-//   // std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
-//   // testEnforceEquilibrium< double, 1 >( simpleTestRateParams.equilibriumReactionsParameters(),
-//   //                                         initialSpeciesConcentration,
-//   //                                         expectedSpeciesConcentrations );
+  // std::cout<<std::endl;
+  // std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
+  // testEnforceEquilibrium< double, 1 >( simpleTestRateParams.equilibriumReactionsParameters(),
+  //                                         initialSpeciesConcentration,
+  //                                         expectedSpeciesConcentrations );
 
-//   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-//   testEnforceEquilibrium< double, 2 >( simpleTestRateParams.equilibriumReactionsParameters(),
-//                                           initialSpeciesConcentration,
-//                                           expectedSpeciesConcentrations );
+  std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
+  testEnforceEquilibrium< double, 2 >( simpleTestRateParams.equilibriumReactionsParameters(),
+                                          initialSpeciesConcentration,
+                                          expectedSpeciesConcentrations );
 
-// }
+}
 
 
 //******************************************************************************
@@ -226,6 +227,16 @@ TEST( testEquilibriumReactions, testCarbonateSystem )
     9.881874292035110e-03, // Mg+2
     1.072307827865370e+00 // Na+1
   };
+
+  std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
+  testEnforceEquilibrium< double, 0 >( carbonateSystem.equilibriumReactionsParameters(),
+                                       initialSpeciesConcentration,
+                                       expectedSpeciesConcentrations );
+
+  // std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
+  // testEnforceEquilibrium< double, 1 >( carbonateSystem.equilibriumReactionsParameters(),
+  //                                      initialSpeciesConcentration,
+  //                                      expectedSpeciesConcentrations );
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
   testEnforceEquilibrium< double, 2 >( carbonateSystem.equilibriumReactionsParameters(),
