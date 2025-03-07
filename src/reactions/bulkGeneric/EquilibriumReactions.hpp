@@ -13,13 +13,14 @@ namespace bulkGeneric
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
-          int RESIDUAL_FORM >
+          int FORMULATION >
 class EquilibriumReactions
 {
 public:
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
   using IndexType = INDEX_TYPE;
+//  constexpr static int formulation = FORMULATION;
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D,

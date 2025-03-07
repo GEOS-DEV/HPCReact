@@ -79,29 +79,6 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
 
-  std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
-  {
-  double const expectedResiduals[] = { 1.0, 0.5 };
-  double const expectedJacobian[2][2] =
-  { { -4.5, 1.0e-16 },
-    { 1.0, -1.5 } };
-  computeResidualAndJacobianTest< double, 0 >( simpleTestRateParams,
-                                                   initialSpeciesConcentration,
-                                                   expectedResiduals,
-                                                   expectedJacobian );
-  }
-
-  {
-  std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
-  double const expectedResiduals[] = { 1.0, 1.0 };
-  double const expectedJacobian[2][2] =
-  { { -0.5,1.0e-16 },
-    { 4.0e-32,-8.0e-16 } };
-  computeResidualAndJacobianTest< double, 1 >( simpleTestRateParams,
-                                                   initialSpeciesConcentration,
-                                                   expectedResiduals,
-                                                   expectedJacobian );
-  }
 
   {
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
@@ -163,16 +140,6 @@ TEST( testEquilibriumReactions, testEnforceEquilibrium )
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };
 
-  std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
-  testEnforceEquilibrium< double, 0 >( simpleTestRateParams.equilibriumReactionsParameters(),
-                                           initialSpeciesConcentration,
-                                           expectedSpeciesConcentrations );
-
-  // std::cout<<std::endl;
-  // std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
-  // testEnforceEquilibrium< double, 1 >( simpleTestRateParams.equilibriumReactionsParameters(),
-  //                                         initialSpeciesConcentration,
-  //                                         expectedSpeciesConcentrations );
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
   testEnforceEquilibrium< double, 2 >( simpleTestRateParams.equilibriumReactionsParameters(),

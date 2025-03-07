@@ -13,7 +13,7 @@ constexpr bool debugPrinting = false;
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
-          int RESIDUAL_FORM >
+          int FORMULATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST,
@@ -24,22 +24,13 @@ void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
-                      RESIDUAL_FORM >::computeResidualAndJacobian( RealType const & temperature,
+                      FORMULATION >::computeResidualAndJacobian( REAL_TYPE const & temperature,
                                                                    PARAMS_DATA const & params,
                                                                    ARRAY_1D_TO_CONST const & speciesConcentration0,
                                                                    ARRAY_1D_TO_CONST2 const & xi,
                                                                    ARRAY_1D & residual,
                                                                    ARRAY_2D & jacobian )
 {
-
-  // printf( "speciesConcentration0 = | %g %g %g %g %g |\n",
-  //         speciesConcentration0[0],
-  //         speciesConcentration0[1],
-  //         speciesConcentration0[2],
-  //         speciesConcentration0[3],
-  //         speciesConcentration0[4] );
-  // printf( "xi = | %g %g |\n", xi[0], xi[1] );
-
 
   HPCREACT_UNUSED_VAR( temperature );
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
@@ -53,10 +44,6 @@ EquilibriumReactions< REAL_TYPE,
     for( IndexType r=0; r<numReactions; ++r )
     {
       speciesConcentration[i] += params.stoichiometricMatrix( r, i ) * xi[r];
-      // if( speciesConcentration[i] < 1.0e-17 )
-      // {
-      //   speciesConcentration[i] = 1.0e-17;
-      // }
     }
   }
 
@@ -73,8 +60,8 @@ EquilibriumReactions< REAL_TYPE,
 
     // these actually only hold the derivatives of the single concentration term for the product...not the full product.
     // it will have to be multiplied by the product itself to get the derivative of the product.
-    RealType dForwardProduct_dxi[numReactions] = {0.0};
-    RealType dReverseProduct_dxi[numReactions] = {0.0};
+    RealType dForwardProduct_dxi_divProduct[numReactions] = {0.0};
+    RealType dReverseProduct_dxi_divProduct[numReactions] = {0.0};
     // loop over species
     for( IndexType i=0; i<numSpecies; ++i )
     {
@@ -86,7 +73,7 @@ EquilibriumReactions< REAL_TYPE,
         // derivative of forward product with respect to xi
         for( IndexType b=0; b<numReactions; ++b )
         {
-          dForwardProduct_dxi[b] += -s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
+          dForwardProduct_dxi_divProduct[b] += -s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
         }
       }
       else if( s_ai > 0.0 )
@@ -96,52 +83,17 @@ EquilibriumReactions< REAL_TYPE,
         // derivative of reverse product with respect to xi
         for( IndexType b=0; b<numReactions; ++b )
         {
-          dReverseProduct_dxi[b] += s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
+          dReverseProduct_dxi_divProduct[b] += s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
         }
       }
     }
     // compute the residual for this reaction
-    if constexpr( RESIDUAL_FORM == 0 )
-    {
-      residual[a] = Keq * forwardProduct - reverseProduct;
-    }
-    else if constexpr( RESIDUAL_FORM == 1 )
-    {
-      residual[a] = 1.0 -  reverseProduct / ( forwardProduct * Keq );
-    }
-    else if constexpr( RESIDUAL_FORM == 2 )
-    {
-      residual[a] = log( reverseProduct / ( forwardProduct * Keq ) );
-    }
-    //     printf( "residual[%d] = %g - %g * %g = %g\n", a, forwardProduct, Keq, reverseProduct, residual[a] );
+    residual[a] = log( reverseProduct / ( forwardProduct * Keq ) );
 
-    // Finish the derivatives of the product terms with respect to xi
+    // compute the jacobian
     for( IndexType b=0; b<numReactions; ++b )
     {
-      // printf( "(%d) dForwardProduct_dxi[%d] = %f\n", a, b, dForwardProduct_dxi[b] );
-      // printf( "(%d) dReverseProduct_dxi[%d] = %f\n", a, b, dReverseProduct_dxi[b] );
-      // printf( "Keq = %f\n", Keq );
-
-
-      if constexpr( RESIDUAL_FORM == 0 )
-      {
-        dForwardProduct_dxi[b] *= forwardProduct;
-        dReverseProduct_dxi[b] *= reverseProduct;
-        jacobian( a, b ) = Keq * dForwardProduct_dxi[b] - dReverseProduct_dxi[b];
-      }
-      else if constexpr( RESIDUAL_FORM == 1 )
-      {
-        dForwardProduct_dxi[b] *= forwardProduct;
-        dReverseProduct_dxi[b] *= reverseProduct;
-        jacobian( a, b ) =  -1/Keq * ( dReverseProduct_dxi[b] / forwardProduct - dForwardProduct_dxi[b] * reverseProduct / ( forwardProduct * forwardProduct ) );
-      }
-      else if constexpr( RESIDUAL_FORM == 2 )
-      {
-        // printf( "(%d) dForwardProduct_dxi[%d] = %f\n", a, b, dForwardProduct_dxi[b] );
-        // printf( "(%d) dReverseProduct_dxi[%d] = %f\n", a, b, dReverseProduct_dxi[b] );
-        jacobian( a, b ) = -dForwardProduct_dxi[b] + dReverseProduct_dxi[b];
-//        printf( " jacobian( a, b ) = %g + %g = %g\n", -dForwardProduct_dxi[b], dReverseProduct_dxi[b], jacobian( a, b ) );
-      }
+      jacobian( a, b ) = -dForwardProduct_dxi_divProduct[b] + dReverseProduct_dxi_divProduct[b];
     }
   }
 }
@@ -149,7 +101,7 @@ EquilibriumReactions< REAL_TYPE,
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
-          int RESIDUAL_FORM >
+          int FORMULATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST >
@@ -158,7 +110,7 @@ void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
-                      RESIDUAL_FORM >::enforceEquilibrium( RealType const & temperature,
+                      FORMULATION >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
                                                            PARAMS_DATA const & params,
                                                            ARRAY_1D_TO_CONST const & speciesConcentration0,
                                                            ARRAY_1D & speciesConcentration )
@@ -194,78 +146,15 @@ EquilibriumReactions< REAL_TYPE,
       break;
     }
 
-    if constexpr( debugPrinting )
-    {
-      printf( "************************************************** \n" );
-      printf( "R = { " );
-      for( int i=0; i<numReactions; ++i )
-      {
-        printf( "%18.12g", residual[i] );
-        if( i < numReactions-1 )
-        {
-          printf( ", " );
-        }
-      }
-      printf( " }\n" );
-
-      printf( "J = { \n" );
-      for( int i=0; i<numReactions; ++i )
-      {
-        printf( " { " );
-        for( int j=0; j<numReactions; ++j )
-        {
-          printf( "%22.14g", jacobian( i, j ) );
-          if( j < numReactions-1 )
-          {
-            printf( ", " );
-          }
-        }
-        printf( "},\n" );
-      }
-      printf( " }\n" );
-
-      int numNonSymmetric = 0;
-      for( int i=0; i<numReactions; ++i )
-      {
-        for( int j=i; j<numReactions; ++j )
-        {
-          if( fabs( jacobian( i, j ) - jacobian( j, i ) ) > 0.5 * ( jacobian( i, j ) + jacobian( j, i ) )*1.0e-14 )
-          {
-            ++numNonSymmetric;
-            printf( "jacobian not symmetric: i = %d, j = %d, jacobian(i,j) = %g, jacobian(j,i) = %g\n", i, j, jacobian( i, j ), jacobian( j, i ) );
-          }
-        }
-      }
-      if( numNonSymmetric > 0 )
-      {
-        printf( "numNonSymmetric = %d\n", numNonSymmetric );
-      }
-
-      printf( " is J PD = %d\n", isPositiveDefinite< double, numReactions >( jacobian.data ) );
-
-    }
-
-
     // solve for the change in xi
     for( int r=0; r<numReactions; ++r )
     {
       dxi[r] = 0.0;
       residual[r] = -residual[r];
     }
-    if constexpr( RESIDUAL_FORM == 2 )
-    {
-      solveNxN_Cholesky< double, numReactions >( jacobian.data, residual, dxi );
-    }
-    else
-    {
-      solveNxN_pivoted< double, numReactions >( jacobian.data, residual, dxi );
-    }
 
-    if constexpr( debugPrinting )
-    {
-      print( xi, "xi", 12 );
-      print( dxi, "dxi", 12 );
-    }
+    solveNxN_Cholesky< double, numReactions >( jacobian.data, residual, dxi );
+
 
     // scaling
     REAL_TYPE scale = 1.0;
@@ -293,27 +182,6 @@ EquilibriumReactions< REAL_TYPE,
     {
       xi[r] += scale * dxi[r];
     }
-
-
-    if constexpr( debugPrinting )
-    {
-      printf( "c = { " );
-      for( IndexType i=0; i<numSpecies; ++i )
-      {
-        REAL_TYPE c = speciesConcentration0[i];
-        for( IndexType r=0; r<numReactions; ++r )
-        {
-          c += params.stoichiometricMatrix( r, i ) * xi[r];
-        }
-        printf( "%18.12g", c );
-        if( i < numSpecies-1 )
-        {
-          printf( ", " );
-        }
-      }
-      printf( " }\n" );
-    }
-
 
   }
 
