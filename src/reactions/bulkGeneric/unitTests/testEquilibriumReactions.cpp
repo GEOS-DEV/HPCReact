@@ -27,8 +27,7 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
 {
   using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
                                                          int,
-                                                         int,
-                                                         RESIDUAL_FORM >;
+                                                         int >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
   constexpr int numReactions = PARAMS_DATA::numReactions;
@@ -105,8 +104,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
 {
   using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
                                                          int,
-                                                         int,
-                                                         RESIDUAL_FORM >;
+                                                         int >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
 
