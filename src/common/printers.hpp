@@ -25,7 +25,7 @@ void print( CArrayWrapper< T, NROWS, NCOLS > const & matrix, char const * name, 
   char format[8];
   snprintf( format, 8, "%%%d.%de", numDigits+7, numDigits );
 
-  printf( "%-9s = { \n", name );
+  printf( "%-9s = \n{ \n", name );
   for( int i=0; i<NROWS; ++i )
   {
     printf( " { " );
@@ -37,7 +37,7 @@ void print( CArrayWrapper< T, NROWS, NCOLS > const & matrix, char const * name, 
         printf( ", " );
       }
     }
-    printf( "},\n" );
+    printf( " },\n" );
   }
   printf( " }\n" );
 }

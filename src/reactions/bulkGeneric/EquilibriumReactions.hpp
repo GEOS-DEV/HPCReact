@@ -50,10 +50,10 @@ public:
 
 private:
   template< typename PARAMS_DATA,
-  typename ARRAY_1D,
-  typename ARRAY_1D_TO_CONST,
-  typename ARRAY_1D_TO_CONST2,
-  typename ARRAY_2D >
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeResidualAndJacobianReactionExtents( RealType const & temperature,
                                              PARAMS_DATA const & params,
@@ -79,11 +79,11 @@ void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE >::computeResidualAndJacobian( REAL_TYPE const & temperature,
-                                                                   PARAMS_DATA const & params,
-                                                                   ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                                   ARRAY_1D_TO_CONST2 const & xi,
-                                                                   ARRAY_1D & residual,
-                                                                   ARRAY_2D & jacobian )
+                                                                PARAMS_DATA const & params,
+                                                                ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                ARRAY_1D_TO_CONST2 const & xi,
+                                                                ARRAY_1D & residual,
+                                                                ARRAY_2D & jacobian )
 {
 
   HPCREACT_UNUSED_VAR( temperature );
@@ -163,9 +163,9 @@ void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE >::enforceEquilibrium( REAL_TYPE const & temperature,
-                                                           PARAMS_DATA const & params,
-                                                           ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                           ARRAY_1D & speciesConcentration )
+                                                        PARAMS_DATA const & params,
+                                                        ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                        ARRAY_1D & speciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
@@ -249,4 +249,3 @@ EquilibriumReactions< REAL_TYPE,
 
 } // namespace bulkGeneric
 } // namespace hpcReact
-

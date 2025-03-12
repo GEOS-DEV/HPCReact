@@ -80,15 +80,15 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
 
 
   {
-  std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-  double const expectedResiduals[] = { -37.534508668465, -72.989575795250 };
-  double const expectedJacobian[2][2] =
-  { { 1.0e16,-2.0 },
-    { -2.0,4.0e16 } };
-  computeResidualAndJacobianTest< double, 2 >( simpleTestRateParams,
-                                               initialSpeciesConcentration,
-                                               expectedResiduals,
-                                               expectedJacobian );
+    std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
+    double const expectedResiduals[] = { -37.534508668465, -72.989575795250 };
+    double const expectedJacobian[2][2] =
+    { { 1.0e16, -2.0 },
+      { -2.0, 4.0e16 } };
+    computeResidualAndJacobianTest< double, 2 >( simpleTestRateParams,
+                                                 initialSpeciesConcentration,
+                                                 expectedResiduals,
+                                                 expectedJacobian );
   }
 
 }
@@ -141,8 +141,8 @@ TEST( testEquilibriumReactions, testEnforceEquilibrium )
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
   testEnforceEquilibrium< double, 2 >( simpleTestRateParams.equilibriumReactionsParameters(),
-                                          initialSpeciesConcentration,
-                                          expectedSpeciesConcentrations );
+                                       initialSpeciesConcentration,
+                                       expectedSpeciesConcentrations );
 
 }
 

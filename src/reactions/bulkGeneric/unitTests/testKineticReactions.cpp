@@ -71,10 +71,9 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
 
 
 
-
   for( int r=0; r<numReactions; ++r )
   {
-    EXPECT_NEAR( reactionRates[r], expectedReactionRates[r], std::max(magScale, fabs(expectedReactionRates[r]) ) * 1.0e-8 );
+    EXPECT_NEAR( reactionRates[r], expectedReactionRates[r], std::max( magScale, fabs( expectedReactionRates[r] ) ) * 1.0e-8 );
   }
 
 
@@ -87,18 +86,18 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
       {
         reactionRatesDerivatives( r, i ) = reactionRatesDerivatives( r, i ) * exp( -speciesConcentration[i] );
       }
-      EXPECT_NEAR( reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], std::max(magScale, fabs(expectedReactionRatesDerivatives[r][i] ) ) * 1.0e-8 );
+      EXPECT_NEAR( reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], std::max( magScale, fabs( expectedReactionRatesDerivatives[r][i] ) ) * 1.0e-8 );
     }
   }
 }
 
 
 //******************************************************************************
-TEST( testKineticReactions, computeReactionRatesTest_simpleTestRateParams)
+TEST( testKineticReactions, computeReactionRatesTest_simpleTestRateParams )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedReactionRates[] = { 1.0, 0.25 };
-  double const expectedReactionRatesDerivatives[][5] = 
+  double const expectedReactionRatesDerivatives[][5] =
   { { 2.0, -0.5, 0.0, 0.0, 0.0 },
     { 0.0, 0.0, 0.5, 0.25, 0.0 } };
   computeReactionRatesTest< double, false >( simpleTestRateParams.kineticReactionsParameters(),
@@ -135,20 +134,21 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystem )
     1.09 // Na+1
   };
 
-  double const expectedReactionRates[11] = { -9.9632648e-01, -1.41376e-01, -3.7599919536e-01, -1.41376e-01, -1.45512e-02, -1.455119956008e-02, -1.24227e-03, -7.3143e-02, -1.3824027e-01, -5.2965000e-04, -3.4989e-02 };
-  double const expectedReactionRatesDerivatives[11][18] = 
-  { 
-    {  3.67352e+13,       0.0,         0.0,       0.0,       0.0,         0.0,       0.0,       0.0,       0.0,       0.0,       0.0,  9.77e-03,       0.0,         0.0,       0.0,          0.0,       0.0,       0.0 },
-    {          0.0,  4.37e-07,         0.0,       0.0,       0.0,         0.0,       0.0,       0.0,       0.0,       0.0,       0.0, -3.76e-01, -3.76e-01,         0.0,       0.0,          0.0,       0.0,       0.0 },
-    {          0.0,       0.0,  8.0464e+09,       0.0,       0.0,         0.0,       0.0,       0.0,       0.0,       0.0,       0.0,  2.14e-06, -1.00e+00,         0.0,       0.0,          0.0,       0.0,       0.0 },
-    {          0.0,       0.0,         0.0,  1.70e-04,       0.0,         0.0,       0.0,       0.0,       0.0,       0.0,       0.0, -3.76e-01, -3.76e-01,         0.0,       0.0,          0.0,       0.0,       0.0 },
-    {          0.0,       0.0,         0.0,       0.0,  8.13e-02,         0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0, -3.87e-02,   -3.76e-01,       0.0,          0.0,       0.0,       0.0 },
-    {          0.0,       0.0,         0.0,       0.0,       0.0,  4.3992e+06,       0.0,       0.0,       0.0,       0.0,       0.0,  1.17e-09, -3.87e-02,   -3.76e-01,       0.0,          0.0,       0.0,       0.0 },
-    {          0.0,       0.0,         0.0,       0.0,       0.0,         0.0,  6.92e-03,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,   -3.21e-02, -3.87e-02,          0.0,       0.0,       0.0 },
-    {          0.0,       0.0,         0.0,       0.0,       0.0,         0.0,       0.0,  4.68e+00,       0.0,       0.0,       0.0,       0.0,       0.0,   -1.89e+00,       0.0,    -3.87e-02,       0.0,       0.0 },
-    {          0.0,       0.0,         0.0,       0.0,       0.0,         0.0,       0.0,       0.0,  3.98e+00,       0.0,       0.0,       0.0,       0.0, -3.5721e+00,       0.0, -1.46286e-01,       0.0,       0.0 },
-    {          0.0,       0.0,         0.0,       0.0,       0.0,         0.0,       0.0,       0.0,       0.0,  3.72e-03,       0.0,       0.0,       0.0,         0.0, -1.65e-02,          0.0, -3.21e-02,       0.0 },
-    {          0.0,       0.0,         0.0,       0.0,       0.0,         0.0,       0.0,       0.0,       0.0,       0.0,  1.51e-01,       0.0,       0.0,         0.0, -1.09e+00,          0.0,       0.0, -3.21e-02 }
+  double const expectedReactionRates[11] = { -9.9632648e-01, -1.41376e-01, -3.7599919536e-01, -1.41376e-01, -1.45512e-02, -1.455119956008e-02, -1.24227e-03, -7.3143e-02, -1.3824027e-01,
+                                             -5.2965000e-04, -3.4989e-02 };
+  double const expectedReactionRatesDerivatives[11][18] =
+  {
+    {  3.67352e+13, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 9.77e-03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+    {          0.0, 4.37e-07, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3.76e-01, -3.76e-01, 0.0, 0.0, 0.0, 0.0, 0.0 },
+    {          0.0, 0.0, 8.0464e+09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.14e-06, -1.00e+00, 0.0, 0.0, 0.0, 0.0, 0.0 },
+    {          0.0, 0.0, 0.0, 1.70e-04, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3.76e-01, -3.76e-01, 0.0, 0.0, 0.0, 0.0, 0.0 },
+    {          0.0, 0.0, 0.0, 0.0, 8.13e-02, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3.87e-02, -3.76e-01, 0.0, 0.0, 0.0, 0.0 },
+    {          0.0, 0.0, 0.0, 0.0, 0.0, 4.3992e+06, 0.0, 0.0, 0.0, 0.0, 0.0, 1.17e-09, -3.87e-02, -3.76e-01, 0.0, 0.0, 0.0, 0.0 },
+    {          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.92e-03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -3.21e-02, -3.87e-02, 0.0, 0.0, 0.0 },
+    {          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.68e+00, 0.0, 0.0, 0.0, 0.0, 0.0, -1.89e+00, 0.0, -3.87e-02, 0.0, 0.0 },
+    {          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.98e+00, 0.0, 0.0, 0.0, 0.0, -3.5721e+00, 0.0, -1.46286e-01, 0.0, 0.0 },
+    {          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.72e-03, 0.0, 0.0, 0.0, 0.0, -1.65e-02, 0.0, -3.21e-02, 0.0 },
+    {          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.51e-01, 0.0, 0.0, 0.0, -1.09e+00, 0.0, 0.0, -3.21e-02 }
   };
 
   computeReactionRatesTest< double, false >( carbonateSystem,
@@ -160,11 +160,6 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystem )
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
 }
-
-
-
-
-
 
 
 
@@ -400,7 +395,7 @@ TEST( testKineticReactions, testTimeStep_carbonateSystem )
     1.65e-2, // Mg+2
     1.09 // Na+1
   };
-  
+
   double const expectedSpeciesConcentrations[18] =
   { 2.327841695586879e-11, // OH-
     3.745973700632716e-01, // CO2
