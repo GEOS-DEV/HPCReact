@@ -110,9 +110,9 @@ void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE >::enforceEquilibrium_Extents( REAL_TYPE const & temperature,
-                                                        PARAMS_DATA const & params,
-                                                        ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                        ARRAY_1D & speciesConcentration )
+                                                                PARAMS_DATA const & params,
+                                                                ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                ARRAY_1D & speciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
   constexpr int numSpecies = PARAMS_DATA::numSpecies;

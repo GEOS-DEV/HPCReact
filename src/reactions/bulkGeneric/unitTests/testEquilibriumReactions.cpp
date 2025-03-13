@@ -119,9 +119,9 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
   }
 
   EquilibriumReactionsType::enforceEquilibrium_Extents( temperature,
-                                                params,
-                                                speciesConcentration0,
-                                                speciesConcentration );
+                                                        params,
+                                                        speciesConcentration0,
+                                                        speciesConcentration );
 
   for( int r=0; r<numSpecies; ++r )
   {
@@ -228,14 +228,14 @@ TEST( testEquilibriumReactions, testCarbonateSystem2 )
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
     3.21e-2, // SO4-2
-    1.89,    // Cl-
+    1.89, // Cl-
     1.65e-2, // Mg+2
-    1.09     // Na+1
+    1.09 // Na+1
   };
 
 
 
-  double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] = 
+  double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
     log( initialPrimarySpeciesConcentration[0] ),
     log( initialPrimarySpeciesConcentration[1] ),
@@ -246,7 +246,7 @@ TEST( testEquilibriumReactions, testCarbonateSystem2 )
     log( initialPrimarySpeciesConcentration[6] )
   };
 
-  double logPrimarySpeciesConcentration[numPrimarySpecies] = 
+  double logPrimarySpeciesConcentration[numPrimarySpecies] =
   {
     logInitialPrimarySpeciesConcentration[0],
     logInitialPrimarySpeciesConcentration[1],
@@ -263,7 +263,7 @@ TEST( testEquilibriumReactions, testCarbonateSystem2 )
                                                           logPrimarySpeciesConcentration );
 
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
-  { 
+  {
     4.396954721488358e-04, // H+
     3.723009698453808e-04, // HCO3-
     1.471656530812871e-02, // Ca+2

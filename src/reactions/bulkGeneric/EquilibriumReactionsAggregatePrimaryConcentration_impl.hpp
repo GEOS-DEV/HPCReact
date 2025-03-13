@@ -14,10 +14,10 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 template< typename PARAMS_DATA,
-typename ARRAY_1D,
-typename ARRAY_1D_TO_CONST,
-typename ARRAY_2D >
-HPCREACT_HOST_DEVICE 
+          typename ARRAY_1D,
+          typename ARRAY_1D_TO_CONST,
+          typename ARRAY_2D >
+HPCREACT_HOST_DEVICE
 inline
 void
 EquilibriumReactions< REAL_TYPE,
@@ -36,12 +36,12 @@ EquilibriumReactions< REAL_TYPE,
 
   RealType aggregatePrimaryConcentrations[numPrimarySpecies] = {0.0};
   ARRAY_2D dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{{0.0}}};
-  calculateAggregatePrimaryConcentrationsWrtLogC<REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
-                                                  logPrimarySpeciesConcentration,
-                                                  aggregatePrimaryConcentrations,
-                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+  calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
+                                                                                     logPrimarySpeciesConcentration,
+                                                                                     aggregatePrimaryConcentrations,
+                                                                                     dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
 
-  
+
   for( IndexType i=0; i<numPrimarySpecies; ++i )
   {
     residual[i] = -(1.0 - aggregatePrimaryConcentrations[i] / targetAggregatePrimaryConcentrations[i]);
@@ -63,9 +63,9 @@ void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE >::enforceEquilibrium_Aggregate( REAL_TYPE const & temperature,
-                                                        PARAMS_DATA const & params,
-                                                        ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
-                                                        ARRAY_1D & logPrimarySpeciesConcentration )
+                                                                  PARAMS_DATA const & params,
+                                                                  ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
+                                                                  ARRAY_1D & logPrimarySpeciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
   constexpr int numSpecies = PARAMS_DATA::numSpecies;
@@ -78,11 +78,11 @@ EquilibriumReactions< REAL_TYPE,
   double dLogCp[numPrimarySpecies] = { 0.0 };
   CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > jacobian;
 
-  
+
   for( int i=0; i<numPrimarySpecies; ++i )
   {
     targetAggregatePrimarySpeciesConcentration[i] = exp( logPrimarySpeciesConcentration0[i] );
-    logPrimarySpeciesConcentration[i] = logPrimarySpeciesConcentration0[i] ;
+    logPrimarySpeciesConcentration[i] = logPrimarySpeciesConcentration0[i];
   }
 
 
@@ -90,11 +90,11 @@ EquilibriumReactions< REAL_TYPE,
   for( int k=0; k<30; ++k )
   {
     computeResidualAndJacobianAggregatePrimaryConcentrations( temperature,
-                                                params,
-                                                targetAggregatePrimarySpeciesConcentration,
-                                                logPrimarySpeciesConcentration,
-                                                residual,
-                                                jacobian );
+                                                              params,
+                                                              targetAggregatePrimarySpeciesConcentration,
+                                                              logPrimarySpeciesConcentration,
+                                                              residual,
+                                                              jacobian );
 
     residualNorm = 0.0;
     for( int j = 0; j < numPrimarySpecies; ++j )

@@ -44,9 +44,9 @@ public:
   static HPCREACT_HOST_DEVICE
   void
   enforceEquilibrium_Extents( RealType const & temperature,
-                      PARAMS_DATA const & params,
-                      ARRAY_1D_TO_CONST const & speciesConcentration0,
-                      ARRAY_1D & speciesConcentration );
+                              PARAMS_DATA const & params,
+                              ARRAY_1D_TO_CONST const & speciesConcentration0,
+                              ARRAY_1D & speciesConcentration );
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
@@ -54,9 +54,9 @@ public:
   static HPCREACT_HOST_DEVICE
   void
   enforceEquilibrium_Aggregate( RealType const & temperature,
-                      PARAMS_DATA const & params,
-                      ARRAY_1D_TO_CONST const & speciesConcentration0,
-                      ARRAY_1D & speciesConcentration );
+                                PARAMS_DATA const & params,
+                                ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                ARRAY_1D & speciesConcentration );
 
 private:
   template< typename PARAMS_DATA,
@@ -84,7 +84,6 @@ private:
                                                             ARRAY_1D & residual,
                                                             ARRAY_2D & jacobian );
 };
-
 
 
 
