@@ -118,7 +118,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
     speciesConcentration0[i] = initialSpeciesConcentration[i];
   }
 
-  EquilibriumReactionsType::enforceEquilibrium( temperature,
+  EquilibriumReactionsType::enforceEquilibrium_Extents( temperature,
                                                 params,
                                                 speciesConcentration0,
                                                 speciesConcentration );
@@ -210,6 +210,76 @@ TEST( testEquilibriumReactions, testCarbonateSystem )
 
 }
 
+
+TEST( testEquilibriumReactions, testCarbonateSystem2 )
+{
+  using EquilibriumReactionsType = EquilibriumReactions< double,
+                                                         int,
+                                                         int >;
+
+  constexpr int numSpecies = carbonateSystem.numSpecies;
+  constexpr int numReactions = carbonateSystem.numReactions;
+  constexpr int numPrimarySpecies = numSpecies - numReactions;
+//  constexpr int numSecondarySpecies = numReactions;
+
+  double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
+  {
+    3.76e-1, // H+
+    3.76e-1, // HCO3-
+    3.87e-2, // Ca+2
+    3.21e-2, // SO4-2
+    1.89,    // Cl-
+    1.65e-2, // Mg+2
+    1.09     // Na+1
+  };
+
+
+
+  double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] = 
+  {
+    log( initialPrimarySpeciesConcentration[0] ),
+    log( initialPrimarySpeciesConcentration[1] ),
+    log( initialPrimarySpeciesConcentration[2] ),
+    log( initialPrimarySpeciesConcentration[3] ),
+    log( initialPrimarySpeciesConcentration[4] ),
+    log( initialPrimarySpeciesConcentration[5] ),
+    log( initialPrimarySpeciesConcentration[6] )
+  };
+
+  double logPrimarySpeciesConcentration[numPrimarySpecies] = 
+  {
+    logInitialPrimarySpeciesConcentration[0],
+    logInitialPrimarySpeciesConcentration[1],
+    logInitialPrimarySpeciesConcentration[2],
+    logInitialPrimarySpeciesConcentration[3],
+    logInitialPrimarySpeciesConcentration[4],
+    logInitialPrimarySpeciesConcentration[5],
+    logInitialPrimarySpeciesConcentration[6]
+  };
+
+  EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
+                                                          carbonateSystem,
+                                                          logInitialPrimarySpeciesConcentration,
+                                                          logPrimarySpeciesConcentration );
+
+  double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
+  { 
+    4.396954721488358e-04, // H+
+    3.723009698453808e-04, // HCO3-
+    1.471656530812871e-02, // Ca+2
+    2.491372274738741e-03, // SO4-2
+    1.858609094598949e+00, // Cl-
+    9.881874292035110e-03, // Mg+2
+    1.072307827865370e+00 // Na+1
+  };
+
+  for( int r=0; r<numPrimarySpecies; ++r )
+  {
+    EXPECT_NEAR( exp( logPrimarySpeciesConcentration[r] ), expectedPrimarySpeciesConcentrations[r], 1.0e-8 * expectedPrimarySpeciesConcentrations[r] );
+  }
+
+
+}
 
 int main( int argc, char * * argv )
 {

@@ -3,6 +3,8 @@ set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
      reactions/bulkGeneric/EquilibriumReactions.hpp
+     reactions/bulkGeneric/EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp
+     reactions/bulkGeneric/EquilibriumReactionsReactionExtents_impl.hpp
      reactions/bulkGeneric/KineticReactions.hpp
      reactions/bulkGeneric/KineticReactions_impl.hpp
      reactions/bulkGeneric/Parameters.hpp
