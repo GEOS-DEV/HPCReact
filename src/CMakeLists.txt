@@ -7,6 +7,7 @@ set( hpcReact_headers
      reactions/bulkGeneric/KineticReactions_impl.hpp
      reactions/bulkGeneric/Parameters.hpp
      reactions/bulkGeneric/ParametersPredefined.hpp
+     reactions/bulkGeneric/SpeciesUtilities.hpp
      )
 
 set( hpcReact_sources
