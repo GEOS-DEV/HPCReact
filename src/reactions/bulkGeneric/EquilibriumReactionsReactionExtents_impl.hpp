@@ -23,12 +23,12 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::computeResidualAndJacobian( REAL_TYPE const & temperature,
-                                                                PARAMS_DATA const & params,
-                                                                ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                                ARRAY_1D_TO_CONST2 const & xi,
-                                                                ARRAY_1D & residual,
-                                                                ARRAY_2D & jacobian )
+                      INDEX_TYPE >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
+                                                                               PARAMS_DATA const & params,
+                                                                               ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                               ARRAY_1D_TO_CONST2 const & xi,
+                                                                               ARRAY_1D & residual,
+                                                                               ARRAY_2D & jacobian )
 {
 
   HPCREACT_UNUSED_VAR( temperature );
@@ -125,12 +125,12 @@ EquilibriumReactions< REAL_TYPE,
   REAL_TYPE residualNorm = 0.0;
   for( int k=0; k<30; ++k )
   {
-    computeResidualAndJacobian( temperature,
-                                params,
-                                speciesConcentration0,
-                                xi,
-                                residual,
-                                jacobian );
+    computeResidualAndJacobianReactionExtents( temperature,
+                                               params,
+                                               speciesConcentration0,
+                                               xi,
+                                               residual,
+                                               jacobian );
 
     residualNorm = 0.0;
     for( int j = 0; j < numReactions; ++j )

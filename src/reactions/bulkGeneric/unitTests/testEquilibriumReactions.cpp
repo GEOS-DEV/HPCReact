@@ -46,12 +46,12 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
   CArrayWrapper< double, numReactions, numReactions > jacobian;
 
 
-  EquilibriumReactionsType::computeResidualAndJacobian( temperature,
-                                                        params,
-                                                        speciesConcentration,
-                                                        xi,
-                                                        residual,
-                                                        jacobian );
+  EquilibriumReactionsType::computeResidualAndJacobianReactionExtents( temperature,
+                                                                       params,
+                                                                       speciesConcentration,
+                                                                       xi,
+                                                                       residual,
+                                                                       jacobian );
 
 //  printf( "R = { %8.4g, %8.4g }\n", residual[0], residual[1] );
   for( int r=0; r<numReactions; ++r )

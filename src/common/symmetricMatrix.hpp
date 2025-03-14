@@ -13,15 +13,15 @@
  * @tparam T The type of the elements of the matrix.
  * @tparam INDEX_TYPE The type of the indices of the matrix.
  * @tparam N The size of the matrix.
- * @details 
+ * @details
  *   The matrix is stored in a 1D array, where the elements are
- *   stored in a compact way. 
- * 
+ *   stored in a compact way.
+ *
  *   The linear index is calculated using
  *   the formula (i*(i+1))/2 + j, where i and j are the indices of
  *   the matrix. This corrosponds to filling the lower triangular
  *   part of the matrix row by row. So each row i has i+1 elements.
- * 
+ *
  *   The size of the matrix is calculated using the
  *   formula (N*(N+1))/2, where N is the size of the matrix.
  */
@@ -30,13 +30,17 @@ struct symmetricMatrix
 {
   /**
    * @brief the storage size of the matrix
+   * @return the storage size of the matrix
    */
   static constexpr INDEX_TYPE size() { return ( N*(N+1) ) / 2; }
 
   /**
    * @brief calculates the linear index of the element at (i,j)
+   * @param i the row index
+   * @param j the column index
+   * @return the linear index of the element at (i,j)
    */
-  static inline INDEX_TYPE linearIndex( INDEX_TYPE const i, INDEX_TYPE const j ) const
+  static inline INDEX_TYPE linearIndex( INDEX_TYPE const i, INDEX_TYPE const j )
   {
     return (( i*(i+1) ) >> 1) + j;
   }
