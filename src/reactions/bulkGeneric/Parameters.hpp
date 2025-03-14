@@ -55,7 +55,7 @@ private:
       m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies] ... },
     m_equilibriumConstant{ equilibriumConstant[R] ... }
     {}
-    );
+    )
 };
 
 
