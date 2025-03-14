@@ -97,9 +97,9 @@ EquilibriumReactions< REAL_TYPE,
                                                               jacobian );
 
     residualNorm = 0.0;
-    for( int j = 0; j < numPrimarySpecies; ++j )
+    for( int i = 0; i < numPrimarySpecies; ++i )
     {
-      residualNorm += residual[j] * residual[j];
+      residualNorm += residual[i] * residual[i];
     }
     residualNorm = sqrt( residualNorm );
     printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
@@ -112,9 +112,9 @@ EquilibriumReactions< REAL_TYPE,
     solveNxN_pivoted< double, numPrimarySpecies >( jacobian.data, residual, dLogCp );
 
 
-    for( IndexType r=0; r<numReactions; ++r )
+    for( IndexType i=0; i<numPrimarySpecies; ++i )
     {
-      logPrimarySpeciesConcentration[r] += dLogCp[r];
+      logPrimarySpeciesConcentration[i] += dLogCp[i];
     }
 
   }
