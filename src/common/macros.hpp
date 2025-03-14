@@ -61,4 +61,6 @@
         __pragma(warning(pop))
 #else
 #define HPCREACT_NO_MISSING_BRACES( ... ) __VA_ARGS__ // No-op for unknown compilers
+#define HPCREACT_NO_MISSING_BRACES_OPEN
+#define HPCREACT_NO_MISSING_BRACES_CLOSE
 #endif

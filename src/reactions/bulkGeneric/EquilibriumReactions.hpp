@@ -13,16 +13,29 @@ namespace hpcReact
 namespace bulkGeneric
 {
 
+/**
+ * @brief This class implements components required to calculate equilibrium 
+ *        reactions for a given set of species. The class also proovides
+ *        device callable methods to enforce equilibrium pointwise and also
+ *        provides methods to launch batch processing of material points.
+ * @tparam REAL_TYPE The type of the real numbers used in the class.
+ * @tparam INT_TYPE The type of the integers used in the class.
+ * @tparam INDEX_TYPE The type of the indices used in the class.
+ */
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE >
 class EquilibriumReactions
 {
 public:
+  /// alias for type of the real numbers used in the class.
   using RealType = REAL_TYPE;
+
+  /// alias for type of the integers used in the class.
   using IntType = INT_TYPE;
+  
+  /// alias for type of the indices used in the class.
   using IndexType = INDEX_TYPE;
-//  constexpr static int formulation = FORMULATION;
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
@@ -37,7 +50,9 @@ public:
                               ARRAY_1D & residual,
                               ARRAY_2D & jacobian );
 
-
+  /**
+   * @brief This method enforces equilibrium for a given set of species using 
+   *        reaction extents.
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
             typename ARRAY_1D_TO_CONST >
