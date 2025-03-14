@@ -20,7 +20,7 @@ jobs:
       - name: Extract docker image tag hash
         id: extract_docker_image_tag_hash
         run: |
-          echo "DOCKER_IMAGE_TAG_HASH=310f70ba6065b94858af2cafeba828ea76c02a1d" >> "$GITHUB_OUTPUT"
+          echo "DOCKER_IMAGE_TAG_HASH=9ee5da1aeae3238b7eea56460fdb00d81e2a3e05" >> "$GITHUB_OUTPUT"
 
   # code_style:
   #   needs: [check_pull_request_is_not_a_draft]
