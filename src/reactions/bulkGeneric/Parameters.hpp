@@ -45,17 +45,17 @@ struct EquilibriumReactionsParameters
   RealType m_equilibriumConstant[numReactions];
 
 private:
-  HPCREACT_NO_MISSING_BRACES (
-    template< std::size_t ... R, std::size_t ... RxS >
-    constexpr
-    EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
-                                    RealType const (&equilibriumConstant)[numReactions],
-                                    std::index_sequence< R... >,
-                                    std::index_sequence< RxS... > ) :
-      m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies] ... },
+  HPCREACT_NO_MISSING_BRACES_OPEN
+  template< std::size_t ... R, std::size_t ... RxS >
+  constexpr
+  EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
+                                  RealType const (&equilibriumConstant)[numReactions],
+                                  std::index_sequence< R... >,
+                                  std::index_sequence< RxS... > ):
+    m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies] ... },
     m_equilibriumConstant{ equilibriumConstant[R] ... }
-    {}
-    )
+  {}
+  HPCREACT_NO_MISSING_BRACES_CLOSE
 };
 
 

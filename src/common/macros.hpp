@@ -27,17 +27,37 @@
         _Pragma("clang diagnostic ignored \"-Wmissing-braces\"") \
         __VA_ARGS__ \
         _Pragma("clang diagnostic pop")
+
+#define HPCREACT_NO_MISSING_BRACES_OPEN \
+        _Pragma("clang diagnostic push") \
+        _Pragma("clang diagnostic ignored \"-Wmissing-braces\"")
+#define HPCREACT_NO_MISSING_BRACES_CLOSE \
+        _Pragma("clang diagnostic pop")
+
 #elif defined(__GNUC__)
 #define HPCREACT_NO_MISSING_BRACES( ... ) \
         _Pragma("GCC diagnostic push") \
         _Pragma("GCC diagnostic ignored \"-Wmissing-braces\"") \
         __VA_ARGS__ \
         _Pragma("GCC diagnostic pop")
+
+#define HPCREACT_NO_MISSING_BRACES_OPEN \
+        _Pragma("GCC diagnostic push") \
+        _Pragma("GCC diagnostic ignored \"-Wmissing-braces\"")
+#define HPCREACT_NO_MISSING_BRACES_CLOSE \
+        _Pragma("GCC diagnostic pop")
+
 #elif defined(_MSC_VER)
 #define HPCREACT_NO_MISSING_BRACES( ... ) \
         __pragma(warning(push)) \
         __pragma(warning(disable : 4351)) \
         __VA_ARGS__ \
+        __pragma(warning(pop))
+
+#define HPCREACT_NO_MISSING_BRACES_OPEN \
+        __pragma(warning(push)) \
+        __pragma(warning(disable : 4351))
+#define HPCREACT_NO_MISSING_BRACES_CLOSE \
         __pragma(warning(pop))
 #else
 #define HPCREACT_NO_MISSING_BRACES( ... ) __VA_ARGS__ // No-op for unknown compilers

@@ -260,7 +260,7 @@ TEST( testEquilibriumReactions, testCarbonateSystem2 )
     2.491372274738741e-03, // SO4-2
     1.858609094598949e+00, // Cl-
     9.881874292035110e-03, // Mg+2
-    1.072307827865370e+00  // Na+1
+    1.072307827865370e+00 // Na+1
   };
 
   for( int r=0; r<numPrimarySpecies; ++r )
