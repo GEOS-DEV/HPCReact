@@ -51,14 +51,14 @@ macro(hpcReact_add_code_checks)
 
     if( CPPCHECK_FOUND )
         add_test( NAME testCppCheck
-                COMMAND bash -c "make cppcheck_check 2> >(tee cppcheck.err) >/dev/null && exit $(cat cppcheck.err | wc -l)"
+                COMMAND bash -c "${CMAKE_MAKE_PROGRAM} cppcheck_check 2> >(tee cppcheck.err) >/dev/null && exit $(cat cppcheck.err | wc -l)"
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
     endif()
 
     if( CLANGTIDY_FOUND )
         add_test( NAME testClangTidy
-                COMMAND bash -c "make clang_tidy_check 2> >(tee tidyCheck.err) >/dev/null && exit $(cat tidyCheck.err | wc -l)"
+                COMMAND bash -c "${CMAKE_MAKE_PROGRAM} clang_tidy_check 2> >(tee tidyCheck.err) >/dev/null && exit $(cat tidyCheck.err | wc -l)"
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
     endif()
