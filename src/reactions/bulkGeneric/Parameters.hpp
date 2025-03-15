@@ -1,7 +1,9 @@
+
 #pragma once
 
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
+#include "common/macros.hpp"
 
 #include <stdexcept>
 #include <string>

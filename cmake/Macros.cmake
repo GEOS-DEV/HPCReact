@@ -41,16 +41,17 @@ macro(hpcReact_add_code_checks)
                         --suppress=noExplicitConstructor
                         --suppress=unusedFunction 
                         --suppress=constStatement 
-                        --suppress=unusedStructMember )
+                        --suppress=unusedStructMember
+                        -I../hpcReact/src )
                         
-    if( ENABLE_UNCRUSTIFY )
+    if( UNCRUSTIFY_FOUND )
         blt_add_code_checks( PREFIX    ${arg_PREFIX}
                             SOURCES   ${_sources}
                             UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
                             CPPCHECK_FLAGS ${CPPCHECK_FLAGS}
                             )
         add_test( NAME testUncrustifyCheck
-                    COMMAND sh -c "${CMAKE_MAKE_PROGRAM} uncrustify_check 2> >(tee uncrustify.err) >/dev/null && exit $(cat uncrustify.err | wc -l)"
+                    COMMAND bash -c "${CMAKE_MAKE_PROGRAM} uncrustify_check 2> >(tee uncrustify.err) >/dev/null && exit $(cat uncrustify.err | wc -l)"
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
     endif()
 
