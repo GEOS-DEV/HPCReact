@@ -41,24 +41,30 @@ macro(hpcReact_add_code_checks)
                         --suppress=noExplicitConstructor
                         --suppress=unusedFunction 
                         --suppress=constStatement 
-                        --suppress=unusedStructMember )
+                        --suppress=unusedStructMember
+                        -I../hpcReact/src )
                         
-    blt_add_code_checks( PREFIX    ${arg_PREFIX}
-                         SOURCES   ${_sources}
-                         UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
-                         CPPCHECK_FLAGS ${CPPCHECK_FLAGS}
-                         )
+    if( UNCRUSTIFY_FOUND )
+        blt_add_code_checks( PREFIX    ${arg_PREFIX}
+                            SOURCES   ${_sources}
+                            UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
+                            CPPCHECK_FLAGS ${CPPCHECK_FLAGS}
+                            )
+        add_test( NAME testUncrustifyCheck
+                    COMMAND bash -c "${CMAKE_MAKE_PROGRAM} uncrustify_check 2> >(tee uncrustify.err) >/dev/null && exit $(cat uncrustify.err | wc -l)"
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
+    endif()
 
     if( CPPCHECK_FOUND )
         add_test( NAME testCppCheck
-                COMMAND bash -c "make cppcheck_check 2> >(tee cppcheck.err) >/dev/null && exit $(cat cppcheck.err | wc -l)"
+                COMMAND bash -c "${CMAKE_MAKE_PROGRAM} cppcheck_check 2> >(tee cppcheck.err) >/dev/null && exit $(cat cppcheck.err | wc -l)"
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
     endif()
 
     if( CLANGTIDY_FOUND )
         add_test( NAME testClangTidy
-                COMMAND bash -c "make clang_tidy_check 2> >(tee tidyCheck.err) >/dev/null && exit $(cat tidyCheck.err | wc -l)"
+                COMMAND bash -c "${CMAKE_MAKE_PROGRAM} clang_tidy_check 2> >(tee tidyCheck.err) >/dev/null && exit $(cat tidyCheck.err | wc -l)"
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
     endif()

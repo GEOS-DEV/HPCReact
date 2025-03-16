@@ -1,9 +1,7 @@
 #pragma once
 
-#include "KineticReactions.hpp"
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "common/macros.hpp"
 #include "common/DirectSystemSolve.hpp"
 
 #include <cmath>
@@ -268,7 +266,7 @@ KineticReactions< REAL_TYPE,
 
 
   REAL_TYPE residualNorm = 0.0;
-  for( int k=0; k<10; ++k )
+  for( int k=0; k<10; ++k ) // newton loop
   {
     // printf( "iteration %2d: \n", k );
 
@@ -329,7 +327,7 @@ KineticReactions< REAL_TYPE,
     }
 
 
-//     printf( "residual = { ");
+//     printf( "residual = { " );
 //     for( int i = 0; i < numSpecies; ++i )
 //     {
 //       printf( " %g, ", residual[i] );
@@ -339,12 +337,15 @@ KineticReactions< REAL_TYPE,
 //     printf( "Jacobian = { \n" );
 //     for( int i = 0; i < numSpecies; ++i )
 //     {
-//       printf( " { ");
+//       printf( " { " );
 //       for( int j = 0; j < numSpecies; ++j )
 //       {
 //         printf( " %g ", speciesRatesDerivatives( i, j ) );
 // //        printf( " %g ", speciesRatesDerivatives( i, j ) / exp(speciesConcentration[j]) );
-//         if( j < numSpecies-1 ) { printf( ", " ); }
+//         if( j < numSpecies-1 )
+//         {
+//           printf( ", " );
+//         }
 //       }
 //       printf( "}, \n" );
 //     }

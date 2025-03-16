@@ -20,9 +20,9 @@ fi
 echo "Using package manager: $PACKAGE_MANAGER"
 
 if [ "$PACKAGE_MANAGER" == "apt" ]; then
-    apt update && apt-get install -y libblas-dev liblapack-dev
+    apt update && apt-get install -y libblas-dev liblapack-dev texlive-full
 elif [ "$PACKAGE_MANAGER" == "yum" ]; then
-    yum install -y blas lapack
+    yum update && yum install -y blas lapack 
 fi
 
 # The or_die function run the passed command line and

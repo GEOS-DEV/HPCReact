@@ -13,6 +13,15 @@ namespace hpcReact
 namespace bulkGeneric
 {
 
+/**
+ * @brief Class for computing reaction rates and species rates for a given set of reactions.
+ * @tparam REAL_TYPE The type of the real numbers used in the class.
+ * @tparam INT_TYPE The type of the integer numbers used in the class.
+ * @tparam INDEX_TYPE The type of the index used in the class.
+ * @tparam LOGE_CONCENTRATION Whether to use logarithm of concentration for the calculations.
+ * @details
+ *   This class provides the ablity to compute kinetic reactions.
+ */
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
@@ -21,8 +30,13 @@ class KineticReactions
 {
 public:
 
+  /// Type alias for the real type used in the class.
   using RealType = REAL_TYPE;
+
+  /// Type alias for the integer type used in the class.
   using IntType = INT_TYPE;
+
+  /// Type alias for the index type used in the class.
   using IndexType = INDEX_TYPE;
 
   /**
@@ -46,6 +60,16 @@ public:
                                                     reactionRatesDerivatives );
   }
 
+  /**
+   * @brief Compute the reaction rates for a given set of species concentrations.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_1D The type of the array of reaction rates.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param speciesConcentration The array of species concentrations.
+   * @param reactionRates The array of reaction rates.
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D >
@@ -64,6 +88,9 @@ public:
   }
 
 
+  /**
+   * @copydoc KineticReactions::computeSpeciesRates_impl()
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D,
@@ -82,6 +109,16 @@ public:
                                                    speciesRatesDerivatives );
   }
 
+  /**
+   * @brief Compute the species rates for a given set of species concentrations.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_1D The type of the array of species rates.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param speciesConcentration The array of species concentrations.
+   * @param speciesRates The array of species rates.
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D >
@@ -99,6 +136,20 @@ public:
                                                     speciesRatesDerivatives );
   }
 
+  /**
+   * @brief execute the time step for a given set of kinetic reactions.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D The type of the array of species concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_2D The type of the array of species rates derivatives.
+   * @param dt The time step to be used for the simulation.
+   * @param temperature The temperature of the reaction.
+   * @param params The parameters data.
+   * @param speciesConcentration_n The array of species concentrations at the beginning of the time step.
+   * @param speciesConcentration The array of species concentrations at the end of the time step.
+   * @param speciesRates The array of species rates.
+   * @param speciesRatesDerivatives The array of species rates derivatives.
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
             typename ARRAY_1D_TO_CONST,
@@ -158,6 +209,19 @@ private:
                              ARRAY_1D & reactionRates,
                              ARRAY_2D & reactionRatesDerivatives );
 
+  /**
+   * @brief Compute the kinetic species rates for a given set of kinetic reactions.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam CALCULATE_DERIVATIVES Whether to calculate the derivatives of the species rates with respect to the species concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_1D The type of the array of species rates.
+   * @tparam ARRAY_2D The type of the array of species rates derivatives.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param speciesConcentration The array of species concentrations.
+   * @param speciesRates The array of species rates.
+   * @param speciesRatesDerivatives The array of species rates derivatives.
+   */
   template< typename PARAMS_DATA,
             bool CALCULATE_DERIVATIVES,
             typename ARRAY_1D_TO_CONST,
@@ -175,4 +239,5 @@ private:
 } // namespace bulkGeneric
 } // namespace hpcReact
 
+#include "KineticReactions_impl.hpp"
 #include "common/macrosCleanup.hpp"

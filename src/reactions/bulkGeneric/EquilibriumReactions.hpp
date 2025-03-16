@@ -3,9 +3,9 @@
 #include "common/macros.hpp"
 #include "common/CArrayWrapper.hpp"
 #include "common/DirectSystemSolve.hpp"
-#include <cmath>
+#include "common/printers.hpp"
 
-#include <stdio.h>
+#include <iostream>
 
 
 namespace hpcReact
@@ -13,160 +13,141 @@ namespace hpcReact
 namespace bulkGeneric
 {
 
+/**
+ * @brief This class implements components required to calculate equilibrium
+ *        reactions for a given set of species. The class also proovides
+ *        device callable methods to enforce equilibrium pointwise and also
+ *        provides methods to launch batch processing of material points.
+ * @tparam REAL_TYPE The type of the real numbers used in the class.
+ * @tparam INT_TYPE The type of the integers used in the class.
+ * @tparam INDEX_TYPE The type of the indices used in the class.
+ */
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE,
-          bool LOGE_CONCENTRATION,
-          bool LOGE_RESIDUAL >
+          typename INDEX_TYPE >
 class EquilibriumReactions
 {
 public:
+  /// alias for type of the real numbers used in the class.
   using RealType = REAL_TYPE;
+
+  /// alias for type of the integers used in the class.
   using IntType = INT_TYPE;
+
+  /// alias for type of the indices used in the class.
   using IndexType = INDEX_TYPE;
 
+
+
+  /**
+   * @brief This method enforces equilibrium for a given set of species using
+   *        reaction extents.
+   * @param temperature The temperature of the system.
+   * @param params The parameters for the equilibrium reactions.
+   * @param speciesConcentration0 The initial species concentrations.
+   * @param speciesConcentration The species concentrations to be updated.
+   * @details This method uses the reaction extents to enforce equilibrium
+   *          for a given set of species. It uses the computeResidualAndJacobian
+   *          method to compute the residual and jacobian for the system and
+   *          then uses a direct solver to solve the system. The solution is
+   *          then used to update the species concentrations.
+   */
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST >
+  static HPCREACT_HOST_DEVICE
+  void
+  enforceEquilibrium_Extents( RealType const & temperature,
+                              PARAMS_DATA const & params,
+                              ARRAY_1D_TO_CONST const & speciesConcentration0,
+                              ARRAY_1D & speciesConcentration );
+
+  /**
+   * @brief This method enforces equilibrium for a given set of species using
+   *        aggregate primary concentrations.
+   * @param temperature The temperature of the system.
+   * @param params The parameters for the equilibrium reactions.
+   * @param speciesConcentration0 The initial species concentrations.
+   * @param speciesConcentration The species concentrations to be updated.
+   * @details This method uses the aggregate primary concentrations to enforce
+   *          equilibrium for a given set of species. It uses the
+   *          computeResidualAndJacobianAggregatePrimaryConcentrations method to
+   *          compute the residual and jacobian for the system and then uses a
+   *          direct solver to solve the system. The solution is then used to
+   *          update the species concentrations.
+   */
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST >
+  static HPCREACT_HOST_DEVICE
+  void
+  enforceEquilibrium_Aggregate( RealType const & temperature,
+                                PARAMS_DATA const & params,
+                                ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                ARRAY_1D & speciesConcentration );
+
+  /**
+   * @brief This method computes the residual and jacobian when using reaction extents to solve
+   *       for the equilibrium of a given set of species.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D The type of the array of species concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_1D_TO_CONST2 The type of the array of reaction extents.
+   * @tparam ARRAY_2D The type of the array of jacobian.
+   * @param temperature The temperature of the system.
+   * @param params The parameters for the equilibrium reactions.
+   * @param speciesConcentration0 The initial species concentrations.
+   * @param xi The reaction extents.
+   * @param residual The residual.
+   * @param jacobian The jacobian.
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
-  computeResidualAndJacobian( RealType const & temperature,
-                              PARAMS_DATA const & params,
-                              ARRAY_1D_TO_CONST const & speciesConcentration0,
-                              ARRAY_1D_TO_CONST2 const & xi,
-                              ARRAY_1D & residual,
-                              ARRAY_2D & jacobian )
-  {
-    HPCREACT_UNUSED_VAR( temperature );
-    constexpr int numSpecies = PARAMS_DATA::numSpecies;
-    constexpr int numReactions = PARAMS_DATA::numReactions;
+  computeResidualAndJacobianReactionExtents( RealType const & temperature,
+                                             PARAMS_DATA const & params,
+                                             ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                             ARRAY_1D_TO_CONST2 const & xi,
+                                             ARRAY_1D & residual,
+                                             ARRAY_2D & jacobian );
 
-    // initialize the species concentration
-    RealType speciesConcentration[numSpecies];
-    for( IndexType i=0; i<numSpecies; ++i )
-    {
-      speciesConcentration[i] = speciesConcentration0[i];
-      for( IndexType r=0; r<numReactions; ++r )
-      {
-        speciesConcentration[i] += params.stoichiometricMatrix( r, i ) * xi[r];
-      }
-    }
-
-    // loop over reactions
-    for( IndexType a=0; a<numReactions; ++a )
-    {
-      // get the equilibrium constant for this reaction
-      RealType const Keq = params.equilibriumConstant( a );
-
-      RealType forwardProduct = 1.0;
-      RealType reverseProduct = 1.0;
-      RealType dForwardProduct_dxi[numReactions] = {0.0};
-      RealType dReverseProduct_dxi[numReactions] = {0.0};
-      // loop over species
-      for( IndexType i=0; i<numSpecies; ++i )
-      {
-        RealType const s_ai = params.stoichiometricMatrix( a, i );
-
-        if( s_ai < 0.0 )
-        {
-          // forward reaction
-          forwardProduct *= pow( speciesConcentration[i], -s_ai );
-          // derivative of forward product with respect to xi
-          for( IndexType b=0; b<numReactions; ++b )
-          {
-            dForwardProduct_dxi[b] += -s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
-          }
-        }
-        else if( s_ai > 0.0 )
-        {
-          // reverse reaction
-          reverseProduct *= pow( speciesConcentration[i], s_ai );
-          // derivative of reverse product with respect to xi
-          for( IndexType b=0; b<numReactions; ++b )
-          {
-            dReverseProduct_dxi[b] += s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
-          }
-        }
-      }
-      // compute the residual for this reaction
-      residual[a] = forwardProduct - Keq * reverseProduct;
-//     printf( "residual[%d] = %g - %g * %g = %g\n", a, forwardProduct, Keq, reverseProduct, residual[a] );
-
-      // Finish the derivatives of the product terms with respect to xi
-      for( IndexType b=0; b<numReactions; ++b )
-      {
-        dForwardProduct_dxi[b] *= forwardProduct;
-        dReverseProduct_dxi[b] *= reverseProduct;
-        // printf( "(%d) dForwardProduct_dxi[%d] = %f\n", a, b, dForwardProduct_dxi[b] );
-        // printf( "(%d) dReverseProduct_dxi[%d] = %f\n", a, b, dReverseProduct_dxi[b] );
-        // printf( "Keq = %f\n", Keq );
-        jacobian( a, b ) = dForwardProduct_dxi[b] - Keq * dReverseProduct_dxi[b];
-      }
-    }
-  }
-
-
+  /**
+   * @brief This method computes the residual and jacobian when using aggregate primary concentrations
+   *        to solve for the equilibrium of a given set of species.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D The type of the array of species concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of target aggregate primary concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of log primary species concentrations.
+   * @tparam ARRAY_2D The type of the array of jacobian.
+   * @param temperature The temperature of the system.
+   * @param params The parameters for the equilibrium reactions.
+   * @param targetAggregatePrimaryConcentrations The target aggregate primary concentrations.
+   * @param logPrimarySpeciesConcentration The log of the primary species concentrations.
+   * @param residual The residual.
+   * @param jacobian The jacobian.
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
-            typename ARRAY_1D_TO_CONST >
-  static HPCREACT_HOST_DEVICE
-  void
-  enforceEquilibrium( RealType const & temperature,
-                      PARAMS_DATA const & params,
-                      ARRAY_1D_TO_CONST const & speciesConcentration0,
-                      ARRAY_1D & speciesConcentration )
-  {
-    HPCREACT_UNUSED_VAR( temperature );
-    constexpr int numSpecies = PARAMS_DATA::numSpecies;
-    constexpr int numReactions = PARAMS_DATA::numReactions;
-    double residual[numReactions] = { 0.0 };
-    double xi[numReactions] = { 0.0 };
-    double dxi[numReactions] = { 0.0 };
-    CArrayWrapper< double, numReactions, numReactions > jacobian;
-
-    REAL_TYPE residualNorm = 0.0;
-    for( int k=0; k<10; ++k )
-    {
-      computeResidualAndJacobian( temperature,
-                                  params,
-                                  speciesConcentration0,
-                                  xi,
-                                  residual,
-                                  jacobian );
-
-      residualNorm = 0.0;
-      for( int j = 0; j < numReactions; ++j )
-      {
-        residualNorm += residual[j] * residual[j];
-      }
-      residualNorm = sqrt( residualNorm );
-      if( residualNorm < 1.0e-14 )
-      {
-        break;
-      }
-
-      solveNxN_pivoted< double, numReactions >( jacobian.data, residual, dxi );
-
-      // solve for the change in xi
-      for( IndexType r=0; r<numReactions; ++r )
-      {
-        xi[r] -= dxi[r];
-      }
-    }
-
-    for( IndexType i=0; i<numSpecies; ++i )
-    {
-      speciesConcentration[i] = speciesConcentration0[i];
-      for( IndexType r=0; r<numReactions; ++r )
-      {
-        speciesConcentration[i] += params.stoichiometricMatrix( r, i ) * xi[r];
-      }
-    }
-  }
-
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_2D >
+  static HPCREACT_HOST_DEVICE void
+  computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
+                                                            PARAMS_DATA const & params,
+                                                            ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
+                                                            ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration,
+                                                            ARRAY_1D & residual,
+                                                            ARRAY_2D & jacobian );
 };
+
 
 
 } // namespace bulkGeneric
 } // namespace hpcReact
+
+#if !defined(__INTELLISENSE__)
+#include "EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp"
+#include "EquilibriumReactionsReactionExtents_impl.hpp"
+#endif

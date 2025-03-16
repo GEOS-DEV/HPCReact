@@ -1,10 +1,13 @@
+
 #pragma once
 
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
+#include "common/macros.hpp"
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace hpcReact
 {
@@ -18,29 +21,125 @@ template< typename REAL_TYPE,
           typename INDEX_TYPE,
           int NUM_SPECIES,
           int NUM_REACTIONS >
-struct ParametersBase
+struct EquilibriumReactionsParameters
 {
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
+  using IndexType = INDEX_TYPE;
 
-  static constexpr IntType numSpecies = NUM_SPECIES;
-  static constexpr IntType numReactions = NUM_REACTIONS;
+  static constexpr IndexType numSpecies = NUM_SPECIES;
+  static constexpr IndexType numReactions = NUM_REACTIONS;
+
+  constexpr
+  EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
+                                  RealType const (&equilibriumConstant)[numReactions] ):
+    EquilibriumReactionsParameters( stoichiometricMatrix,
+                                    equilibriumConstant,
+                                    std::make_index_sequence< NUM_REACTIONS >(),
+                                    std::make_index_sequence< NUM_REACTIONS *NUM_SPECIES >() )
+  {}
+
+
+  RealType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
+  RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
+
   RealType m_stoichiometricMatrix[numReactions][numSpecies];
+  RealType m_equilibriumConstant[numReactions];
+
+private:
+  HPCREACT_NO_MISSING_BRACES_OPEN
+  template< std::size_t ... R, std::size_t ... RxS >
+  constexpr
+  EquilibriumReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
+                                  RealType const (&equilibriumConstant)[numReactions],
+                                  std::index_sequence< R... >,
+                                  std::index_sequence< RxS... > ):
+    m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies] ... },
+    m_equilibriumConstant{ equilibriumConstant[R] ... }
+  {}
+  HPCREACT_NO_MISSING_BRACES_CLOSE
 };
 
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          int NUM_SPECIES,
           int NUM_REACTIONS >
-struct EquilibriumKineticsModelConstants
+struct KineticReactionsParameters
 {
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
+  using IndexType = INDEX_TYPE;
 
-  static constexpr IntType numReactions = NUM_REACTIONS;
+  static constexpr IndexType numSpecies = NUM_SPECIES;
+  static constexpr IndexType numReactions = NUM_REACTIONS;
 
-  void verifyParameters()
+  KineticReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
+                              RealType const (&rateConstantForward)[numReactions],
+                              RealType const (&rateConstantReverse)[numReactions] ):
+    KineticReactionsParameters( stoichiometricMatrix,
+                                rateConstantForward,
+                                rateConstantReverse,
+                                std::make_index_sequence< NUM_REACTIONS >(),
+                                std::make_index_sequence< NUM_REACTIONS *NUM_SPECIES >() )
+  {}
+
+
+  RealType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
+  RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
+  RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
+
+
+  RealType m_stoichiometricMatrix[numReactions][numSpecies];
+  RealType m_rateConstantForward[numReactions];
+  RealType m_rateConstantReverse[numReactions];
+
+private:
+  HPCREACT_NO_MISSING_BRACES(
+    template< std::size_t ... R, std::size_t ... RxS >
+    KineticReactionsParameters( RealType const (&stoichiometricMatrix)[numReactions][numSpecies],
+                                RealType const (&rateConstantForward)[numReactions],
+                                RealType const (&rateConstantReverse)[numReactions],
+                                std::index_sequence< R... >,
+                                std::index_sequence< RxS... > ) :
+      m_stoichiometricMatrix{ stoichiometricMatrix[RxS/numSpecies][RxS%numSpecies] ... },
+    m_rateConstantForward{ rateConstantForward[R] ... },
+    m_rateConstantReverse{ rateConstantReverse[R] ... }
+    {}
+    )
+
+};
+
+
+template< typename REAL_TYPE,
+          typename INT_TYPE,
+          typename INDEX_TYPE,
+          int NUM_SPECIES,
+          int NUM_REACTIONS >
+struct MixedReactionsParameters
+{
+  using RealType = REAL_TYPE;
+  using IntType = INT_TYPE;
+  using IndexType = INDEX_TYPE;
+  static constexpr IndexType numSpecies = NUM_SPECIES;
+  static constexpr IndexType numReactions = NUM_REACTIONS;
+
+  constexpr
+  EquilibriumReactionsParameters< RealType, IntType, IndexType, numSpecies, numReactions >
+  equilibriumReactionsParameters() const
+  {
+    return {m_stoichiometricMatrix, m_equilibriumConstant};
+  }
+
+  constexpr
+  KineticReactionsParameters< RealType, IntType, IndexType, numSpecies, numReactions >
+  kineticReactionsParameters() const
+  {
+    return {m_stoichiometricMatrix, m_rateConstantForward, m_rateConstantReverse};
+  }
+
+  void verifyParameterConsistency()
   {
     static constexpr int num_digits = 12;
     for( int i = 0; i < numReactions; ++i )
@@ -67,7 +166,7 @@ struct EquilibriumKineticsModelConstants
         RealType const absDiff = fabs( K - ( kf / kr ) );
         RealType const effectiveMagnitude = max( fabs( K ), fabs( kf/kr ));
         RealType const tolerance = effectiveMagnitude * pow( 10, -num_digits );
-        if( absDiff > tolerance )    // Tolerance for floating point precision
+        if( absDiff > tolerance ) // Tolerance for floating point precision
         {
           throw std::runtime_error( "Error: Inconsistent equilibrium relation for reaction " + std::to_string( i ));
         }
@@ -75,87 +174,15 @@ struct EquilibriumKineticsModelConstants
     }
   }
 
-  RealType equilibriumConstant( int const i ) const { return m_equilibriumConstant[i]; }
-  RealType rateConstantForward( int const i ) const { return m_rateConstantForward[i]; }
-  RealType rateConstantReverse( int const i ) const { return m_rateConstantReverse[i]; }
+  RealType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
+  RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
+  RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
+  RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
 
-
-  RealType m_equilibriumConstant[numReactions] = {0.0};
-  RealType m_rateConstantForward[numReactions] = {0.0};
-  RealType m_rateConstantReverse[numReactions] = {0.0};
-
-};
-
-template< typename REAL_TYPE,
-          typename INT_TYPE,
-          typename INDEX_TYPE,
-          template< typename, typename, typename, int > typename RATE_CONSTANTS_TYPE,
-          int NUM_SPECIES,
-          int NUM_REACTIONS >
-struct ReactionsParameters
-{
-  using RealType = REAL_TYPE;
-  using IntType = INT_TYPE;
-  using RateConstantType = RATE_CONSTANTS_TYPE< REAL_TYPE, INT_TYPE, INDEX_TYPE, NUM_REACTIONS >;
-  static constexpr IntType numSpecies = NUM_SPECIES;
-  static constexpr IntType numReactions = NUM_REACTIONS;
-
-
-  static_assert( std::is_same_v< REAL_TYPE, typename RateConstantType::RealType >, "RealType of RATE_CONSTANTS_TYPE is inconsistent" );
-  static_assert( std::is_same_v< INT_TYPE, typename RateConstantType::IntType >, "IntType of RATE_CONSTANTS_TYPE is inconsistent" );
-  static_assert( numReactions == RateConstantType::numReactions, "numReactions of RATE_CONSTANTS_TYPE is inconsistent" );
-
-  RealType stoichiometricMatrix( int const r, int const i ) const { return m_base.m_stoichiometricMatrix[r][i]; }
-  RealType equilibriumConstant( int const r ) const { return m_rateConstants.equilibriumConstant( r ); }
-  RealType rateConstantForward( int const r ) const { return m_rateConstants.rateConstantForward( r ); }
-  RealType rateConstantReverse( int const r ) const { return m_rateConstants.rateConstantReverse( r ); }
-
-  ParametersBase< REAL_TYPE, INT_TYPE, INT_TYPE, NUM_SPECIES, NUM_REACTIONS > m_base;
-  RateConstantType m_rateConstants;
-
-  //  RealType (&m_stoichiometricMatrix)[numReactions][numSpecies] = m_base.m_stoichiometricMatrix;
-
-};
-
-
-
-template< typename REAL_TYPE,
-          typename INT_TYPE,
-          typename INDEX_TYPE,
-          int NUM_PRIMARY_SPECIES,
-          int NUM_KINETIC_REACTIONS >
-struct KineticParameters
-{
-  using RealType = REAL_TYPE;
-  using IntType = INT_TYPE;
-
-  static constexpr IntType numPrimarySpecies = NUM_PRIMARY_SPECIES;
-  static constexpr IntType numKineticReactions = NUM_KINETIC_REACTIONS;
-
-  RealType m_activationEnergy[numKineticReactions];
-  RealType m_equilibriumConstant[numKineticReactions];
-  RealType m_stoichiometricMatrix[numKineticReactions][numPrimarySpecies];
-
-  RealType m_rateConstant[numKineticReactions];
-};
-
-template< typename REAL_TYPE,
-          typename INT_TYPE,
-          typename INDEX_TYPE,
-          int NUM_PRIMARY_SPECIES,
-          int NUM_SECONDARY_SPECIES,
-          int NUM_KINETIC_REACTIONS,
-          int NUM_EQUILIBRIUM_REACTIONS >
-struct BulkParameters
-{
-  using RealType = REAL_TYPE;
-  using IntType = INT_TYPE;
-
-  static constexpr IntType numPrimarySpecies = NUM_PRIMARY_SPECIES;
-  static constexpr IntType numSecondarySpecies = NUM_SECONDARY_SPECIES;
-  static constexpr IntType numKineticReactions = NUM_KINETIC_REACTIONS;
-  static constexpr IntType numEquilibriumReactions = NUM_EQUILIBRIUM_REACTIONS;
-
+  RealType m_stoichiometricMatrix[numReactions][numSpecies];
+  RealType m_equilibriumConstant[numReactions];
+  RealType m_rateConstantForward[numReactions];
+  RealType m_rateConstantReverse[numReactions];
 };
 
 

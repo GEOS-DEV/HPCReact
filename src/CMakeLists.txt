@@ -3,9 +3,13 @@ set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
      reactions/bulkGeneric/EquilibriumReactions.hpp
+     reactions/bulkGeneric/EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp
+     reactions/bulkGeneric/EquilibriumReactionsReactionExtents_impl.hpp
      reactions/bulkGeneric/KineticReactions.hpp
+     reactions/bulkGeneric/KineticReactions_impl.hpp
      reactions/bulkGeneric/Parameters.hpp
      reactions/bulkGeneric/ParametersPredefined.hpp
+     reactions/bulkGeneric/SpeciesUtilities.hpp
      )
 
 set( hpcReact_sources
@@ -35,6 +39,7 @@ target_include_directories( hpcReact
                             $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
                             $<INSTALL_INTERFACE:include> )
 
+blt_print_target_properties( TARGET hpcReact )
 # install( FILES ${hpcReact_headers} 
 #          DESTINATION include )
 
