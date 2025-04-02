@@ -1,5 +1,5 @@
 message( "this hostconfig assumes you are using homebrew")
-message( "brew install bison cmake gcc git-lfs open-mpi openblas python3")
+message( "brew install bison cmake gcc git-lfs open-mpi openblas python3 llvm cppcheck lcov")
 
 message( "CMAKE_SYSTEM_PROCESSOR = ${CMAKE_SYSTEM_PROCESSOR}" )
 message("CONFIG_NAME = ${CONFIG_NAME}")
