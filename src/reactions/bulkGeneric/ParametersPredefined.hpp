@@ -34,8 +34,10 @@ namespace bulkGeneric
 //   um1Constants };
 
 
+using simpleTestType = MixedReactionsParameters< double, int, int, 5, 2 >;
+
 constexpr 
-MixedReactionsParameters< double, int, int, 5, 2 > 
+simpleTestType
 simpleTestRateParams = 
 { 
   // stoichiometric matrix
@@ -51,6 +53,7 @@ simpleTestRateParams =
   { 1.0, 0.5 }
 };
 
+using carbonateSystemType = MixedReactionsParameters< double, int, int, 18, 11 > ;
 
 constexpr 
 MixedReactionsParameters< double, int, int, 18, 11 > 
