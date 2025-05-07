@@ -271,6 +271,125 @@ TEST( testEquilibriumReactions, testCarbonateSystem2 )
 
 }
 
+//******************************************************************************
+// TEST( testEquilibriumReactions, testUltramaficSimple )
+// {
+//   double const initialSpeciesConcentration[20] =
+//   {
+//     1.0e-16, // OH-
+//     1.0e-16, // CO2(aq)
+//     1.0e-16, // CO3--
+//     1.0e-16, // Mg2OH+++
+//     1.0e-16, // Mg4(OH)++++
+//     1.0e-16, // MgOH+
+//     1.0e-16, // Mg2CO3++
+//     1.0e-16, // MgCO3(aq)
+//     1.0e-16, // MgHCO3+
+//     1.0e-16, // Mg(H3SiO4)2
+//     1.0e-16, // MgH2SiO4
+//     1.0e-16, // MgH3SiO4+
+//     1.0e-16, // H2SiO4--
+//     1.0e-16, // H3SiO4-
+//     1.0e-16, // H4(H2SiO4)----
+//     1.0e-16, // H6(H2SiO4)--
+//     1.0e-8,  // H+
+//     2.58e-2, // HCO3-
+//     1.29e-2, // Mg++
+//     1.00e-4  // SiO2(aq)
+//   };
+
+//   double const expectedSpeciesConcentrations[20] =
+//   { 7.168404255310522e-07, // OH-
+//     7.068350358622488e-04, // CO2(aq)
+//     7.041662940803142e-05, // CO3--
+//     3.051006343632069e-10, // Mg2OH+++
+//     5.633728363523073e-17, // Mg4(OH)++++
+//     1.146268639575029e-06, // MgOH+
+//     2.046739591400719e-05, // Mg2CO3++
+//     5.876590118328070e-04, // MgCO3(aq)
+//     2.265277974033460e-03, // MgHCO3+
+//     1.254144047990584e-05, // Mg(H3SiO4)2
+//     4.559320174327157e-08, // MgH2SiO4
+//     3.113799869189480e-07, // MgH3SiO4+
+//     5.359176335852257e-12, // H2SiO4--
+//     9.484325760570243e-07, // H3SiO4-
+//     2.582114899938736e-21, // H4(H2SiO4)----
+//     1.018017421565557e-14, // H6(H2SiO4)--
+//     1.410523128980817e-08, // H+
+//     2.214933979548627e-02, // HCO3-
+//     9.992079871368957e-03, // Mg++
+//     8.615314817151535e-05  // SiO2(aq)
+//   };
+
+//   std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
+//   testEnforceEquilibrium< double, 0 >( UltramaficSimple.equilibriumReactionsParameters(),
+//                                        initialSpeciesConcentration,
+//                                        expectedSpeciesConcentrations );
+
+  // std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
+  // testEnforceEquilibrium< double, 1 >( carbonateSystem.equilibriumReactionsParameters(),
+  //                                      initialSpeciesConcentration,
+  //                                      expectedSpeciesConcentrations );
+
+//   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
+//   testEnforceEquilibrium< double, 2 >( UltramaficSimple.equilibriumReactionsParameters(),
+//                                        initialSpeciesConcentration,
+//                                        expectedSpeciesConcentrations );
+
+// }
+
+
+TEST( testEquilibriumReactions, testUltramaficSimple )
+{
+  using EquilibriumReactionsType = EquilibriumReactions< double,
+                                                         int,
+                                                         int >;
+
+  constexpr int numSpecies = UltramaficSimple.numSpecies;
+  constexpr int numReactions = UltramaficSimple.numReactions;
+  constexpr int numPrimarySpecies = numSpecies - numReactions;
+//  constexpr int numSecondarySpecies = numReactions;
+
+  double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
+  {
+    1.0e-8,  // H+
+    2.58e-2, // HCO3-
+    1.29e-2, // Mg++
+    1.00e-4  // SiO2(aq)
+  };
+
+
+
+  double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
+  {
+    log( initialPrimarySpeciesConcentration[0] ),
+    log( initialPrimarySpeciesConcentration[1] ),
+    log( initialPrimarySpeciesConcentration[2] ),
+    log( initialPrimarySpeciesConcentration[3] )
+  };
+
+  double logPrimarySpeciesConcentration[numPrimarySpecies];
+  EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
+                                                          UltramaficSimple,
+                                                          logInitialPrimarySpeciesConcentration,
+                                                          logPrimarySpeciesConcentration );
+
+  double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
+  {
+    1.410523128980817e-08, // H+
+    2.214933979548627e-02, // HCO3-
+    9.992079871368957e-03, // Mg++
+    8.615314817151535e-05  // SiO2(aq)
+  };
+
+  for( int r=0; r<numPrimarySpecies; ++r )
+  {
+    EXPECT_NEAR( exp( logPrimarySpeciesConcentration[r] ), expectedPrimarySpeciesConcentrations[r], 1.0e-8 * expectedPrimarySpeciesConcentrations[r] );
+  }
+
+
+}
+
 int main( int argc, char * * argv )
 {
   ::testing::InitGoogleTest( &argc, argv );
