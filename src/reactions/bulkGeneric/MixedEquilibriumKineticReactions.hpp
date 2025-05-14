@@ -25,7 +25,7 @@ namespace bulkGeneric
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
-          bool LOGE_CONCENTRATION >
+          bool LOGE_CONCENTRATION = true >
 class MixedEquilibriumKineticReactions
 {
 public:
@@ -51,13 +51,15 @@ public:
                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                      ARRAY_1D & logSecondarySpeciesConcentrations,
                      ARRAY_1D & aggregatePrimarySpeciesConcentrations,
-                     ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
+                     ARRAY_2D & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                      ARRAY_1D & reactionRates,
-                     ARRAY_2D & reactionRatesDerivatives )
+                     ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations,
+                     ARRAY_1D & aggregateSpeciesRates,
+                     ARRAY_2D & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
   {
-    constexpr int numSpecies = PARAMS_DATA::numSpecies;
-    constexpr int numSecondarySpecies = PARAMS_DATA::numReactions;
-    constexpr int numPrimarySpecies = numSpecies - numSecondarySpecies;
+    constexpr IntType numSpecies = PARAMS_DATA::numSpecies;
+    constexpr IntType numSecondarySpecies = PARAMS_DATA::numReactions;
+    constexpr IntType numPrimarySpecies = numSpecies - numSecondarySpecies;
 
     // 1. Compute new aggregate species from primary species
     calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
@@ -69,15 +71,120 @@ public:
                                                                   dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 
     // 2. Compute the reaction rates for all kinetic reactions
+    computeReactionRates( temperature,
+                          params,
+                          logPrimarySpeciesConcentrations,
+                          logSecondarySpeciesConcentrations,
+                          aggregatePrimarySpeciesConcentrations,
+                          dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                          reactionRates,
+                          dReactionRates_dLogPrimarySpeciesConcentrations );
+    
+
+    // 3. Compute aggregate species rates
+    computeAggregateSpeciesRates( params,
+                                  logPrimarySpeciesConcentrations
+                                  reactionRates,
+                                  dReactionRates_dLogPrimarySpeciesConcentrations,
+                                  aggregateSpeciesRates,
+                                  dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
+    
+    
+  }
+  
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D,
+            typename ARRAY_2D >
+  static HPCREACT_HOST_DEVICE inline void
+  computeReactionRates( RealType const & temperature,
+                        PARAMS_DATA const & params,
+                        ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                        ARRAY_1D_TO_CONST const & logSecondarySpeciesConcentrations,
+                        ARRAY_2D_TO_CONST const & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                        ARRAY_1D & reactionRates,
+                        ARRAY_2D & dReactionRates_dPrimarySpeciesConcentrations )
+
+  {
+    constexpr IntType numSpecies = PARAMS_DATA::numSpecies;
+    constexpr IntType numSecondarySpecies = PARAMS_DATA::numReactions;
+    constexpr IntType numPrimarySpecies = numSpecies - numSecondarySpecies;
+
+    RealType logSpeciesConcentration[numSpecies] {};
+    for ( IntType i = 0; i < numPrimarySpecies; ++i )
+    {
+      speciesConcentration[i] = logPrimarySpeciesConcentrations[i];
+    }
+    for ( IntType i = 0; i < numSecondarySpecies; ++i )
+    {
+      logSpeciesConcentration[i+numPrimarySpecies] = logSecondarySpeciesConcentrations[i];
+    }
+    
+    CArrayWrapper< RealType, PARAMS_DATA::numReactions, numSpecies > reactionRatesDerivatives;
     kineticReactions::computeReactionRates( temperature,
                                             params,
-                                            speciesConcentration,
+                                            logSpeciesConcentration,
                                             reactionRates,
                                             reactionRatesDerivatives );
 
-    // 3. Compute aggregate species rates
-    
-    
+    // Compute the reaction rates derivatives w.r.t. log primary species concentrations
+    for( IntType i = 0; i < numKineticReactions; ++i )
+    {
+      for( IntType j = 0; j < numPrimarySpecies; ++j )
+      {
+        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = reactionRatesDerivatives( i, j );
+        for( IntType k = 0; k < numSecondarySpecies; ++k )
+        {
+          RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( k, j+numSecondarySpecies );
+          
+          dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) += 
+          reactionRatesDerivatives( i, numPrimarySpecies + k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( k, j );
+        }
+      }
+    }
+  }                                        
+
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_2D_TO_CONST
+            typename ARRAY_1D,
+            typename ARRAY_2D >
+  static HPCREACT_HOST_DEVICE inline void
+  computeAggregateSpeciesRates( PARAMS_DATA const & params,
+                                ARRAY_1D_TO_CONST const & speciesConcentration,
+                                ARRAY_1D_TO_CONST const & reactionRates,
+                                ARRAY_2D_TO_CONST const & reactionRatesDerivatives 
+                                ARRAY_1D & aggregatesRates,
+                                ARRAY_2D & aggregatesRatesDerivatives )
+  {
+    constexpr IntType numSpecies = PARAMS_DATA::numSpecies;
+    constexpr IntType numSecondarySpecies = PARAMS_DATA::numReactions;
+    constexpr IntType numPrimarySpecies = numSpecies - numSecondarySpecies;
+
+    for( IntType i = 0; i < numPrimarySpecies; ++i )
+    {
+      speciesRates[i] = 0.0;
+      if constexpr( CALCULATE_DERIVATIVES )
+      {
+        for( IntType j = 0; j < numPrimarySpecies; ++j )
+        {
+          speciesRatesDerivatives( i, j ) = 0.0;
+       }
+      }
+      for( IntType r=0; r<PARAMS_DATA::numReactions; ++r )
+      {
+        RealType const s_ir = params.stoichiometricMatrix( r, i );
+        speciesRates[i] += s_ir * reactionRates[r];
+        if constexpr( CALCULATE_DERIVATIVES )
+        {
+          for( IntType j = 0; j < numPrimarySpecies; ++j )
+          {
+            speciesRatesDerivatives( i, j ) += s_ir * reactionRatesDerivatives( r, j );
+          }
+        }
+      } 
+    }
+
   }
 
 private:
