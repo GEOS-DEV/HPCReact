@@ -26,9 +26,8 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 ARRAY_1D & logSecondarySpeciesConcentrations,
                                                 FUNC && derivativeFunc )
 {
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numSecondarySpecies = PARAMS_DATA::numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numSecondarySpecies;
+  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies(); 
 
   for( int j=0; j<numSecondarySpecies; ++j )
   {
@@ -98,15 +97,15 @@ template< typename REAL_TYPE,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE
 inline
-void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
+void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA & params,
                                                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                      ARRAY_1D & logSecondarySpeciesConcentrations,
                                                      ARRAY_1D & aggregatePrimarySpeciesConcentrations,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numSecondarySpecies = PARAMS_DATA::numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numSecondarySpecies;
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+
 
   calculateLogSecondarySpeciesConcentration< REAL_TYPE,
                                              INT_TYPE,
@@ -148,9 +147,8 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                                      ARRAY_1D & aggregatePrimarySpeciesConcentrations,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numSecondarySpecies = PARAMS_DATA::numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numSecondarySpecies;
+  constexpr int numSecondarySpecies = PARAMS_DATA::numReactions();
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
 
@@ -179,15 +177,6 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
     }
   }
 }
-
-// template< typename REAL_TYPE,
-//           typename INT_TYPE,
-//           typename INDEX_TYPE,
-//           typename PARAMS_DATA,
-//           typename ARRAY_1D_TO_CONST,
-//           typename ARRAY_1D,
-//           typename ARRAY_2D >
-// void calculateAggregateBasedResidualAndJacobianWrtLogC( )
 
 } // namespace bulkGeneric
 } // namespace hpcReact

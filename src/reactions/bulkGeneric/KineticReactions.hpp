@@ -79,7 +79,7 @@ public:
                         ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates )
   {
-    REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions][PARAMS_DATA::numSpecies] = { {0.0} };
+    REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] = { {0.0} };
     computeReactionRates_impl< PARAMS_DATA, false >( temperature,
                                                      params,
                                                      speciesConcentration,

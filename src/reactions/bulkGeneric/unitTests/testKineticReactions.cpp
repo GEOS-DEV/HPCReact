@@ -22,17 +22,17 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void computeReactionRatesTest( PARAMS_DATA const & params,
-                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                               REAL_TYPE const (&expectedReactionRates)[PARAMS_DATA::numReactions],
-                               REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions][PARAMS_DATA::numSpecies] )
+                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                               REAL_TYPE const (&expectedReactionRates)[PARAMS_DATA::numReactions()],
+                               REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] )
 {
   using KineticReactionsType = KineticReactions< REAL_TYPE,
                                                  int,
                                                  int,
                                                  LOGE_CONCENTRATION >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numReactions = PARAMS_DATA::numReactions;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  constexpr int numReactions = PARAMS_DATA::numReactions();
 
   double const temperature = 298.15;
   double speciesConcentration[numSpecies];
@@ -93,18 +93,18 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
 
 
 //******************************************************************************
-TEST( testKineticReactions, computeReactionRatesTest_simpleTestRateParams )
+TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedReactionRates[] = { 1.0, 0.25 };
   double const expectedReactionRatesDerivatives[][5] =
   { { 2.0, -0.5, 0.0, 0.0, 0.0 },
     { 0.0, 0.0, 0.5, 0.25, 0.0 } };
-  computeReactionRatesTest< double, false >( simpleTestRateParams.kineticReactionsParameters(),
+  computeReactionRatesTest< double, false >( simpleKineticTestRateParams.kineticReactionsParameters(),
                                              initialSpeciesConcentration,
                                              expectedReactionRates,
                                              expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( simpleTestRateParams,
+  computeReactionRatesTest< double, true >( simpleKineticTestRateParams.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
@@ -168,9 +168,9 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void computeSpeciesRatesTest( PARAMS_DATA const & params,
-                              REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                              REAL_TYPE const (&expectedSpeciesRates)[PARAMS_DATA::numSpecies],
-                              REAL_TYPE const (&expectedSpeciesRatesDerivatives)[PARAMS_DATA::numSpecies][PARAMS_DATA::numSpecies] )
+                              REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                              REAL_TYPE const (&expectedSpeciesRates)[PARAMS_DATA::numSpecies()],
+                              REAL_TYPE const (&expectedSpeciesRatesDerivatives)[PARAMS_DATA::numSpecies()][PARAMS_DATA::numSpecies()] )
 {
 
   using KineticReactionsType = KineticReactions< REAL_TYPE,
@@ -178,7 +178,7 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
                                                  int,
                                                  LOGE_CONCENTRATION >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
   double const temperature = 298.15;
   double speciesConcentration[numSpecies];
@@ -225,7 +225,7 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
   }
 }
 
-TEST( testKineticReactions, computeSpeciesRatesTest_simpleTestRateParams )
+TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams )
 {
   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesRates[5] = { -2.0, 1.0, 0.75, -0.25, 0.5 };
@@ -235,12 +235,12 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleTestRateParams )
     {  0.0, 0.0, -0.5, -0.25, 0.0 },
     {  0.0, 0.0, 1.0, 0.5, 0.0 } };
 
-  computeSpeciesRatesTest< double, false >( simpleTestRateParams,
+  computeSpeciesRatesTest< double, false >( simpleKineticTestRateParams,
                                             initialSpeciesConcentration,
                                             expectedSpeciesRates,
                                             expectedSpeciesRatesDerivatives );
 
-  computeSpeciesRatesTest< double, true >( simpleTestRateParams,
+  computeSpeciesRatesTest< double, true >( simpleKineticTestRateParams,
                                            initialSpeciesConcentration,
                                            expectedSpeciesRates,
                                            expectedSpeciesRatesDerivatives );
@@ -289,15 +289,15 @@ template< typename REAL_TYPE,
 void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const dt,
                    int const numSteps,
-                   REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies] )
+                   REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
   using KineticReactionsType = KineticReactions< double,
                                                  int,
                                                  int,
                                                  LOGE_CONCENTRATION >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
   double const temperature = 298.15;
 
   double speciesConcentration[numSpecies];
@@ -357,14 +357,14 @@ TEST( testKineticReactions, testTimeStep )
   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01, 7.02014627734060e-01, 5.95970744531880e-01 };
 
-  timeStepTest< double, false >( simpleTestRateParams,
+  timeStepTest< double, false >( simpleKineticTestRateParams,
                                  2.0,
                                  10,
                                  initialSpeciesConcentration,
                                  expectedSpeciesConcentrations );
 
   // ln(c) as the primary variable results in a singular system.
-  // timeStepTest< double, true >( simpleTestRateParams,
+  // timeStepTest< double, true >( simpleKineticTestRateParams,
   //                               2.0,
   //                               10,
   //                               initialSpeciesConcentration,
@@ -424,7 +424,7 @@ TEST( testKineticReactions, testTimeStep_carbonateSystem )
                                  expectedSpeciesConcentrations );
 
   // ln(c) as the primary variable results in a singular system.
-  // timeStepTest< double, true >( simpleTestRateParams,
+  // timeStepTest< double, true >( simpleKineticTestRateParams,
   //                               2.0,
   //                               10,
   //                               initialSpeciesConcentration,

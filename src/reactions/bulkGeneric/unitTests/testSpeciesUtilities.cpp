@@ -11,10 +11,10 @@ using namespace hpcReact::bulkGeneric;
 
 TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 {
-  constexpr int numReactions = carbonateSystem.numReactions;
-  constexpr int numSpecies = carbonateSystem.numSpecies;
-  constexpr int numPrimarySpecies = numSpecies - numReactions;
-  constexpr int numSecondarySpecies = numReactions;
+  constexpr int numReactions = carbonateSystem.numReactions();
+  constexpr int numSpecies = carbonateSystem.numSpecies();
+  constexpr int numPrimarySpecies = carbonateSystem.numPrimarySpecies();
+  constexpr int numSecondarySpecies = carbonateSystem.numSecondarySpecies();
 
   double const logPrimarySpeciesSolution[numPrimarySpecies] =
   {
@@ -98,10 +98,7 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 
 TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
 {
-  constexpr int numReactions = carbonateSystem.numReactions;
-  constexpr int numSpecies = carbonateSystem.numSpecies;
-  constexpr int numPrimarySpecies = numSpecies - numReactions;
-//  constexpr int numSecondarySpecies = numReactions;
+  constexpr int numPrimarySpecies = carbonateSystem.numPrimarySpecies();
 
   double primarySpeciesSolution[numPrimarySpecies] =
   {

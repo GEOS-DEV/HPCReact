@@ -30,9 +30,7 @@ EquilibriumReactions< REAL_TYPE,
                                                                                               ARRAY_2D & jacobian )
 {
   HPCREACT_UNUSED_VAR( temperature );
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numSecondarySpecies = PARAMS_DATA::numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numSecondarySpecies;
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   RealType aggregatePrimaryConcentrations[numPrimarySpecies] = {0.0};
   ARRAY_2D dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{{0.0}}};
@@ -68,9 +66,7 @@ EquilibriumReactions< REAL_TYPE,
                                                                   ARRAY_1D & logPrimarySpeciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numReactions = PARAMS_DATA::numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numReactions;
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   double residual[numPrimarySpecies] = { 0.0 };
 //  double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = { 0.0 };

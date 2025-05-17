@@ -7,6 +7,8 @@ set( hpcReact_headers
      reactions/bulkGeneric/EquilibriumReactionsReactionExtents_impl.hpp
      reactions/bulkGeneric/KineticReactions.hpp
      reactions/bulkGeneric/KineticReactions_impl.hpp
+     reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp
+     reactions/bulkGeneric/MixedEquilibriumKineticReactions_impl.hpp
      reactions/bulkGeneric/Parameters.hpp
      reactions/bulkGeneric/ParametersPredefined.hpp
      reactions/bulkGeneric/SpeciesUtilities.hpp

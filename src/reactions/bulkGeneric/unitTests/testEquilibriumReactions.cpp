@@ -21,16 +21,16 @@ template< typename REAL_TYPE,
           int RESIDUAL_FORM,
           typename PARAMS_DATA >
 void computeResidualAndJacobianTest( PARAMS_DATA const & params,
-                                     REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                                     REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions],
-                                     REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions][PARAMS_DATA::numReactions] )
+                                     REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                                     REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions()],
+                                     REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions()][PARAMS_DATA::numReactions()] )
 {
   using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
                                                          int,
                                                          int >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numReactions = PARAMS_DATA::numReactions;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  constexpr int numReactions = PARAMS_DATA::numReactions();
 
   double const temperature = 298.15;
   double speciesConcentration[numSpecies];
@@ -99,14 +99,14 @@ template< typename REAL_TYPE,
           int RESIDUAL_FORM,
           typename PARAMS_DATA >
 void testEnforceEquilibrium( PARAMS_DATA const & params,
-                             REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                             REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies] )
+                             REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                             REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
   using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
                                                          int,
                                                          int >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
   double const temperature = 298.15;
   double speciesConcentration0[numSpecies];
@@ -217,10 +217,7 @@ TEST( testEquilibriumReactions, testCarbonateSystem2 )
                                                          int,
                                                          int >;
 
-  constexpr int numSpecies = carbonateSystem.numSpecies;
-  constexpr int numReactions = carbonateSystem.numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numReactions;
-//  constexpr int numSecondarySpecies = numReactions;
+  constexpr int numPrimarySpecies = carbonateSystem.numPrimarySpecies();
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
