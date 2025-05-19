@@ -140,9 +140,9 @@ constexpr CArrayWrapper<double, 11> reverseRates =
     //  1           //   Ca(OH)2​(s) + 2H+ = Ca2+ + 2H2​O (kinetic)
   };
 
-  carbonateSystemAllKineticType carbonateSystemAllKinetic( stoichMatrix, equilibriumConstants, forwardRates, reverseRates );
-  carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( stoichMatrix, equilibriumConstants, forwardRates, reverseRates );
-  carbonateSystemType carbonateSystem( stoichMatrix, equilibriumConstants, forwardRates, reverseRates );
+  constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( stoichMatrix, equilibriumConstants, forwardRates, reverseRates );
+  constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( stoichMatrix, equilibriumConstants, forwardRates, reverseRates );
+  constexpr carbonateSystemType carbonateSystem( stoichMatrix, equilibriumConstants, forwardRates, reverseRates );
 
 // *****UNCRUSTIFY-ON******
 } // namespace bulkGeneric
