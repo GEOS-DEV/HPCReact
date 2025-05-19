@@ -29,7 +29,7 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 
   calculateLogSecondarySpeciesConcentration< double,
                                              int,
-                                             int >( carbonateSystemAllEquilibrium,
+                                             int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
                                                     logPrimarySpeciesSolution,
                                                     logSecondarySpeciesConcentrations );
 
@@ -40,12 +40,12 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
     3.956656978189425e-11,
     0.0009629355924566718,
     0.00006739226982791149,
-    1.065032288527949e-9,
     0.005298329882666744,
     0.005844517547638335,
     0.012773193926706526,
     0.006618125707964999,
-    0.01769217213462983
+    0.01769217213462983,
+    1.065032288527949e-9
   };
 
   for( int j=0; j<numSecondarySpecies; ++j )
@@ -60,7 +60,7 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 
   calculateLogSecondarySpeciesConcentrationWrtLogC< double,
                                                     int,
-                                                    int >( carbonateSystemAllEquilibrium,
+                                                    int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
                                                            logPrimarySpeciesSolution,
                                                            logSecondarySpeciesConcentrations,
                                                            dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
@@ -74,12 +74,13 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
     { -1, 1, 0, 0, 0, 0, 0 },
     {  1, 1, 0, 0, 0, 0, 0 },
     {  0, 1, 1, 0, 0, 0, 0 },
-    { -1, 1, 1, 0, 0, 0, 0 },
     {  0, 0, 1, 1, 0, 0, 0 },
     {  0, 0, 1, 0, 1, 0, 0 },
     {  0, 0, 1, 0, 2, 0, 0 },
     {  0, 0, 0, 1, 0, 1, 0 },
-    {  0, 0, 0, 1, 0, 0, 1 }
+    {  0, 0, 0, 1, 0, 0, 1 },
+    { -1, 1, 1, 0, 0, 0, 0 }
+
   };
 
   for( int i=0; i<numSecondarySpecies; ++i )
@@ -118,9 +119,16 @@ TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
   double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = {0};
 
 
-  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{0.0}};
+  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations;
+  for( int i = 0; i < numPrimarySpecies; ++i )
+  {
+    for( int k=0; k<numPrimarySpecies; ++k )
+    {
+      std::cout << "dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations("<< i << ", " << k << " )" << dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) << std::endl;
+    }  
+  }
 
-  calculateAggregatePrimaryConcentrationsWrtLogC< double, int, int >( carbonateSystemAllEquilibrium,
+  calculateAggregatePrimaryConcentrationsWrtLogC< double, int, int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
                                                                       primarySpeciesSolution,
                                                                       aggregatePrimarySpeciesConcentration,
                                                                       dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );

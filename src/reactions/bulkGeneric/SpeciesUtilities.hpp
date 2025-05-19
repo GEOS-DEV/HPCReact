@@ -3,6 +3,7 @@
 #include "common/macros.hpp"
 #include <math.h>
 #include <functional>
+#include <iostream>
 
 namespace hpcReact
 {
@@ -147,7 +148,7 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                                      ARRAY_1D & aggregatePrimarySpeciesConcentrations,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
-  constexpr int numSecondarySpecies = PARAMS_DATA::numReactions();
+  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};

@@ -27,18 +27,34 @@ struct CArrayWrapper;
 template< typename T, int DIM0 >
 struct CArrayWrapper< T, DIM0 >
 {
-  
+  // default constructor
   constexpr CArrayWrapper() = default;
-
+  
+  /**
+   * @brief Construct a CArrayWrapper from an initializer list.
+   *
+   * Allows brace-initialization with a list of values:
+   * @code
+   * CArrayWrapper< double, 3 > arr = {1.0, 2.0, 3.0};
+   * @endcode
+   *
+   * @param init An initializer list with exactly DIM0 elements.
+   *
+   * @note No runtime bounds checking is performed on the initializer size.
+   */
   constexpr CArrayWrapper( std::initializer_list< T > init )
   {
+    // static_assert(init.size() == DIM0, "Size mismatch"); // needs c++20
     int i = 0;
     for( auto const & val : init )
     {
       data[i++] = val;
     }
   }
-
+  /**
+   * @brief Copy constructor.
+   * @param src The source CArrayWrapper to copy from.
+   */ 
   constexpr CArrayWrapper( CArrayWrapper const & src )
   {
     for( size_t i = 0; i < DIM0; i++ )
@@ -76,7 +92,7 @@ struct CArrayWrapper< T, DIM0 >
   HPCREACT_HOST_DEVICE constexpr inline T const & operator[]( int const dim ) const { return data[dim]; }
 
   /// The underlying 1D C-style array.
-  T data[DIM0];
+  T data[DIM0]{};
 };
 
 /**
@@ -92,9 +108,13 @@ struct CArrayWrapper< T, DIM0 >
 template< typename T, int DIM0, int DIM1 >
 struct CArrayWrapper< T, DIM0, DIM1 >
 {
-  
+  // default constructor
   constexpr CArrayWrapper() = default;
-
+  
+  /**
+   * @brief Copy constructor.
+   * @param src The source CArrayWrapper to copy from.
+   */
   constexpr CArrayWrapper( CArrayWrapper const & src )
   {
     for( size_t i = 0; i < DIM0; i++ )
@@ -121,9 +141,11 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    */
   constexpr CArrayWrapper( std::initializer_list< std::initializer_list< T > > init )
   {
+    // static_assert(init.size() == DIM0, "Size mismatch"); // needs c++20
     int i = 0;
     for( auto const & row : init )
     {
+      // static_assert(row.size() == DIM1, "Size mismatch"); // needs c++20
       int j = 0;
       for( auto const & val : row )
       {
@@ -178,7 +200,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
   }
 
   /// The underlying 2D C-style array of size DIM0 x DIM1.
-  T data[DIM0][DIM1];
+  T data[DIM0][DIM1]{};
 };
 
 /**
@@ -195,7 +217,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
 template< typename T, int DIM0, int DIM1, int DIM2 >
 struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
 {
-  
+  // default constructor
   constexpr CArrayWrapper() = default;
 
   /**
@@ -223,12 +245,15 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
    */
   constexpr CArrayWrapper( std::initializer_list< std::initializer_list< std::initializer_list< T > > > init )
   {
+    // static_assert(init.size() == DIM0, "Size mismatch"); // needs c++20
     int i = 0;
     for( auto const & plane : init )
     {
+      // static_assert(plane.size() == DIM1, "Size mismatch"); // needs c++20
       int j = 0;
       for( auto const & row : plane )
       {
+        // static_assert(row.size() == DIM2, "Size mismatch"); // needs c++20
         int k = 0;
         for( auto const & val : row )
         {
@@ -292,5 +317,5 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
   }
 
   /// The underlying 3D C-style array of size DIM0 x DIM1 x DIM2.
-  T data[DIM0][DIM1][DIM2];
+  T data[DIM0][DIM1][DIM2]{};
 };
