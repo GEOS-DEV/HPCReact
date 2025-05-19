@@ -101,6 +101,16 @@ struct MixedReactionsParameters
 
   constexpr MixedReactionsParameters() = default;
 
+  constexpr MixedReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
+                                      CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,                                  
+                                      CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
+                                      CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse ):
+  m_stoichiometricMatrix( stoichiometricMatrix ),
+  m_equilibriumConstant( equilibriumConstant ),
+  m_rateConstantForward( rateConstantForward ),
+  m_rateConstantReverse( rateConstantReverse )
+  {}
+
   static constexpr IndexType numReactions() { return NUM_REACTIONS; }
 
   static constexpr IndexType numKineticReactions() { return NUM_REACTIONS - NUM_EQ_REACTIONS; }

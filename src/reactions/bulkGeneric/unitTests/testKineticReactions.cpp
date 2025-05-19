@@ -110,7 +110,7 @@ TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams
                                             expectedReactionRatesDerivatives );
 }
 
-TEST( testKineticReactions, computeReactionRatesTest_carbonateSystem )
+TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
 {
   double const initialSpeciesConcentration[18] =
   {
@@ -119,12 +119,12 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystem )
     1.0e-16, // CO3-2
     1.0e-16, // H2CO3
     1.0e-16, // CaHCO3+
-    1.0e-16, // CaCO3
     1.0e-16, // CaSO4
     1.0e-16, // CaCl+
     1.0e-16, // CaCl2
     1.0e-16, // MgSO4
     1.0e-16, // NaSO4-
+    1.0e-16, // CaCO3
     3.76e-1, // H+
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
@@ -151,11 +151,11 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystem )
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.e7, 0, 0, 0, -7.2158e7, 0, 0, -2.12502e6 }
   };
 
-  computeReactionRatesTest< double, false >( carbonateSystem,
+  computeReactionRatesTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                              initialSpeciesConcentration,
                                              expectedReactionRates,
                                              expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( carbonateSystem,
+  computeReactionRatesTest< double, true >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
@@ -235,19 +235,19 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams 
     {  0.0, 0.0, -0.5, -0.25, 0.0 },
     {  0.0, 0.0, 1.0, 0.5, 0.0 } };
 
-  computeSpeciesRatesTest< double, false >( simpleKineticTestRateParams,
+  computeSpeciesRatesTest< double, false >( simpleKineticTestRateParams.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
                                             expectedSpeciesRates,
                                             expectedSpeciesRatesDerivatives );
 
-  computeSpeciesRatesTest< double, true >( simpleKineticTestRateParams,
+  computeSpeciesRatesTest< double, true >( simpleKineticTestRateParams.kineticReactionsParameters(),
                                            initialSpeciesConcentration,
                                            expectedSpeciesRates,
                                            expectedSpeciesRatesDerivatives );
 
 }
 
-// TEST( testKineticReactions, computeSpeciesRatesTest_carbonateSystem )
+// TEST( testKineticReactions, computeSpeciesRatesTest_carbonateSystemAllKinetic )
 // {
 //   double const initialSpeciesConcentration[18] =
 //   {
@@ -274,7 +274,7 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams 
 //   double const expectedSpeciesRates[18] = { 0 };
 //   double const expectedSpeciesRatesDerivatives[18][18] = {{ 0}};
 
-//   computeSpeciesRatesTest< double, false >( carbonateSystem,
+//   computeSpeciesRatesTest< double, false >( carbonateSystemAllKinetic,
 //                                             initialSpeciesConcentration,
 //                                             expectedSpeciesRates,
 //                                             expectedSpeciesRatesDerivatives );
@@ -357,7 +357,7 @@ TEST( testKineticReactions, testTimeStep )
   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01, 7.02014627734060e-01, 5.95970744531880e-01 };
 
-  timeStepTest< double, false >( simpleKineticTestRateParams,
+  timeStepTest< double, false >( simpleKineticTestRateParams.kineticReactionsParameters(),
                                  2.0,
                                  10,
                                  initialSpeciesConcentration,
@@ -372,7 +372,7 @@ TEST( testKineticReactions, testTimeStep )
 }
 
 
-TEST( testKineticReactions, testTimeStep_carbonateSystem )
+TEST( testKineticReactions, testTimeStep_carbonateSystemAllKinetic )
 {
   double const initialSpeciesConcentration[18] =
   {
@@ -381,12 +381,12 @@ TEST( testKineticReactions, testTimeStep_carbonateSystem )
     1.0e-16, // CO3-2
     1.0e-16, // H2CO3
     1.0e-16, // CaHCO3+
-    1.0e-16, // CaCO3
     1.0e-16, // CaSO4
     1.0e-16, // CaCl+
     1.0e-16, // CaCl2
     1.0e-16, // MgSO4
     1.0e-16, // NaSO4-
+    1.0e-16, // CaCO3
     3.76e-1, // H+
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
@@ -402,12 +402,12 @@ TEST( testKineticReactions, testTimeStep_carbonateSystem )
     3.956656978189456e-11, // CO3-2
     9.629355924567627e-04, // H2CO3
     6.739226982791492e-05, // CaHCO3+
-    1.065032288527957e-09, // CaCO3
     5.298329882666738e-03, // CaSO4
     5.844517547638333e-03, // CaCl+
     1.277319392670652e-02, // CaCl2
     6.618125707964991e-03, // MgSO4
     1.769217213462983e-02, // NaSO4-
+    1.065032288527957e-09, // CaCO3
     4.396954721488358e-04, // H+
     3.723009698453808e-04, // HCO3-
     1.471656530812871e-02, // Ca+2
@@ -417,7 +417,7 @@ TEST( testKineticReactions, testTimeStep_carbonateSystem )
     1.072307827865370e+00 // Na+1
   };
 
-  timeStepTest< double, false >( carbonateSystem,
+  timeStepTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                  2.0,
                                  100000,
                                  initialSpeciesConcentration,

@@ -276,7 +276,7 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
    *
    * This allows usage like `obj[dim0][dim1][dim2]`.
    */
-  HPCREACT_HOST_DEVICE constexpr inline T       ( & operator[]( int const dim0 ))[DIM1][DIM2]
+  HPCREACT_HOST_DEVICE constexpr inline T ( & operator[]( int const dim0 ))[DIM1][DIM2]
   {
     return data[dim0];
   }

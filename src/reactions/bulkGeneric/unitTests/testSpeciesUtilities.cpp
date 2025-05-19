@@ -11,10 +11,8 @@ using namespace hpcReact::bulkGeneric;
 
 TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 {
-  constexpr int numReactions = carbonateSystem.numReactions();
-  constexpr int numSpecies = carbonateSystem.numSpecies();
-  constexpr int numPrimarySpecies = carbonateSystem.numPrimarySpecies();
-  constexpr int numSecondarySpecies = carbonateSystem.numSecondarySpecies();
+  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
 
   double const logPrimarySpeciesSolution[numPrimarySpecies] =
   {
@@ -31,7 +29,7 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 
   calculateLogSecondarySpeciesConcentration< double,
                                              int,
-                                             int >( carbonateSystem,
+                                             int >( carbonateSystemAllEquilibrium,
                                                     logPrimarySpeciesSolution,
                                                     logSecondarySpeciesConcentrations );
 
@@ -62,7 +60,7 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 
   calculateLogSecondarySpeciesConcentrationWrtLogC< double,
                                                     int,
-                                                    int >( carbonateSystem,
+                                                    int >( carbonateSystemAllEquilibrium,
                                                            logPrimarySpeciesSolution,
                                                            logSecondarySpeciesConcentrations,
                                                            dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
@@ -98,7 +96,7 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 
 TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
 {
-  constexpr int numPrimarySpecies = carbonateSystem.numPrimarySpecies();
+  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
 
   double primarySpeciesSolution[numPrimarySpecies] =
   {
@@ -120,9 +118,9 @@ TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
   double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = {0};
 
 
-  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{{0.0}}};
+  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{0.0}};
 
-  calculateAggregatePrimaryConcentrationsWrtLogC< double, int, int >( carbonateSystem,
+  calculateAggregatePrimaryConcentrationsWrtLogC< double, int, int >( carbonateSystemAllEquilibrium,
                                                                       primarySpeciesSolution,
                                                                       aggregatePrimarySpeciesConcentration,
                                                                       dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
