@@ -57,7 +57,7 @@ struct CArrayWrapper< T, DIM0 >
    */ 
   constexpr CArrayWrapper( CArrayWrapper const & src )
   {
-    for( size_t i = 0; i < DIM0; i++ )
+    for( std::size_t i = 0; i < DIM0; i++ )
     {
       data[i] = src.data[i];
     }
@@ -117,9 +117,9 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    */
   constexpr CArrayWrapper( CArrayWrapper const & src )
   {
-    for( size_t i = 0; i < DIM0; i++ )
+    for( std::size_t i = 0; i < DIM0; i++ )
     {
-      for ( size_t j = 0; j < DIM1; j++)
+      for ( std::size_t j = 0; j < DIM1; j++)
         data[i][j] = src.data[i][j];
     }
   }
