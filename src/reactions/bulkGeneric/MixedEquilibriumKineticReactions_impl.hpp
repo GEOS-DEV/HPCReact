@@ -58,8 +58,6 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                           params,
                           logPrimarySpeciesConcentrations,
                           logSecondarySpeciesConcentrations,
-                          aggregatePrimarySpeciesConcentrations,
-                          dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                           reactionRates,
                           dReactionRates_dLogPrimarySpeciesConcentrations );
     
@@ -164,7 +162,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
     for( IntType i = 0; i < numPrimarySpecies; ++i )
     {
-      speciesRates[i] = 0.0;
+      aggregatesRates[i] = 0.0;
       if constexpr( CALCULATE_DERIVATIVES )
       {
         for( IntType j = 0; j < numPrimarySpecies; ++j )
@@ -175,12 +173,12 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
       for( IntType r=0; r<numKineticReactions; ++r )
       {
         RealType const s_ir = params.stoichiometricMatrix( r, i );
-        speciesRates[i] += s_ir * reactionRates[r];
+        aggregatesRates[i] += s_ir * reactionRates[r];
         if constexpr( CALCULATE_DERIVATIVES )
         {
           for( IntType j = 0; j < numPrimarySpecies; ++j )
           {
-            speciesRatesDerivatives( i, j ) += s_ir * reactionRatesDerivatives( r, j );
+            aggregatesRatesDerivatives( i, j ) += s_ir * reactionRatesDerivatives( r, j );
           }
         }
       } 
