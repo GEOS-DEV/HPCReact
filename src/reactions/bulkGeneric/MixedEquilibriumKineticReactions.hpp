@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/macros.hpp"
+#include "KineticReactions.hpp"
 
 /** @file MixedEquilibriumKineticReactions.hpp
  *  @brief Header file for the MixedEquilibriumKineticReactions class.
@@ -71,15 +72,16 @@ public:
   
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST2,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE inline void
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
                         ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                        ARRAY_1D_TO_CONST const & logSecondarySpeciesConcentrations,
+                        ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
                         ARRAY_1D & reactionRates,
-                        ARRAY_2D & dReactionRates_dPrimarySpeciesConcentrations )
+                        ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
 
   {
     computeReactionRates_impl( temperature,
@@ -87,23 +89,30 @@ public:
                                logPrimarySpeciesConcentrations,
                                logSecondarySpeciesConcentrations,
                                reactionRates,
-                               dReactionRates_dPrimarySpeciesConcentrations );
+                               dReactionRates_dLogPrimarySpeciesConcentrations );
   }                                        
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST2,
             typename ARRAY_2D_TO_CONST,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE inline void
   computeAggregateSpeciesRates( PARAMS_DATA const & params,
                                 ARRAY_1D_TO_CONST const & speciesConcentration,
-                                ARRAY_1D_TO_CONST const & reactionRates,
+                                ARRAY_1D_TO_CONST2 const & reactionRates,
                                 ARRAY_2D_TO_CONST const & reactionRatesDerivatives, 
                                 ARRAY_1D & aggregatesRates,
                                 ARRAY_2D & aggregatesRatesDerivatives )
   {
-    computeAggregateSpeciesRates_impl< true >( params,
+    computeAggregateSpeciesRates_impl<  PARAMS_DATA, 
+                                        ARRAY_1D_TO_CONST,
+                                        ARRAY_1D_TO_CONST2,
+                                        ARRAY_2D_TO_CONST,
+                                        ARRAY_1D,
+                                        ARRAY_2D,
+                                        true >( params,
                                                speciesConcentration,
                                                reactionRates,
                                                reactionRatesDerivatives,
@@ -131,20 +140,22 @@ public:
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST2,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeReactionRates_impl( RealType const & temperature,
                         PARAMS_DATA const & params,
                         ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                        ARRAY_1D_TO_CONST const & logSecondarySpeciesConcentrations,
+                        ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
                         ARRAY_1D & reactionRates,
-                        ARRAY_2D & dReactionRates_dPrimarySpeciesConcentrations );
+                        ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations );
 
 
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST2,
             typename ARRAY_2D_TO_CONST,
             typename ARRAY_1D,
             typename ARRAY_2D,
@@ -152,7 +163,7 @@ public:
   static HPCREACT_HOST_DEVICE void
   computeAggregateSpeciesRates_impl( PARAMS_DATA const & params,
                                      ARRAY_1D_TO_CONST const & speciesConcentration,
-                                     ARRAY_1D_TO_CONST const & reactionRates,
+                                     ARRAY_1D_TO_CONST2 const & reactionRates,
                                      ARRAY_2D_TO_CONST const & reactionRatesDerivatives, 
                                      ARRAY_1D & aggregatesRates,
                                      ARRAY_2D & aggregatesRatesDerivatives );

@@ -16,6 +16,7 @@ template< typename REAL_TYPE,
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_TO_CONST2,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE
 inline
@@ -25,7 +26,7 @@ EquilibriumReactions< REAL_TYPE,
                       INDEX_TYPE >::computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
                                                                                               PARAMS_DATA const & params,
                                                                                               ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
-                                                                                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration,
+                                                                                              ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
                                                                                               ARRAY_1D & residual,
                                                                                               ARRAY_2D & jacobian )
 {
