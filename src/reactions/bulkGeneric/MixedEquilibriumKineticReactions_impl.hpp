@@ -40,10 +40,10 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D & aggregateSpeciesRates,
                                                              ARRAY_2D & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
   {
-    constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
-    constexpr IntType numSecondarySpecies = PARAMS_DATA::numReactions();
-    constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
-
+    // constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
+    // constexpr IntType numSecondarySpecies = PARAMS_DATA::numReactions();
+    // constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+    
     // 1. Compute new aggregate species from primary species
     calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
                                                            INT_TYPE,
@@ -51,7 +51,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                   logPrimarySpeciesConcentrations,
                                                                   logSecondarySpeciesConcentrations,
                                                                   aggregatePrimarySpeciesConcentrations,
-                                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                  dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
 
     // 2. Compute the reaction rates for all kinetic reactions
     computeReactionRates( temperature,
@@ -79,6 +79,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
           bool LOGE_CONCENTRATION >  
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST2,
             typename ARRAY_1D,
             typename ARRAY_2D >
   HPCREACT_HOST_DEVICE inline void
@@ -89,9 +90,9 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                      >::computeReactionRates_impl( RealType const & temperature, 
                                                                    PARAMS_DATA const & params,
                                                                    ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                                   ARRAY_1D_TO_CONST const & logSecondarySpeciesConcentrations,
+                                                                   ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
                                                                    ARRAY_1D & reactionRates,
-                                                                   ARRAY_2D & dReactionRates_dPrimarySpeciesConcentrations )
+                                                                   ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
 
   {
     constexpr IntType numSpecies          = PARAMS_DATA::numSpecies();
@@ -100,18 +101,19 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     constexpr IntType numKineticReactions = PARAMS_DATA::numKineticReactions();
 
     RealType logSpeciesConcentration[numSpecies] {};
-    for ( IntType i = 0; i < numPrimarySpecies; ++i )
-    {
-      logSpeciesConcentration[i] = logPrimarySpeciesConcentrations[i];
-    }
     for ( IntType i = 0; i < numSecondarySpecies; ++i )
     {
-      logSpeciesConcentration[i+numPrimarySpecies] = logSecondarySpeciesConcentrations[i];
+      logSpeciesConcentration[i] = logSecondarySpeciesConcentrations[i];
+    }
+    for ( IntType i = 0; i < numPrimarySpecies; ++i )
+    {
+      logSpeciesConcentration[i+numSecondarySpecies] = logPrimarySpeciesConcentrations[i];
     }
     
     CArrayWrapper< RealType, numKineticReactions, numSpecies > reactionRatesDerivatives;
+
     kineticReactions::computeReactionRates( temperature,
-                                            params,
+                                            params.kineticReactionsParameters(),
                                             logSpeciesConcentration,
                                             reactionRates,
                                             reactionRatesDerivatives );
@@ -120,15 +122,16 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     for( IntType i = 0; i < numKineticReactions; ++i )
     {
       for( IntType j = 0; j < numPrimarySpecies; ++j )
-      {
-        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = reactionRatesDerivatives( i, j );
+      { 
+        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = reactionRatesDerivatives( i, j + numSecondarySpecies );
+
         for( IntType k = 0; k < numSecondarySpecies; ++k )
         {
-          RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( k, j+numSecondarySpecies );
+          RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = params.stoichiometricMatrix( k, j + numSecondarySpecies );
           
           dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) += 
-          reactionRatesDerivatives( i, numPrimarySpecies + k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( k, j );
-        }
+          reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
+         }
       }
     }
   }                                        
@@ -139,6 +142,7 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION >  
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_TO_CONST2,
           typename ARRAY_2D_TO_CONST,
           typename ARRAY_1D,
           typename ARRAY_2D,
@@ -150,12 +154,13 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                   LOGE_CONCENTRATION 
                                 >::computeAggregateSpeciesRates_impl( PARAMS_DATA const & params,
                                                                       ARRAY_1D_TO_CONST const & speciesConcentration,
-                                                                      ARRAY_1D_TO_CONST const & reactionRates,
+                                                                      ARRAY_1D_TO_CONST2 const & reactionRates,
                                                                       ARRAY_2D_TO_CONST const & reactionRatesDerivatives, 
                                                                       ARRAY_1D & aggregatesRates,
                                                                       ARRAY_2D & aggregatesRatesDerivatives )
   {
-    constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
+    GEOS_UNUSED_VAR( speciesConcentration );
+    // constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
     constexpr IntType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
     constexpr IntType numKineticReactions = PARAMS_DATA::numKineticReactions();
     constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
@@ -167,12 +172,12 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
       {
         for( IntType j = 0; j < numPrimarySpecies; ++j )
         {
-          speciesRatesDerivatives( i, j ) = 0.0;
+          aggregatesRatesDerivatives( i, j ) = 0.0;
        }
       }
       for( IntType r=0; r<numKineticReactions; ++r )
       {
-        RealType const s_ir = params.stoichiometricMatrix( r, i );
+        RealType const s_ir = params.kineticReactionsParameters().stoichiometricMatrix( r, i+numSecondarySpecies );
         aggregatesRates[i] += s_ir * reactionRates[r];
         if constexpr( CALCULATE_DERIVATIVES )
         {
