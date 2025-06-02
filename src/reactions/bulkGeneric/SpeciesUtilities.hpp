@@ -94,14 +94,15 @@ template< typename REAL_TYPE,
           typename INDEX_TYPE,
           typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
-          typename ARRAY_1D,
+          typename ARRAY_1D_PRIMARY,
+          typename ARRAY_1D_SECONDARY,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE
 inline
-void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA & params,
+void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                     ARRAY_1D & logSecondarySpeciesConcentrations,
-                                                     ARRAY_1D & aggregatePrimarySpeciesConcentrations,
+                                                     ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
+                                                     ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();

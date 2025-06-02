@@ -3,6 +3,7 @@ set( testSourceFiles
      testEquilibriumReactions.cpp
      testKineticReactions.cpp
      testSpeciesUtilities.cpp
+     testMixedReactions.cpp
      )
 
 set( dependencyList hpcReact gtest )

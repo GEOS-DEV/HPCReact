@@ -21,33 +21,33 @@ template< typename REAL_TYPE,
           typename INDEX_TYPE,
           bool LOGE_CONCENTRATION >  
 template< typename PARAMS_DATA,
-            typename ARRAY_1D_TO_CONST,
-            typename ARRAY_1D,
-            typename ARRAY_2D >
+          typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_PRIMARY,
+          typename ARRAY_1D_SECONDARY,
+          typename ARRAY_1D_KINETIC,
+          typename ARRAY_2D_PRIMARY,
+          typename ARRAY_2D_KINETIC >
 HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
                                   INDEX_TYPE,
                                   LOGE_CONCENTRATION 
                                 >::updateMixedSystem_impl( RealType const & temperature,
-                                                             PARAMS_DATA const & params,
-                                                             ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                             ARRAY_1D & logSecondarySpeciesConcentrations, 
-                                                             ARRAY_1D & aggregatePrimarySpeciesConcentrations,
-                                                             ARRAY_2D & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
-                                                             ARRAY_1D & reactionRates,
-                                                             ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations,
-                                                             ARRAY_1D & aggregateSpeciesRates,
-                                                             ARRAY_2D & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
+                                                           PARAMS_DATA const & params,
+                                                           ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                                                           ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
+                                                           ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                                                           ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                                                           ARRAY_1D_KINETIC & reactionRates,
+                                                           ARRAY_2D_KINETIC & dReactionRates_dLogPrimarySpeciesConcentrations,
+                                                           ARRAY_1D_PRIMARY & aggregateSpeciesRates,
+                                                           ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations  )
   {
-    // constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
-    // constexpr IntType numSecondarySpecies = PARAMS_DATA::numReactions();
-    // constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
     
     // 1. Compute new aggregate species from primary species
     calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
-                                                           INT_TYPE,
-                                                           INDEX_TYPE >( params, 
+                                                    INT_TYPE,
+                                                    INDEX_TYPE >( params.equilibriumReactionsParameters(), 
                                                                   logPrimarySpeciesConcentrations,
                                                                   logSecondarySpeciesConcentrations,
                                                                   aggregatePrimarySpeciesConcentrations,
@@ -105,9 +105,9 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     {
       logSpeciesConcentration[i] = logSecondarySpeciesConcentrations[i];
     }
-    for ( IntType i = 0; i < numPrimarySpecies; ++i )
+    for ( IntType i = numSecondarySpecies; i < numSpecies; ++i )
     {
-      logSpeciesConcentration[i+numSecondarySpecies] = logPrimarySpeciesConcentrations[i];
+      logSpeciesConcentration[i] = logPrimarySpeciesConcentrations[i];
     }
     
     CArrayWrapper< RealType, numKineticReactions, numSpecies > reactionRatesDerivatives;
@@ -159,7 +159,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                       ARRAY_1D & aggregatesRates,
                                                                       ARRAY_2D & aggregatesRatesDerivatives )
   {
-    GEOS_UNUSED_VAR( speciesConcentration );
+    HPCREACT_UNUSED_VAR( speciesConcentration );
     // constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
     constexpr IntType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
     constexpr IntType numKineticReactions = PARAMS_DATA::numKineticReactions();

@@ -44,19 +44,22 @@ public:
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
-            typename ARRAY_1D,
-            typename ARRAY_2D >
+            typename ARRAY_1D_PRIMARY,
+            typename ARRAY_1D_SECONDARY,
+            typename ARRAY_1D_KINETIC,
+            typename ARRAY_2D_PRIMARY,
+            typename ARRAY_2D_KINETIC >
   static HPCREACT_HOST_DEVICE inline void
   updateMixedSystem( RealType const & temperature,
                      PARAMS_DATA const & params,
                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                     ARRAY_1D & logSecondarySpeciesConcentrations,
-                     ARRAY_1D & aggregatePrimarySpeciesConcentrations,
-                     ARRAY_2D & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
-                     ARRAY_1D & reactionRates,
-                     ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations,
-                     ARRAY_1D & aggregateSpeciesRates,
-                     ARRAY_2D & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
+                     ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
+                     ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                     ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                     ARRAY_1D_KINETIC & reactionRates,
+                     ARRAY_2D_KINETIC & dReactionRates_dLogPrimarySpeciesConcentrations,
+                     ARRAY_1D_PRIMARY & aggregateSpeciesRates,
+                     ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
   {
     updateMixedSystem_impl( temperature,
                             params,
@@ -124,19 +127,22 @@ public:
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
-            typename ARRAY_1D,
-            typename ARRAY_2D >
+            typename ARRAY_1D_PRIMARY,
+            typename ARRAY_1D_SECONDARY,
+            typename ARRAY_1D_KINETIC, 
+            typename ARRAY_2D_PRIMARY,
+            typename ARRAY_2D_KINETIC >
   static HPCREACT_HOST_DEVICE void
   updateMixedSystem_impl( RealType const & temperature,
                           PARAMS_DATA const & params,
                           ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                          ARRAY_1D & logSecondarySpeciesConcentrations,
-                          ARRAY_1D & aggregatePrimarySpeciesConcentrations,
-                          ARRAY_2D & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
-                          ARRAY_1D & reactionRates,
-                          ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations,
-                          ARRAY_1D & aggregateSpeciesRates,
-                          ARRAY_2D & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
+                          ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
+                          ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                          ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                          ARRAY_1D_KINETIC & reactionRates,
+                          ARRAY_2D_KINETIC & dReactionRates_dLogPrimarySpeciesConcentrations,
+                          ARRAY_1D_PRIMARY & aggregateSpeciesRates,
+                          ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
