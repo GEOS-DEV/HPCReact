@@ -65,20 +65,11 @@ void timeStepTest( PARAMS_DATA const & params,
     aggregatePrimarySpeciesConcentration[i] = initialSpeciesConcentration[i];
   }
   
-  printf( "Initial equilibrium solve\n");
   EquilibriumReactionsType::enforceEquilibrium_Aggregate( temperature,
                                                           carbonateSystem.equilibriumReactionsParameters(),
                                                           logPrimarySpeciesConcentration,
                                                           logPrimarySpeciesConcentration );
-                                                          
-  for( int i = 0; i < numPrimarySpecies; ++i )
-  {
-  std::cout << "aggregatePrimarySpeciesConcentration[" << i << "] = "
-            << aggregatePrimarySpeciesConcentration[i] << ",  ";
-
-  std::cout << "logPrimarySpeciesConcentration[" << i << "] = "
-            << logPrimarySpeciesConcentration[i] << std::endl;
-  }                                                      
+                                                                                                         
   
   /// Time step loop 
   double time = 0.0;
@@ -106,19 +97,7 @@ void timeStepTest( PARAMS_DATA const & params,
                                              aggregateSpeciesRates,
                                              dAggregateSpeciesRates_dlogPrimarySpeciesConcentration );
 
-     for( int i = 0; i < numPrimarySpecies; ++i )
-     {
-      std::cout << "aggregateSpeciesRates[" << i << "] = "
-            << aggregateSpeciesRates[i] << ",  ";
-      std::cout << std::endl;
-      for ( int j = 0; j < numPrimarySpecies; ++j )
-      {
-        std::cout << "dAggregateSpeciesRates_dlogPrimarySpeciesConcentration[" << i << "][" << j << "] = "
-            << dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration[i][j] << ",  ";
-      }      
-      std::cout << std::endl;
-     }                                 
-      
+                                  
       for ( int i = 0; i < numPrimarySpecies; ++i ) 
       {
         r[i] = ( aggregatePrimarySpeciesConcentration[i] - aggregatePrimarySpeciesConcentration_n[i] ) - aggregateSpeciesRates[i] * dt;
@@ -126,13 +105,15 @@ void timeStepTest( PARAMS_DATA const & params,
         {
           J[i][j] = dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration[i][j] - dAggregateSpeciesRates_dlogPrimarySpeciesConcentration[i][j] * dt;
         }
-      }                     
+      } 
     };
     
     nonlinearSolvers::newtonRaphson< numPrimarySpecies >( logPrimarySpeciesConcentration, computeResidualAndJacobian );
 
     time += dt;
   }
+  
+  EXPECT_NEAR( reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], std::max( magScale, fabs( expectedReactionRatesDerivatives[r][i] ) ) * 1.0e-8 );
 }
 
 TEST( testMixedReactions, testTimeStep_carbonateSystem )
@@ -141,7 +122,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 
   double const initialSpeciesConcentration[numPrimarySpecies] =
   {
-    3.76e-3,    // 
+    3.76e-3, // CaCO3 
     3.76e-1, // H+
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
@@ -153,7 +134,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 
   double const expectedSpeciesConcentrations[numPrimarySpecies] =
   {
-    1.0e-3,    // 
+    1.0e-3,  // CaCO3
     3.76e-1, // H+
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
@@ -165,7 +146,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 
   timeStepTest< double, true >( carbonateSystem,
                                 0.2,
-                                1,
+                                10,
                                 initialSpeciesConcentration,
                                 expectedSpeciesConcentrations );
 

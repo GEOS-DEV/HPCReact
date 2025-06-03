@@ -39,6 +39,39 @@ void scale( double (&x)[N], double const value )
 
 }
 
+namespace utils
+{   
+template< int N >
+HPCREACT_HOST_DEVICE
+void print(double const (&J)[N][N], double const (&r)[N], double const (&dx)[N])
+{
+    printf("=======================\nJacobian matrix:\n=======================\n");
+    printf("     RowID           ColID                       Value\n");    for ( int i = 0; i < N; ++i )
+    {
+        for ( int j = 0; j < N; ++j )
+        {
+            printf("%10d%16d%27.16e\n", i, j, J[i][j]);
+        }
+    }
+
+    printf("\n=======================\nSystem right-hand side:\n=======================\n");
+    printf("     RowID                       Value\n");
+
+    for ( int i = 0; i < N; ++i )
+    {
+        printf("%10d%27.16e\n", i, r[i]);
+    }
+    
+    printf("\n=======================\nDelta update vector:\n=======================\n");
+    printf("     RowID                       Value\n");
+    
+    for ( int i = 0; i < N; ++i )
+    {
+        printf("%10d%27.16e\n", i, dx[i]);
+    }
+}
+}
+
 template< int N,
           typename REAL_TYPE, 
           typename ResidualFunc, 
@@ -74,12 +107,13 @@ template< int N,
 HPCREACT_HOST_DEVICE 
 bool newtonRaphson( REAL_TYPE (&x)[N], 
                     FUNCTION_TYPE computeResidualAndJacobian,
-                    int maxIters = 25,
-                    double tol = 1e-10 )
+                    int maxIters = 12,
+                    double tol = 1e-10,
+                    bool const do_print = false )
 {
-    REAL_TYPE residual[N];
-    REAL_TYPE dx[N];
-    REAL_TYPE jacobian[N][N];
+    REAL_TYPE residual[N]{};
+    REAL_TYPE dx[N]{};
+    REAL_TYPE jacobian[N][N]{};
 
      for ( int iter = 0; iter < maxIters; ++iter ) 
     {
@@ -94,8 +128,15 @@ bool newtonRaphson( REAL_TYPE (&x)[N],
             return true;
         }
         internal::scale<N>( residual, -1.0);
+
+        if( do_print )
+        {
+            utils::print( jacobian, residual, dx );
+        }
+       
         solveNxN_pivoted< REAL_TYPE, N >( jacobian, residual, dx );
         internal::add< N >( x, dx );
+        
     }
     
     printf( "--Newton solver error: Max iterations reached without convergence.\n" );

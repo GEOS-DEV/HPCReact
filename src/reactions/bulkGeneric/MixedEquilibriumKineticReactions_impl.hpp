@@ -101,13 +101,21 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     constexpr IntType numKineticReactions = PARAMS_DATA::numKineticReactions();
 
     RealType logSpeciesConcentration[numSpecies] {};
-    for ( IntType i = 0; i < numSecondarySpecies; ++i )
+    for ( INDEX_TYPE i = 0; i < numSecondarySpecies; ++i )
     {
       logSpeciesConcentration[i] = logSecondarySpeciesConcentrations[i];
     }
-    for ( IntType i = numSecondarySpecies; i < numSpecies; ++i )
+    for ( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
     {
-      logSpeciesConcentration[i] = logPrimarySpeciesConcentrations[i];
+      logSpeciesConcentration[i+numSecondarySpecies] = logPrimarySpeciesConcentrations[i];
+    }
+
+    for( INDEX_TYPE i = 0; i < numKineticReactions; ++i )
+    {
+      for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
+      {
+        dReactionRates_dLogPrimarySpeciesConcentrations[i][j] = 0.0;
+      }
     }
     
     CArrayWrapper< RealType, numKineticReactions, numSpecies > reactionRatesDerivatives;
@@ -165,12 +173,12 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     constexpr IntType numKineticReactions = PARAMS_DATA::numKineticReactions();
     constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
-    for( IntType i = 0; i < numPrimarySpecies; ++i )
+    for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
     {
       aggregatesRates[i] = 0.0;
       if constexpr( CALCULATE_DERIVATIVES )
       {
-        for( IntType j = 0; j < numPrimarySpecies; ++j )
+        for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
         {
           aggregatesRatesDerivatives( i, j ) = 0.0;
        }

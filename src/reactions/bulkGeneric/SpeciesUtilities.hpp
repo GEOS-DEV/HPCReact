@@ -30,6 +30,11 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
   constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies(); 
 
+  for (INDEX_TYPE i = 0; i < numSecondarySpecies; ++i)
+  {
+    logSecondarySpeciesConcentrations[i] = 0.0;
+  }
+
   for( int j=0; j<numSecondarySpecies; ++j )
   {
     REAL_TYPE const gamma = 1;
@@ -114,6 +119,13 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                              INDEX_TYPE >( params,
                                                            logPrimarySpeciesConcentrations,
                                                            logSecondarySpeciesConcentrations );
+  for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
+  {
+    for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
+    {
+      dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations[i][j] = 0.0;
+    }
+  }
 
   for( int i = 0; i < numPrimarySpecies; ++i )
   {
@@ -153,6 +165,14 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
+
+  for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
+  {
+    for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
+    {
+      dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations[i][j] = 0.0;
+    }
+  }
 
   calculateLogSecondarySpeciesConcentration< REAL_TYPE,
                                              INT_TYPE,
