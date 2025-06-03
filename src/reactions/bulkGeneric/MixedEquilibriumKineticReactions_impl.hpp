@@ -52,7 +52,11 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                   logSecondarySpeciesConcentrations,
                                                                   aggregatePrimarySpeciesConcentrations,
                                                                   dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
-
+    
+    if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
+    {
+      
+    
     // 2. Compute the reaction rates for all kinetic reactions
     computeReactionRates( temperature,
                           params,
@@ -69,7 +73,10 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                   dReactionRates_dLogPrimarySpeciesConcentrations,
                                   aggregateSpeciesRates,
                                   dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
-    
+    } else
+    {
+      GEOS_UNUSED_VAR( reactionRates, dReactionRates_dLogPrimarySpeciesConcentrations, aggregateSpeciesRates, dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
+    }
     
   }
   
