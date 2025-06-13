@@ -209,6 +209,35 @@ private:
                              ARRAY_1D & reactionRates,
                              ARRAY_2D & reactionRatesDerivatives );
 
+/**
+ * @brief 
+ * 
+ * @tparam PARAMS_DATA 
+ * @tparam CALCULATE_DERIVATIVES 
+ * @tparam ARRAY_1D_TO_CONST 
+ * @tparam ARRAY_1D 
+ * @tparam ARRAY_2D 
+ * @param temperature 
+ * @param params 
+ * @param speciesConcentration 
+ * @param surfaceArea 
+ * @param reactionRates 
+ * @param reactionRatesDerivatives 
+ * @return HPCREACT_HOST_DEVICE 
+ */
+  template< typename PARAMS_DATA,
+            bool CALCULATE_DERIVATIVES,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D,
+            typename ARRAY_2D >
+  static HPCREACT_HOST_DEVICE void
+  computeReactionRatesQuotient_impl( RealType const & temperature,
+                                     PARAMS_DATA const & params,
+                                     ARRAY_1D_TO_CONST const & speciesConcentration,
+                                     ARRAY_1D_TO_CONST const & surfaceArea,
+                                     ARRAY_1D & reactionRates,
+                                     ARRAY_2D & reactionRatesDerivatives );                           
+
   /**
    * @brief Compute the kinetic species rates for a given set of kinetic reactions.
    * @tparam PARAMS_DATA The type of the parameters data.

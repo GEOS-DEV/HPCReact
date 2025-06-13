@@ -46,9 +46,32 @@ struct EquilibriumReactionsParameters
   RealType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
   RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
 
-   CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
-   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
+  CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
+  CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
 };
+
+template< typename REAL_TYPE,
+          typename INT_TYPE,
+          typename INDEX_TYPE,
+          int NUM_SPECIES,
+          int NUM_REACTIONS >
+struct SurfaceReactionsParameters : public EquilibriumReactionsParameters< REAL_TYPE, 
+                                                                           INT_TYPE, 
+                                                                           INDEX_TYPE, 
+                                                                           NUM_SPECIES, 
+                                                                           NUM_REACTIONS >
+{
+  using Base = EquilibriumReactionsParameters< REAL_TYPE, INT_TYPE, INDEX_TYPE, NUM_SPECIES, NUM_REACTIONS >;
+  using RealType  = Base::RealType;
+  using IntType   = Base::IntType;
+  using IndexType = Base::IndexType
+
+  constexpr SurfaceReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
+                                        CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant ) :
+  Base( stoichiometricMatrix, equilibriumConstant )
+  {} 
+};
+
 
 
 template< typename REAL_TYPE,
