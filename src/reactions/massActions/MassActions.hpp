@@ -13,40 +13,6 @@ namespace massActions
 namespace massActions_impl
 {
 
-template< typename REAL_TYPE,
-          typename INT_TYPE,
-          typename INDEX_TYPE,
-          typename PARAMS_DATA,
-          typename ARRAY_1D_TO_CONST,
-          typename ARRAY_1D,
-          typename FUNC >
-HPCREACT_HOST_DEVICE
-inline
-void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
-                                                ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                ARRAY_1D & logSecondarySpeciesConcentrations,
-                                                FUNC && derivativeFunc )
-{
-  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
-  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies(); 
-
-  for (INDEX_TYPE i = 0; i < numSecondarySpecies; ++i)
-  {
-    logSecondarySpeciesConcentrations[i] = 0.0;
-  }
-
-  for( int j=0; j<numSecondarySpecies; ++j )
-  {
-    REAL_TYPE const gamma = 1;
-    logSecondarySpeciesConcentrations[j] = -log( params.equilibriumConstant( j ) ) - log( gamma );
-    for( int k=0; k<numPrimarySpecies; ++k )
-    {
-      logSecondarySpeciesConcentrations[j] += params.stoichiometricMatrix( j, k+numSecondarySpecies ) * ( logPrimarySpeciesConcentrations[k] + log( gamma ) );
-      derivativeFunc( j, k, params.stoichiometricMatrix( j, k+numSecondarySpecies ) );
-    }
-  }
-}
-
 // template< typename REAL_TYPE,
 //           typename INT_TYPE,
 //           typename INDEX_TYPE,
@@ -61,45 +27,79 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
 //                                                 ARRAY_1D & logSecondarySpeciesConcentrations,
 //                                                 FUNC && derivativeFunc )
 // {
-//   constexpr INDEX_TYPE numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
-//   constexpr INDEX_TYPE numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies(); 
-//   constexpr INDEX_TYPE numAqueousReactions = PARAMS_DATA::numAqueousReactions();
-//   constexpr INDEX_TYPE numSurfaceReactions = PARAMS_DATA::numSurfaceReactions();
-  
-//   // Initialize
-//   for ( INDEX_TYPE i = 0; i < numSecondarySpecies; ++i )
+//   constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+//   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies(); 
+
+//   for (INDEX_TYPE i = 0; i < numSecondarySpecies; ++i)
 //   {
 //     logSecondarySpeciesConcentrations[i] = 0.0;
 //   }
 
-//   // Aqueous reactions
-//   for ( INDEX_TYPE j = 0; j < numAqueousReactions; ++j )
+//   for( int j=0; j<numSecondarySpecies; ++j )
 //   {
-//     logSecondarySpeciesConcentrations[j] = -log( params.equilibriumConstant(j) );
-//     for ( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
+//     REAL_TYPE const gamma = 1;
+//     logSecondarySpeciesConcentrations[j] = -log( params.equilibriumConstant( j ) ) - log( gamma );
+//     for( int k=0; k<numPrimarySpecies; ++k )
 //     {
-//       auto const coeff = params.stoichiometricMatrix( j, k + numSecondarySpecies );
-//       logSecondarySpeciesConcentrations[j] += coeff * logPrimarySpeciesConcentrations[k];
-//       derivativeFunc( j, k, coeff );
+//       logSecondarySpeciesConcentrations[j] += params.stoichiometricMatrix( j, k+numSecondarySpecies ) * ( logPrimarySpeciesConcentrations[k] + log( gamma ) );
+//       derivativeFunc( j, k, params.stoichiometricMatrix( j, k+numSecondarySpecies ) );
 //     }
-//   }
-
-//   // Surface reactions
-//   for ( INDEX_TYPE j = 0; j < numSurfaceReactions; ++j )
-//   {
-//     INDEX_TYPE const jGlobal = j + numAqueousReactions;
-//     logSecondarySpeciesConcentrations[jGlobal] = -log( params.equilibriumConstant(jGlobal) );
-//     for ( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
-//     {
-//       auto const coeff = params.stoichiometricMatrix( jGlobal, k + numSecondarySpecies );
-//       logSecondarySpeciesConcentrations[jGlobal] += coeff * logPrimarySpeciesConcentrations[k];
-//       derivativeFunc( jGlobal, k, coeff );
-//     }
-
-//     // Add log(S) from last part of the array
-//     logSecondarySpeciesConcentrations[jGlobal] += params.surfaceStoichiometry(j) * logSecondarySpeciesConcentrations[ numAqueousReactions + j];
 //   }
 // }
+
+template< typename REAL_TYPE,
+          typename INT_TYPE,
+          typename INDEX_TYPE,
+          typename PARAMS_DATA,
+          typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D,
+          typename FUNC >
+HPCREACT_HOST_DEVICE
+inline
+void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
+                                                ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                                                ARRAY_1D & logSecondarySpeciesConcentrations,
+                                                FUNC && derivativeFunc )
+{
+  constexpr INDEX_TYPE numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  constexpr INDEX_TYPE numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies(); 
+  constexpr INDEX_TYPE numAqueousReactions = PARAMS_DATA::numAqueousReactions();
+  constexpr INDEX_TYPE numSurfaceReactions = PARAMS_DATA::numSurfaceReactions();
+  
+  // Initialize
+  for ( INDEX_TYPE i = 0; i < numSecondarySpecies; ++i )
+  {
+    logSecondarySpeciesConcentrations[i] = 0.0;
+  }
+
+  // Aqueous reactions
+  for ( INDEX_TYPE j = 0; j < numAqueousReactions; ++j )
+  {
+    logSecondarySpeciesConcentrations[j] = -log( params.equilibriumConstant(j) );
+    for ( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
+    {
+      auto const coeff = params.stoichiometricMatrix( j, k + numSecondarySpecies );
+      logSecondarySpeciesConcentrations[j] += coeff * logPrimarySpeciesConcentrations[k];
+      derivativeFunc( j, k, coeff );
+    }
+  }
+
+  // Surface reactions
+  for ( INDEX_TYPE j = 0; j < numSurfaceReactions; ++j )
+  {
+    INDEX_TYPE const jGlobal = j + numAqueousReactions;
+    logSecondarySpeciesConcentrations[jGlobal] = -log( params.equilibriumConstant(jGlobal) );
+    for ( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
+    {
+      auto const coeff = params.stoichiometricMatrix( jGlobal, k + numSecondarySpecies );
+      logSecondarySpeciesConcentrations[jGlobal] += coeff * logPrimarySpeciesConcentrations[k];
+      derivativeFunc( jGlobal, k, coeff );
+    }
+
+    // Add log(S) from last part of the array
+    logSecondarySpeciesConcentrations[jGlobal] += params.stoichiometricMatrix(jGlobal, jGlobal) * logSecondarySpeciesConcentrations[ jGlobal ];
+  }
+}
 
 } // namespace
 
