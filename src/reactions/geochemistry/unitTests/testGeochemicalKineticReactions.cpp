@@ -1,5 +1,5 @@
 
-#include "reactions/bulkGeneric/unitTestUtilities/kineticReactionsTest_utilities.hpp"
+#include "reactions/unitTestUtilities/kineticReactionsTestUtilities.hpp"
 #include "../GeochemicalSystems.hpp"
 #include <gtest/gtest.h>
 

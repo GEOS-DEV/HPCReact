@@ -1,6 +1,6 @@
 
-#include "../unitTestUtilities/kineticReactionsTest_utilities.hpp"
-#include "../ParametersPredefined.hpp"
+#include "reactions/unitTestUtilities/kineticReactionsTestUtilities.hpp"
+#include "../GenericSystems.hpp"
 
 #include <gtest/gtest.h>
 

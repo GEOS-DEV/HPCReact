@@ -1,7 +1,8 @@
 
-#include "../MixedEquilibriumKineticReactions.hpp"
-#include "../EquilibriumReactions.hpp"
-#include "../ParametersPredefined.hpp"
+#pragma once
+#include "reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp"
+#include "reactions/bulkGeneric/EquilibriumReactions.hpp"
+#include "reactions/bulkGeneric/GenericSystems.hpp"
 #include "reactions/geochemistry/GeochemicalSystems.hpp"
 #include "common/macros.hpp"
 #include "common/printers.hpp"
@@ -10,15 +11,11 @@
 
 #include <gtest/gtest.h>
 
-
-using namespace hpcReact;
-using namespace hpcReact::bulkGeneric;
-
-template< typename REAL_TYPE >
-REAL_TYPE tolerance( REAL_TYPE const a, REAL_TYPE const b, REAL_TYPE const ndigits )
+namespace hpcReact
 {
-  return std::numeric_limits< double >::epsilon() * std::max( fabs( a ), fabs( b ) ) * pow( 10, ndigits );
-}
+
+namespace unitTest_utilities
+{
 
 //******************************************************************************
 template< typename REAL_TYPE,
@@ -43,13 +40,13 @@ void timeStepTest( PARAMS_DATA const & params,
                               primarySpeciesConcentration.data, 
                               [=] HPCREACT_HOST_DEVICE ( auto * speciesConcentration ) 
   { 
-    using MixedReactionsType = MixedEquilibriumKineticReactions< REAL_TYPE,
-                                                                  int,
-                                                                  int,
-                                                               LOGE_CONCENTRATION >;
-    using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
-                                                           int,
-                                                           int >;
+    using MixedReactionsType = bulkGeneric::MixedEquilibriumKineticReactions< REAL_TYPE,
+                                                                              int,
+                                                                              int,
+                                                                              LOGE_CONCENTRATION >;
+    using EquilibriumReactionsType = bulkGeneric::EquilibriumReactions< REAL_TYPE,
+                                                                        int,
+                                                                        int >;
     
     // constexpr int numSpecies = PARAMS_DATA::numSpecies();
     constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
@@ -135,47 +132,6 @@ void timeStepTest( PARAMS_DATA const & params,
   }
 }
 
-TEST( testMixedReactions, testTimeStep_carbonateSystem )
-{
-  using namespace hpcReact::geochemistry;
 
-  constexpr int numPrimarySpecies = carbonateSystemType::numPrimarySpecies();
-
-  double const initialAggregateSpeciesConcentration[numPrimarySpecies] =
-  {
-    3.76e-3, // CaCO3 
-    3.76e-1, // H+
-    3.76e-1, // HCO3-
-    3.87e-2, // Ca+2
-    3.21e-2, // SO4-2
-    1.89,    // Cl-
-    1.65e-2, // Mg+2
-    1.09     // Na+1
-  };
-
-  double const expectedSpeciesConcentrations[numPrimarySpecies] =
-  {
-    3.3318075516669661e-05,  // CaCO3
-    2.5894448848121536e-05, // H+
-    0.0062660162912796741, // HCO3-
-    0.015741214773567921, // Ca+2
-    0.0024602709470074127, // SO4-2
-    1.8564927944498291,    // Cl-
-    0.0099316034080546619, // Mg+2
-    1.0725251492409775     // Na+1
-  };
-
-  timeStepTest< double, true >( carbonateSystem,
-                                0.2,
-                                10,
-                                initialAggregateSpeciesConcentration,
-                                expectedSpeciesConcentrations );
-
-}
-
-int main( int argc, char * * argv )
-{
-  ::testing::InitGoogleTest( &argc, argv );
-  int const result = RUN_ALL_TESTS();
-  return result;
-}
+} // namespace unitTest_utilities
+} // namespace hpcReact

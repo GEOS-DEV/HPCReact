@@ -3,7 +3,7 @@
 #include "common/macros.hpp"
 #include "common/printers.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "../KineticReactions.hpp"
+#include "reactions/bulkGeneric/KineticReactions.hpp"
 
 #include <gtest/gtest.h>
 

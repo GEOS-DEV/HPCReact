@@ -11,9 +11,11 @@ set( hpcReact_headers
      reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp
      reactions/bulkGeneric/MixedEquilibriumKineticReactions_impl.hpp
      reactions/bulkGeneric/Parameters.hpp
-     reactions/bulkGeneric/ParametersPredefined.hpp
+     reactions/bulkGeneric/GenericSystems.hpp
      reactions/bulkGeneric/SpeciesUtilities.hpp
-     reactions/bulkGeneric/unitTestUtilities/kineticReactionsTest_utilities.hpp
+     reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp
+     reactions/unitTestUtilities/kineticReactionsTestUtilities.hpp
+     reactions/unitTestUtilities/mixedReactionsTestUtilities.hpp
      reactions/massActions/MassActions.hpp
      )
 
