@@ -2,7 +2,7 @@
 #include "EquilibriumReactions.hpp"
 #endif
 
-#include "SpeciesUtilities.hpp"
+#include "reactions/massActions/MassActions.hpp"
 
 namespace hpcReact
 {
@@ -35,10 +35,10 @@ EquilibriumReactions< REAL_TYPE,
 
   RealType aggregatePrimaryConcentrations[numPrimarySpecies] = {0.0};
   ARRAY_2D dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{{0.0}}};
-  calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
-                                                                                     logPrimarySpeciesConcentration,
-                                                                                     aggregatePrimaryConcentrations,
-                                                                                     dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+  massActions::calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
+                                                                                                  logPrimarySpeciesConcentration,
+                                                                                                  aggregatePrimaryConcentrations,
+                                                                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
 
 
   for( IndexType i=0; i<numPrimarySpecies; ++i )

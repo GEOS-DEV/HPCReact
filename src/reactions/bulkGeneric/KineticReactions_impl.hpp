@@ -273,9 +273,10 @@ KineticReactions< REAL_TYPE,
             reactionRatesDerivatives( r, i ) = 0.0;
           }
         }
-     } // end of if constexpr ( CALCULATE_DERIVATIVES )
+     } // end of if constexpr ( CALCULATE_DERIVATIVES )     
+    } // end of else
     reactionRates[r] = - rateConstant * surfaceArea[r] * ( 1 - quotient / equilibriumConstant );
-  } // end of if constexpr ( LOGE_CONCENTRATION )
+  } 
 }
 
 // function to  the reaction rate. Includes impact of temperature, concentration, surface area, volume fraction and porosity

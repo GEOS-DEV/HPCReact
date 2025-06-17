@@ -2,6 +2,7 @@
 #include "../MixedEquilibriumKineticReactions.hpp"
 #include "../EquilibriumReactions.hpp"
 #include "../ParametersPredefined.hpp"
+#include "reactions/geochemistry/GeochemicalSystems.hpp"
 #include "common/macros.hpp"
 #include "common/printers.hpp"
 #include "common/nonlinearSolvers.hpp"
@@ -76,7 +77,7 @@ void timeStepTest( PARAMS_DATA const & params,
     }
     
     EquilibriumReactionsType::enforceEquilibrium_Aggregate( temperature,
-                                                            carbonateSystem.equilibriumReactionsParameters(),
+                                                            hpcReact::geochemistry::carbonateSystem.equilibriumReactionsParameters(),
                                                             logPrimarySpeciesConcentration,
                                                             logPrimarySpeciesConcentration );
                                                                                                          
@@ -136,6 +137,8 @@ void timeStepTest( PARAMS_DATA const & params,
 
 TEST( testMixedReactions, testTimeStep_carbonateSystem )
 {
+  using namespace hpcReact::geochemistry;
+
   constexpr int numPrimarySpecies = carbonateSystemType::numPrimarySpecies();
 
   double const initialAggregateSpeciesConcentration[numPrimarySpecies] =

@@ -2,7 +2,7 @@
 
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "SpeciesUtilities.hpp"
+#include "reactions/massActions/MassActions.hpp"
 
 
 /** @file MixedEquilibriumKineticReactions_impl.hpp
@@ -45,13 +45,13 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   {
     
     // 1. Compute new aggregate species from primary species
-    calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
-                                                    INT_TYPE,
-                                                    INDEX_TYPE >( params.equilibriumReactionsParameters(), 
-                                                                  logPrimarySpeciesConcentrations,
-                                                                  logSecondarySpeciesConcentrations,
-                                                                  aggregatePrimarySpeciesConcentrations,
-                                                                  dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+    massActions::calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
+                                                                 INT_TYPE,
+                                                                 INDEX_TYPE >( params.equilibriumReactionsParameters(), 
+                                                                               logPrimarySpeciesConcentrations,
+                                                                               logSecondarySpeciesConcentrations,
+                                                                               aggregatePrimarySpeciesConcentrations,
+                                                                               dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
     
     if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
     {

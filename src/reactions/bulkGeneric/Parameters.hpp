@@ -20,7 +20,8 @@ template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
           int NUM_SPECIES,
-          int NUM_REACTIONS >
+          int NUM_REACTIONS,
+          int NUM_SURFACE_REACTIONS = 0 >
 struct EquilibriumReactionsParameters
 {
   using RealType = REAL_TYPE;
@@ -31,9 +32,14 @@ struct EquilibriumReactionsParameters
 
   static constexpr IndexType numReactions() { return NUM_REACTIONS; }
 
+  static constexpr IndexType numSurfaceReactions() { return NUM_SURFACE_REACTIONS; }
+
+  static constexpr IndexType numAqueousReactions() { return numReactions() - numSurfaceReactions(); }
+
   static constexpr IndexType numPrimarySpecies() { return numSpecies() - numReactions(); }
 
   static constexpr IndexType numSecondarySpecies() { return numSpecies() - numPrimarySpecies(); }
+  
 
   constexpr
   EquilibriumReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
@@ -49,30 +55,6 @@ struct EquilibriumReactionsParameters
   CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
 };
-
-template< typename REAL_TYPE,
-          typename INT_TYPE,
-          typename INDEX_TYPE,
-          int NUM_SPECIES,
-          int NUM_REACTIONS >
-struct SurfaceReactionsParameters : public EquilibriumReactionsParameters< REAL_TYPE, 
-                                                                           INT_TYPE, 
-                                                                           INDEX_TYPE, 
-                                                                           NUM_SPECIES, 
-                                                                           NUM_REACTIONS >
-{
-  using Base = EquilibriumReactionsParameters< REAL_TYPE, INT_TYPE, INDEX_TYPE, NUM_SPECIES, NUM_REACTIONS >;
-  using RealType  = Base::RealType;
-  using IntType   = Base::IntType;
-  using IndexType = Base::IndexType
-
-  constexpr SurfaceReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
-                                        CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant ) :
-  Base( stoichiometricMatrix, equilibriumConstant )
-  {} 
-};
-
-
 
 template< typename REAL_TYPE,
           typename INT_TYPE,

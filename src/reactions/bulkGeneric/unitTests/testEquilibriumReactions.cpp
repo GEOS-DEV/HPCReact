@@ -2,6 +2,7 @@
 #include "../EquilibriumReactions.hpp"
 #include "../ParametersPredefined.hpp"
 #include "common/macros.hpp"
+#include "reactions/geochemistry/GeochemicalSystems.hpp"
 
 #include <gtest/gtest.h>
 
@@ -150,6 +151,8 @@ TEST( testEquilibriumReactions, testEnforceEquilibrium )
 //******************************************************************************
 TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 {
+  using namespace hpcReact::geochemistry;
+
   double const initialSpeciesConcentration[18] =
   {
     1.0e-16, // OH-
@@ -213,11 +216,12 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 
 TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 {
+
   using EquilibriumReactionsType = EquilibriumReactions< double,
                                                          int,
                                                          int >;
 
-  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  constexpr int numPrimarySpecies = hpcReact::geochemistry::carbonateSystemAllEquilibrium.numPrimarySpecies();
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
@@ -245,7 +249,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
   EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
-                                                          carbonateSystemAllEquilibrium,
+                                                          hpcReact::geochemistry::carbonateSystemAllEquilibrium,
                                                           logInitialPrimarySpeciesConcentration,
                                                           logPrimarySpeciesConcentration );
 

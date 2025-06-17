@@ -1,8 +1,6 @@
 # Specify list of tests
 set( testSourceFiles
-     testEquilibriumReactions.cpp
-     testKineticReactions.cpp
-     testMixedReactions.cpp
+     testGeochemicalKineticReactions.cpp
      )
 
 set( dependencyList hpcReact gtest )

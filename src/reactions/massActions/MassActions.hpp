@@ -7,10 +7,10 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace massActions
 {
 
-namespace utilities_impl
+namespace massActions_impl
 {
 
 template< typename REAL_TYPE,
@@ -86,7 +86,7 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
   // Surface 
   for( INDEX_TYPE j = 0; j < numSurfaceReactions; ++j )
   {
-    INDEX_TYPE const jGlobal = j + numAqueous;
+    INDEX_TYPE const jGlobal = j + numAqueousReactions;
     logSecondarySpeciesConcentrations[jGlobal] = -log( params.equilibriumConstant( jGlobal ) );
     for( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
     {
@@ -95,7 +95,7 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
     }
 
     // Add log(S) contribution
-    logSecondarySpeciesConcentrations[jGlobal] += params.surfaceStoichiometry(j) * logSurfaceSiteConcentration;
+    logSecondarySpeciesConcentrations[jGlobal] += params.surfaceStoichiometry(j) * logSurfaceSiteConcentrations;
   }
 }
 
@@ -114,7 +114,7 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                 ARRAY_1D & logSecondarySpeciesConcentrations )
 {
-  utilities_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE,
+  massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE,
                                                              INT_TYPE,
                                                              INDEX_TYPE >( params,
                                                                            logPrimarySpeciesConcentrations,
@@ -137,7 +137,7 @@ void calculateLogSecondarySpeciesConcentrationWrtLogC( PARAMS_DATA const & param
                                                        ARRAY_1D & logSecondarySpeciesConcentrations,
                                                        ARRAY_2D & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations )
 {
-  utilities_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
+  massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
                                                                                                 logPrimarySpeciesConcentrations,
                                                                                                 logSecondarySpeciesConcentrations,
                                                                                                 [&]( const int j, const int k, REAL_TYPE const value )
@@ -252,5 +252,5 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
   }
 }
 
-} // namespace bulkGeneric
+} // namespace massActions
 } // namespace hpcReact

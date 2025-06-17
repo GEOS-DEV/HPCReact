@@ -5,6 +5,7 @@ set( hpcReact_headers
      reactions/bulkGeneric/EquilibriumReactions.hpp
      reactions/bulkGeneric/EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp
      reactions/bulkGeneric/EquilibriumReactionsReactionExtents_impl.hpp
+     reactions/geochemistry/GeochemicalSystems.hpp
      reactions/bulkGeneric/KineticReactions.hpp
      reactions/bulkGeneric/KineticReactions_impl.hpp
      reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp
@@ -12,6 +13,8 @@ set( hpcReact_headers
      reactions/bulkGeneric/Parameters.hpp
      reactions/bulkGeneric/ParametersPredefined.hpp
      reactions/bulkGeneric/SpeciesUtilities.hpp
+     reactions/bulkGeneric/unitTestUtilities/kineticReactionsTest_utilities.hpp
+     reactions/massActions/MassActions.hpp
      )
 
 set( hpcReact_sources)
@@ -60,6 +63,8 @@ message(STATUS "HPCReact/src CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DI
 #                        EXCLUDES "blt/*" )
 
 add_subdirectory( reactions/bulkGeneric/unitTests )
+add_subdirectory( reactions/geochemistry/unitTests )
+add_subdirectory( reactions/massActions/unitTests )
 add_subdirectory( common/unitTests )
 add_subdirectory( docs )
 
