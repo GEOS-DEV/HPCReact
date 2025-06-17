@@ -6,13 +6,14 @@ set( hpcReact_headers
      reactions/bulkGeneric/EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp
      reactions/bulkGeneric/EquilibriumReactionsReactionExtents_impl.hpp
      reactions/geochemistry/GeochemicalSystems.hpp
+     reactions/geochemistry/Carbonate.hpp
+     reactions/geochemistry/Ultramafics.hpp
      reactions/bulkGeneric/KineticReactions.hpp
      reactions/bulkGeneric/KineticReactions_impl.hpp
      reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp
      reactions/bulkGeneric/MixedEquilibriumKineticReactions_impl.hpp
      reactions/bulkGeneric/Parameters.hpp
      reactions/bulkGeneric/GenericSystems.hpp
-     reactions/bulkGeneric/SpeciesUtilities.hpp
      reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp
      reactions/unitTestUtilities/kineticReactionsTestUtilities.hpp
      reactions/unitTestUtilities/mixedReactionsTestUtilities.hpp
