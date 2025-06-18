@@ -13,6 +13,13 @@ namespace nonlinearSolvers
 namespace internal
 {
 
+/**
+ * Computes the norm of a vector.
+ * This function calculates the Euclidean norm (L2 norm) of a vector.
+ * @tparam N The size of the vector.
+ * @param r The input vector.
+ * @return The Euclidean norm of the vector.
+ */
 template< int N >
 HPCREACT_HOST_DEVICE 
 double norm( double const (&r)[N]) 
@@ -22,7 +29,13 @@ double norm( double const (&r)[N])
     return ::sqrt( sum );
 }
 
-
+/**
+ * Adds two vectors element-wise.
+ * This function adds the elements of the second vector to the first vector.
+ * @tparam N The size of the vectors.
+ * @param x The first vector, which will be modified.
+ * @param dx The second vector, which will be added to the first vector.
+ */
 template< int N >
 HPCREACT_HOST_DEVICE 
 void add(double (&x)[N], double const (&dx)[N]) 
@@ -30,6 +43,13 @@ void add(double (&x)[N], double const (&dx)[N])
     for (int i = 0; i < N; ++i) x[i] += dx[i];
 }
 
+/**
+ * Scales a vector by a constant value.
+ * This function multiplies each element of the vector by a given value.
+ * @tparam N The size of the vector.
+ * @param x The vector to be scaled.
+ * @param value The scaling factor.
+ */
 template< int N >
 HPCREACT_HOST_DEVICE 
 void scale( double (&x)[N], double const value ) 
@@ -41,6 +61,17 @@ void scale( double (&x)[N], double const value )
 
 namespace utils
 {   
+// LCOV_EXCL_START
+
+/**
+ * Prints the Jacobian matrix, residual vector, and delta update vector.
+ * This function is useful for debugging and understanding the
+ * state of the Newton-Raphson method at each iteration.
+ * @tparam N The size of the vectors and matrix.
+ * @param J The Jacobian matrix.
+ * @param r The residual vector.
+ * @param dx The delta update vector.
+ */
 template< int N >
 HPCREACT_HOST_DEVICE
 void print(double const (&J)[N][N], double const (&r)[N], double const (&dx)[N])
@@ -70,6 +101,8 @@ void print(double const (&J)[N][N], double const (&r)[N], double const (&dx)[N])
         printf("%10d%27.16e\n", i, dx[i]);
     }
 }
+// LCOV_EXCL_STOP
+
 }
 
 template< int N,
@@ -114,8 +147,9 @@ bool newtonRaphson( REAL_TYPE (&x)[N],
     REAL_TYPE residual[N]{};
     REAL_TYPE dx[N]{};
     REAL_TYPE jacobian[N][N]{};
+    bool isConverged = false;
 
-     for ( int iter = 0; iter < maxIters; ++iter ) 
+    for ( int iter = 0; iter < maxIters; ++iter ) 
     {
         computeResidualAndJacobian( x, residual, jacobian );
 
@@ -125,13 +159,14 @@ bool newtonRaphson( REAL_TYPE (&x)[N],
 
         if ( norm < tol ) {
             printf( "--Converged.\n" );
-            return true;
+            isConverged = true;
+            break;
         }
         internal::scale<N>( residual, -1.0);
 
         if( do_print )
         {
-            utils::print( jacobian, residual, dx );
+            utils::print( jacobian, residual, dx ); // LCOV_EXCL_LINE
         }
        
         solveNxN_pivoted< REAL_TYPE, N >( jacobian, residual, dx );
@@ -139,9 +174,12 @@ bool newtonRaphson( REAL_TYPE (&x)[N],
         
     }
     
-    printf( "--Newton solver error: Max iterations reached without convergence.\n" );
+    if( !isConverged )
+    {
+        printf( "--Newton solver error: Max iterations reached without convergence.\n" );
+    }
 
-    return false;
+    return isConverged;
 }
 
 }
