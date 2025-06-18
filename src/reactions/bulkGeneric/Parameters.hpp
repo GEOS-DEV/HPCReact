@@ -26,7 +26,7 @@ struct EquilibriumReactionsParameters
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
   using IndexType = INDEX_TYPE;
-  
+
   static constexpr IndexType numSpecies() { return NUM_SPECIES; }
 
   static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -38,16 +38,16 @@ struct EquilibriumReactionsParameters
   constexpr
   EquilibriumReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
                                   CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant ):
-  m_stoichiometricMatrix( stoichiometricMatrix ),
-  m_equilibriumConstant( equilibriumConstant )
+    m_stoichiometricMatrix( stoichiometricMatrix ),
+    m_equilibriumConstant( equilibriumConstant )
   {}
 
 
   RealType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
   RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
 
-   CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
-   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
+  CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
+  CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
 };
 
 
@@ -69,9 +69,9 @@ struct KineticReactionsParameters
   constexpr KineticReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse ):
-  m_stoichiometricMatrix( stoichiometricMatrix ),
-  m_rateConstantForward( rateConstantForward ),
-  m_rateConstantReverse( rateConstantReverse ) 
+    m_stoichiometricMatrix( stoichiometricMatrix ),
+    m_rateConstantForward( rateConstantForward ),
+    m_rateConstantReverse( rateConstantReverse )
   {}
 
 
@@ -102,13 +102,13 @@ struct MixedReactionsParameters
   constexpr MixedReactionsParameters() = default;
 
   constexpr MixedReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
-                                      CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,                                  
+                                      CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse ):
-  m_stoichiometricMatrix( stoichiometricMatrix ),
-  m_equilibriumConstant( equilibriumConstant ),
-  m_rateConstantForward( rateConstantForward ),
-  m_rateConstantReverse( rateConstantReverse )
+    m_stoichiometricMatrix( stoichiometricMatrix ),
+    m_equilibriumConstant( equilibriumConstant ),
+    m_rateConstantForward( rateConstantForward ),
+    m_rateConstantReverse( rateConstantReverse )
   {}
 
   static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -118,7 +118,7 @@ struct MixedReactionsParameters
   static constexpr IndexType numEquilibriumReactions() { return NUM_EQ_REACTIONS; }
 
   static constexpr IndexType numSpecies() { return NUM_SPECIES; }
-  
+
   static constexpr IndexType numPrimarySpecies() { return NUM_SPECIES - NUM_EQ_REACTIONS; }
 
   static constexpr IndexType numSecondarySpecies() { return NUM_EQ_REACTIONS; }
@@ -129,14 +129,14 @@ struct MixedReactionsParameters
   {
     CArrayWrapper< RealType, numEquilibriumReactions(), numSpecies() > eqMatrix{};
     CArrayWrapper< RealType, numEquilibriumReactions() > eqConstants{};
-    
-    for (IntType i = 0; i < numEquilibriumReactions(); ++i)
+
+    for( IntType i = 0; i < numEquilibriumReactions(); ++i )
     {
-      for (IntType j = 0; j < numSpecies(); ++j)
+      for( IntType j = 0; j < numSpecies(); ++j )
       {
-        eqMatrix(i, j) = m_stoichiometricMatrix(i, j);
+        eqMatrix( i, j ) = m_stoichiometricMatrix( i, j );
       }
-      eqConstants(i) = m_equilibriumConstant(i);
+      eqConstants( i ) = m_equilibriumConstant( i );
     }
 
     return { eqMatrix, eqConstants };
@@ -149,12 +149,12 @@ struct MixedReactionsParameters
     CArrayWrapper< RealType, numKineticReactions(), numSpecies() > kineticMatrix{};
     CArrayWrapper< RealType, numKineticReactions() > rateConstantForward{};
     CArrayWrapper< RealType, numKineticReactions() > rateConstantReverse{};
-    
-    for ( IndexType i = 0; i < numKineticReactions(); ++i )
+
+    for( IndexType i = 0; i < numKineticReactions(); ++i )
     {
-      for ( IndexType j = 0; j < numSpecies(); ++j )
+      for( IndexType j = 0; j < numSpecies(); ++j )
       {
-        kineticMatrix(i, j) = m_stoichiometricMatrix( numEquilibriumReactions() + i, j );
+        kineticMatrix( i, j ) = m_stoichiometricMatrix( numEquilibriumReactions() + i, j );
       }
       rateConstantForward( i ) = m_rateConstantForward( numEquilibriumReactions() + i );
       rateConstantReverse( i ) = m_rateConstantReverse( numEquilibriumReactions() + i );

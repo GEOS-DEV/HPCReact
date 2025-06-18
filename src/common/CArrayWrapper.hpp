@@ -29,7 +29,7 @@ struct CArrayWrapper< T, DIM0 >
 {
   // default constructor
   constexpr CArrayWrapper() = default;
-  
+
   /**
    * @brief Construct a CArrayWrapper from an initializer list.
    *
@@ -54,7 +54,7 @@ struct CArrayWrapper< T, DIM0 >
   /**
    * @brief Copy constructor.
    * @param src The source CArrayWrapper to copy from.
-   */ 
+   */
   constexpr CArrayWrapper( CArrayWrapper const & src )
   {
     for( std::size_t i = 0; i < DIM0; i++ )
@@ -110,7 +110,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
 {
   // default constructor
   constexpr CArrayWrapper() = default;
-  
+
   /**
    * @brief Copy constructor.
    * @param src The source CArrayWrapper to copy from.
@@ -119,7 +119,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
   {
     for( std::size_t i = 0; i < DIM0; i++ )
     {
-      for ( std::size_t j = 0; j < DIM1; j++)
+      for( std::size_t j = 0; j < DIM1; j++ )
         data[i][j] = src.data[i][j];
     }
   }

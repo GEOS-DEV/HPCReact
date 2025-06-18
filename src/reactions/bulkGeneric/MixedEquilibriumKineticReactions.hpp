@@ -39,10 +39,10 @@ public:
 
   /// Type alias for the index type used in the class.
   using IndexType = INDEX_TYPE;
-  
+
   /// Type alias for the Kinetic reactions type used in the class.
   using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, LOGE_CONCENTRATION >;
-  
+
   /**
    * @brief Update a mixed chemical system by computing secondary species concentrations,
    * aggregate primary species concentrations, and reaction rates.
@@ -60,7 +60,8 @@ public:
    * @param logPrimarySpeciesConcentrations Log of primary species concentrations
    * @param logSecondarySpeciesConcentrations Output log concentrations for secondary species
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)
-   * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log primary
+   * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log
+   * primary
    * @param reactionRates Output vector of kinetic reaction rates
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
    * @param aggregateSpeciesRates Output net source/sink for each primary species
@@ -96,23 +97,23 @@ public:
                             aggregateSpeciesRates,
                             dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
   }
-  
- /**
-  * @brief Compute reaction rates and their derivatives.
-  *
-  * @tparam PARAMS_DATA Struct providing reaction parameters
-  * @tparam ARRAY_1D_TO_CONST Read-only array of primary species (log-space)
-  * @tparam ARRAY_1D_TO_CONST2 Read-only array of secondary species (log-space)
-  * @tparam ARRAY_1D Output array type for reaction rates
-  * @tparam ARRAY_2D Output array type for reaction rate derivatives
-  *
-  * @param temperature Temperature in Kelvin
-  * @param params Parameter data for the reaction system
-  * @param logPrimarySpeciesConcentrations Log concentrations of primary species
-  * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
-  * @param reactionRates Output reaction rates for each kinetic reaction
-  * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
-  */
+
+  /**
+   * @brief Compute reaction rates and their derivatives.
+   *
+   * @tparam PARAMS_DATA Struct providing reaction parameters
+   * @tparam ARRAY_1D_TO_CONST Read-only array of primary species (log-space)
+   * @tparam ARRAY_1D_TO_CONST2 Read-only array of secondary species (log-space)
+   * @tparam ARRAY_1D Output array type for reaction rates
+   * @tparam ARRAY_2D Output array type for reaction rate derivatives
+   *
+   * @param temperature Temperature in Kelvin
+   * @param params Parameter data for the reaction system
+   * @param logPrimarySpeciesConcentrations Log concentrations of primary species
+   * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
+   * @param reactionRates Output reaction rates for each kinetic reaction
+   * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
@@ -133,8 +134,8 @@ public:
                                logSecondarySpeciesConcentrations,
                                reactionRates,
                                dReactionRates_dLogPrimarySpeciesConcentrations );
-  }                                        
-  
+  }
+
   /**
    * @brief Compute net reaction rate for each primary species by aggregating contributions from all reactions.
    *
@@ -162,17 +163,17 @@ public:
   computeAggregateSpeciesRates( PARAMS_DATA const & params,
                                 ARRAY_1D_TO_CONST const & speciesConcentration,
                                 ARRAY_1D_TO_CONST2 const & reactionRates,
-                                ARRAY_2D_TO_CONST const & reactionRatesDerivatives, 
+                                ARRAY_2D_TO_CONST const & reactionRatesDerivatives,
                                 ARRAY_1D & aggregatesRates,
                                 ARRAY_2D & aggregatesRatesDerivatives )
   {
-    computeAggregateSpeciesRates_impl<  PARAMS_DATA, 
-                                        ARRAY_1D_TO_CONST,
-                                        ARRAY_1D_TO_CONST2,
-                                        ARRAY_2D_TO_CONST,
-                                        ARRAY_1D,
-                                        ARRAY_2D,
-                                        true >( params,
+    computeAggregateSpeciesRates_impl< PARAMS_DATA,
+                                       ARRAY_1D_TO_CONST,
+                                       ARRAY_1D_TO_CONST2,
+                                       ARRAY_2D_TO_CONST,
+                                       ARRAY_1D,
+                                       ARRAY_2D,
+                                       true >( params,
                                                speciesConcentration,
                                                reactionRates,
                                                reactionRatesDerivatives,
@@ -180,7 +181,7 @@ public:
                                                aggregatesRatesDerivatives );
   }
 
-  private:
+private:
   /**
    * @brief Internal implementation of updateMixedSystem with template-dispatched logic.
    *
@@ -199,7 +200,8 @@ public:
    * @param logPrimarySpeciesConcentrations Log of primary species concentrations
    * @param logSecondarySpeciesConcentrations Output log concentrations for secondary species
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)
-   * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log primary
+   * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log
+   * primary
    * @param reactionRates Output vector of kinetic reaction rates
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
    * @param aggregateSpeciesRates Output net source/sink for each primary species
@@ -209,7 +211,7 @@ public:
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_PRIMARY,
             typename ARRAY_1D_SECONDARY,
-            typename ARRAY_1D_KINETIC, 
+            typename ARRAY_1D_KINETIC,
             typename ARRAY_2D_PRIMARY,
             typename ARRAY_2D_KINETIC >
   static HPCREACT_HOST_DEVICE void
@@ -241,11 +243,11 @@ public:
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeReactionRates_impl( RealType const & temperature,
-                        PARAMS_DATA const & params,
-                        ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                        ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
-                        ARRAY_1D & reactionRates,
-                        ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations );
+                             PARAMS_DATA const & params,
+                             ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                             ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                             ARRAY_1D & reactionRates,
+                             ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations );
 
 
   /**
@@ -276,7 +278,7 @@ public:
   computeAggregateSpeciesRates_impl( PARAMS_DATA const & params,
                                      ARRAY_1D_TO_CONST const & speciesConcentration,
                                      ARRAY_1D_TO_CONST2 const & reactionRates,
-                                     ARRAY_2D_TO_CONST const & reactionRatesDerivatives, 
+                                     ARRAY_2D_TO_CONST const & reactionRatesDerivatives,
                                      ARRAY_1D & aggregatesRates,
                                      ARRAY_2D & aggregatesRatesDerivatives );
 

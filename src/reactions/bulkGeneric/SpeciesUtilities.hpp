@@ -28,9 +28,9 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 FUNC && derivativeFunc )
 {
   constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
-  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies(); 
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
-  for (INDEX_TYPE i = 0; i < numSecondarySpecies; ++i)
+  for( INDEX_TYPE i = 0; i < numSecondarySpecies; ++i )
   {
     logSecondarySpeciesConcentrations[i] = 0.0;
   }
