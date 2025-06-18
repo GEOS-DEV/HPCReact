@@ -91,13 +91,13 @@ void timeStepTest( PARAMS_DATA const & params,
         aggregatePrimarySpeciesConcentration_n[i] = aggregatePrimarySpeciesConcentration[i];
       }
       
-      auto computeResidualAndJacobian = [&] HPCREACT_HOST_DEVICE ( REAL_TYPE const (&logPrimarySpeciesConcentration)[numPrimarySpecies], 
+      auto computeResidualAndJacobian = [&] HPCREACT_HOST_DEVICE ( REAL_TYPE const (&primarySpeciesConcentration)[numPrimarySpecies], 
                                                                  REAL_TYPE (&r)[numPrimarySpecies],
                                                                  REAL_TYPE (&J)[numPrimarySpecies][numPrimarySpecies] )  
       { 
         MixedReactionsType::updateMixedSystem( temperature,
                                                params,
-                                               logPrimarySpeciesConcentration,
+                                               primarySpeciesConcentration,
                                                logSecondarySpeciesConcentration,
                                                aggregatePrimarySpeciesConcentration,
                                                dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
