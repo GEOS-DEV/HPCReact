@@ -181,7 +181,7 @@ bool newtonRaphson( REAL_TYPE (& x)[N],
 
   if( !isConverged )
   {
-    printf( "--Newton solver error: Max iterations reached without convergence.\n" );
+    printf( "--Newton solver error: Max iterations reached without convergence.\n" ); // LCOV_EXCL_LINE
   }
 
   return isConverged;
