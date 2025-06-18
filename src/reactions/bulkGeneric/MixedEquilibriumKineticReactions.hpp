@@ -39,7 +39,8 @@ public:
 
   /// Type alias for the index type used in the class.
   using IndexType = INDEX_TYPE;
-
+  
+  /// Type alias for the Kinetic reactions type used in the class.
   using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, LOGE_CONCENTRATION >;
   
   /**
