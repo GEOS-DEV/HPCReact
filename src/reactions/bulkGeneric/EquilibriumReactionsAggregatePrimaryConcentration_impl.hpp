@@ -16,6 +16,7 @@ template< typename REAL_TYPE,
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_TO_CONST2,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE
 inline
@@ -25,14 +26,12 @@ EquilibriumReactions< REAL_TYPE,
                       INDEX_TYPE >::computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
                                                                                               PARAMS_DATA const & params,
                                                                                               ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
-                                                                                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration,
+                                                                                              ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
                                                                                               ARRAY_1D & residual,
                                                                                               ARRAY_2D & jacobian )
 {
   HPCREACT_UNUSED_VAR( temperature );
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numSecondarySpecies = PARAMS_DATA::numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numSecondarySpecies;
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   RealType aggregatePrimaryConcentrations[numPrimarySpecies] = {0.0};
   ARRAY_2D dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{{0.0}}};
@@ -68,9 +67,7 @@ EquilibriumReactions< REAL_TYPE,
                                                                   ARRAY_1D & logPrimarySpeciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numReactions = PARAMS_DATA::numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numReactions;
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   double residual[numPrimarySpecies] = { 0.0 };
 //  double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = { 0.0 };

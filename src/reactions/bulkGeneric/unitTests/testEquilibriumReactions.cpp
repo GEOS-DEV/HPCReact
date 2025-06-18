@@ -21,16 +21,16 @@ template< typename REAL_TYPE,
           int RESIDUAL_FORM,
           typename PARAMS_DATA >
 void computeResidualAndJacobianTest( PARAMS_DATA const & params,
-                                     REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                                     REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions],
-                                     REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions][PARAMS_DATA::numReactions] )
+                                     REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                                     REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions()],
+                                     REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions()][PARAMS_DATA::numReactions()] )
 {
   using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
                                                          int,
                                                          int >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
-  constexpr int numReactions = PARAMS_DATA::numReactions;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  constexpr int numReactions = PARAMS_DATA::numReactions();
 
   double const temperature = 298.15;
   double speciesConcentration[numSpecies];
@@ -99,14 +99,14 @@ template< typename REAL_TYPE,
           int RESIDUAL_FORM,
           typename PARAMS_DATA >
 void testEnforceEquilibrium( PARAMS_DATA const & params,
-                             REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies],
-                             REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies] )
+                             REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                             REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
   using EquilibriumReactionsType = EquilibriumReactions< REAL_TYPE,
                                                          int,
                                                          int >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
   double const temperature = 298.15;
   double speciesConcentration0[numSpecies];
@@ -148,7 +148,7 @@ TEST( testEquilibriumReactions, testEnforceEquilibrium )
 
 
 //******************************************************************************
-TEST( testEquilibriumReactions, testCarbonateSystem )
+TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 {
   double const initialSpeciesConcentration[18] =
   {
@@ -157,12 +157,12 @@ TEST( testEquilibriumReactions, testCarbonateSystem )
     1.0e-16, // CO3-2
     1.0e-16, // H2CO3
     1.0e-16, // CaHCO3+
-    1.0e-16, // CaCO3
     1.0e-16, // CaSO4
     1.0e-16, // CaCl+
     1.0e-16, // CaCl2
     1.0e-16, // MgSO4
     1.0e-16, // NaSO4-
+    1.0e-16, // CaCO3
     3.76e-1, // H+
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
@@ -178,12 +178,12 @@ TEST( testEquilibriumReactions, testCarbonateSystem )
     3.956656978189456e-11, // CO3-2
     9.629355924567627e-04, // H2CO3
     6.739226982791492e-05, // CaHCO3+
-    1.065032288527957e-09, // CaCO3
     5.298329882666738e-03, // CaSO4
     5.844517547638333e-03, // CaCl+
     1.277319392670652e-02, // CaCl2
     6.618125707964991e-03, // MgSO4
     1.769217213462983e-02, // NaSO4-
+    1.065032288527957e-09, // CaCO3
     4.396954721488358e-04, // H+
     3.723009698453808e-04, // HCO3-
     1.471656530812871e-02, // Ca+2
@@ -194,33 +194,30 @@ TEST( testEquilibriumReactions, testCarbonateSystem )
   };
 
   std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
-  testEnforceEquilibrium< double, 0 >( carbonateSystem.equilibriumReactionsParameters(),
+  testEnforceEquilibrium< double, 0 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
                                        initialSpeciesConcentration,
                                        expectedSpeciesConcentrations );
 
   // std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
-  // testEnforceEquilibrium< double, 1 >( carbonateSystem.equilibriumReactionsParameters(),
+  // testEnforceEquilibrium< double, 1 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
   //                                      initialSpeciesConcentration,
   //                                      expectedSpeciesConcentrations );
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-  testEnforceEquilibrium< double, 2 >( carbonateSystem.equilibriumReactionsParameters(),
+  testEnforceEquilibrium< double, 2 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
                                        initialSpeciesConcentration,
                                        expectedSpeciesConcentrations );
 
 }
 
 
-TEST( testEquilibriumReactions, testCarbonateSystem2 )
+TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 {
   using EquilibriumReactionsType = EquilibriumReactions< double,
                                                          int,
                                                          int >;
 
-  constexpr int numSpecies = carbonateSystem.numSpecies;
-  constexpr int numReactions = carbonateSystem.numReactions;
-  constexpr int numPrimarySpecies = numSpecies - numReactions;
-//  constexpr int numSecondarySpecies = numReactions;
+  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
@@ -248,7 +245,7 @@ TEST( testEquilibriumReactions, testCarbonateSystem2 )
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
   EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
-                                                          carbonateSystem,
+                                                          carbonateSystemAllEquilibrium,
                                                           logInitialPrimarySpeciesConcentration,
                                                           logPrimarySpeciesConcentration );
 

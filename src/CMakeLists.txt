@@ -7,13 +7,14 @@ set( hpcReact_headers
      reactions/bulkGeneric/EquilibriumReactionsReactionExtents_impl.hpp
      reactions/bulkGeneric/KineticReactions.hpp
      reactions/bulkGeneric/KineticReactions_impl.hpp
+     reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp
+     reactions/bulkGeneric/MixedEquilibriumKineticReactions_impl.hpp
      reactions/bulkGeneric/Parameters.hpp
      reactions/bulkGeneric/ParametersPredefined.hpp
      reactions/bulkGeneric/SpeciesUtilities.hpp
      )
 
-set( hpcReact_sources
-     )
+set( hpcReact_sources)
 
 find_package(LAPACK REQUIRED)
 find_package(BLAS REQUIRED)
@@ -35,11 +36,13 @@ blt_add_library( NAME             hpcReact
 
 target_include_directories( hpcReact
                             INTERFACE
-                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}../include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                             $<INSTALL_INTERFACE:include> )
 
 blt_print_target_properties( TARGET hpcReact )
+message(STATUS "HPCReact/src CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+
 # install( FILES ${hpcReact_headers} 
 #          DESTINATION include )
 

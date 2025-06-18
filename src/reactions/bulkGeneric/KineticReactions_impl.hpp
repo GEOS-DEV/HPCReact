@@ -47,7 +47,7 @@ KineticReactions< REAL_TYPE,
   }
 
   // loop over each reaction
-  for( IntType r=0; r<PARAMS_DATA::numReactions; ++r )
+  for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
   {
     // set reaction rate to zero
     reactionRates[r] = 0.0;
@@ -62,8 +62,9 @@ KineticReactions< REAL_TYPE,
       RealType productConcReverse = 0.0;
 
       // build the products for the forward and reverse reaction rates
-      for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
+
         RealType const s_ri = params.stoichiometricMatrix( r, i );
 
         if( s_ri < 0.0 )
@@ -81,7 +82,7 @@ KineticReactions< REAL_TYPE,
 
       if constexpr( CALCULATE_DERIVATIVES )
       {
-        for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+        for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
         {
           RealType const s_ri = params.stoichiometricMatrix( r, i );
           if( s_ri < 0.0 )
@@ -105,16 +106,16 @@ KineticReactions< REAL_TYPE,
       RealType productConcForward = 1.0;
       RealType productConcReverse = 1.0;
 
-      RealType dProductConcForward_dC[PARAMS_DATA::numSpecies];
-      RealType dProductConcReverse_dC[PARAMS_DATA::numSpecies];
-      for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+      RealType dProductConcForward_dC[PARAMS_DATA::numSpecies()];
+      RealType dProductConcReverse_dC[PARAMS_DATA::numSpecies()];
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
         dProductConcForward_dC[i] = 1.0;
         dProductConcReverse_dC[i] = 1.0;
       }
 
       // build the products for the forward and reverse reaction rates
-      for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
 
         RealType const s_ri = params.stoichiometricMatrix( r, i );
@@ -134,7 +135,7 @@ KineticReactions< REAL_TYPE,
 
           if( s_ri < 0.0 )
           {
-            for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
+            for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
             {
               if( i==j )
               {
@@ -149,7 +150,7 @@ KineticReactions< REAL_TYPE,
           }
           else if( s_ri > 0.0 )
           {
-            for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
+            for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
             {
               if( i==j )
               {
@@ -173,7 +174,7 @@ KineticReactions< REAL_TYPE,
 
       if constexpr( CALCULATE_DERIVATIVES )
       {
-        for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+        for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
         {
           reactionRatesDerivatives( r, i ) = forwardRateConstant * dProductConcForward_dC[i] - reverseRateConstant * dProductConcReverse_dC[i];
         }
@@ -205,8 +206,8 @@ KineticReactions< REAL_TYPE,
                                                ARRAY_1D & speciesRates,
                                                ARRAY_2D & speciesRatesDerivatives )
 {
-  RealType reactionRates[PARAMS_DATA::numReactions] = { 0.0 };
-  CArrayWrapper< double, PARAMS_DATA::numReactions, PARAMS_DATA::numSpecies > reactionRatesDerivatives;
+  RealType reactionRates[PARAMS_DATA::numReactions()] = { 0.0 };
+  CArrayWrapper< double, PARAMS_DATA::numReactions(), PARAMS_DATA::numSpecies() > reactionRatesDerivatives;
 
   if constexpr( !CALCULATE_DERIVATIVES )
   {
@@ -215,23 +216,23 @@ KineticReactions< REAL_TYPE,
 
   computeReactionRates< PARAMS_DATA >( temperature, params, speciesConcentration, reactionRates, reactionRatesDerivatives );
 
-  for( IntType i = 0; i < PARAMS_DATA::numSpecies; ++i )
+  for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
   {
     speciesRates[i] = 0.0;
     if constexpr( CALCULATE_DERIVATIVES )
     {
-      for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
+      for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
       {
         speciesRatesDerivatives( i, j ) = 0.0;
       }
     }
-    for( IntType r=0; r<PARAMS_DATA::numReactions; ++r )
+    for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
     {
       RealType const s_ir = params.stoichiometricMatrix( r, i );
       speciesRates[i] += s_ir * reactionRates[r];
       if constexpr( CALCULATE_DERIVATIVES )
       {
-        for( IntType j = 0; j < PARAMS_DATA::numSpecies; ++j )
+        for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
         {
           speciesRatesDerivatives( i, j ) += s_ir * reactionRatesDerivatives( r, j );
         }
@@ -260,8 +261,8 @@ KineticReactions< REAL_TYPE,
                                                   ARRAY_1D & speciesRates,
                                                   ARRAY_2D & speciesRatesDerivatives )
 {
-//  constexpr int numReactions = PARAMS_DATA::numReactions;
-  constexpr int numSpecies = PARAMS_DATA::numSpecies;
+//  constexpr int numReactions = PARAMS_DATA::numReactions();
+  constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
 
 
