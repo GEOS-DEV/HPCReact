@@ -22,6 +22,7 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION >  
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_TO_CONST_KINETIC,
           typename ARRAY_1D_PRIMARY,
           typename ARRAY_1D_SECONDARY,
           typename ARRAY_1D_KINETIC,
@@ -35,6 +36,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                 >::updateMixedSystem_impl( RealType const & temperature,
                                                            PARAMS_DATA const & params,
                                                            ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                                                           ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                            ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
                                                            ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
                                                            ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
@@ -60,6 +62,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                             params,
                             logPrimarySpeciesConcentrations,
                             logSecondarySpeciesConcentrations,
+                            surfaceArea,
                             reactionRates,
                             dReactionRates_dLogPrimarySpeciesConcentrations );
       
@@ -84,6 +87,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D,
             typename ARRAY_2D >
   HPCREACT_HOST_DEVICE inline void
@@ -95,6 +99,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                    PARAMS_DATA const & params,
                                                                    ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                                    ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                                                                   ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                                    ARRAY_1D & reactionRates,
                                                                    ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
 
@@ -127,6 +132,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     kineticReactions::computeReactionRates( temperature,
                                             params.kineticReactionsParameters(),
                                             logSpeciesConcentration,
+                                            surfaceArea,
                                             reactionRates,
                                             reactionRatesDerivatives );
 

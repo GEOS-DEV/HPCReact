@@ -25,10 +25,10 @@ constexpr CArrayWrapper<double, 11, 18> stoichMatrix =
     {     0,     0,     0,     0,     0,     0,     0,    -1,     0,     0,     0,     0,     0,     1,     0,     2,     0,     0  }, //        CaCl2 = Ca+2 + 2Cl- 
     {     0,     0,     0,     0,     0,     0,     0,     0,    -1,     0,     0,     0,     0,     0,     1,     0,     1,     0  }, //        MgSO4 = Mg+2 + SO4-2
     {     0,     0,     0,     0,     0,     0,     0,     0,     0,    -1,     0,     0,     0,     0,     1,     0,     0,     1  }, //       NaSO4- = Na+ + SO4-2
-    {     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    -1,    -1,     1,     1,     0,     0,     0,     0  }  //   CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+    {     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    -1,    -1,     1,     1,     0,     0,     0,     0  }  //   CaCO3(s) + H+ = Ca+2 + HCO3- (kinetic)
  // {     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    -2,     0,     1,     0,     0,     0,     0  }  //   Ca(OH)2​(s) + 2H+ = Ca2+ + 2H2​O (kinetic)
   };
-
+// C^{n+1} - C^n - r( C^{n+1} ) * dt = 0 
 constexpr CArrayWrapper<double, 11> equilibriumConstants = 
   { 
     9.77E+13,   //   OH- + H+ = H2O         

@@ -25,6 +25,7 @@ void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const dt,
                    int const numSteps,
                    REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numPrimarySpecies()],
+                   REAL_TYPE const (&surfaceArea)[PARAMS_DATA::numKineticReactions()],
                    REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numPrimarySpecies()] )
 {
   HPCREACT_UNUSED_VAR( expectedSpeciesConcentrations );
@@ -90,12 +91,13 @@ void timeStepTest( PARAMS_DATA const & params,
       }
       
       auto computeResidualAndJacobian = [&] HPCREACT_HOST_DEVICE ( REAL_TYPE const (&X)[numPrimarySpecies], 
-                                                                 REAL_TYPE (&r)[numPrimarySpecies],
-                                                                 REAL_TYPE (&J)[numPrimarySpecies][numPrimarySpecies] )  
+                                                                   REAL_TYPE (&r)[numPrimarySpecies],
+                                                                   REAL_TYPE (&J)[numPrimarySpecies][numPrimarySpecies] )  
       { 
         MixedReactionsType::updateMixedSystem( temperature,
                                                params,
                                                X,
+                                               surfaceArea,
                                                logSecondarySpeciesConcentration,
                                                aggregatePrimarySpeciesConcentration,
                                                dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
