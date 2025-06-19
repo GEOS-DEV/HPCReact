@@ -1,5 +1,5 @@
 
-#include "reactions/bulkGeneric/EquilibriumReactions.hpp"
+#include "reactions/reactionsSystems/EquilibriumReactions.hpp"
 #include "common/macros.hpp"
 
 #include <gtest/gtest.h>
@@ -27,7 +27,7 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
                                      REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions()],
                                      REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions()][PARAMS_DATA::numReactions()] )
 {
-  using EquilibriumReactionsType = bulkGeneric::EquilibriumReactions< REAL_TYPE,
+  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                       int,
                                                                       int >;
 
@@ -83,7 +83,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
                              REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
                              REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
-  using EquilibriumReactionsType = bulkGeneric::EquilibriumReactions< REAL_TYPE,
+  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                       int,
                                                                       int >;
 

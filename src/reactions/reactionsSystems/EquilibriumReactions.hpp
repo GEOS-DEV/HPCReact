@@ -10,7 +10,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 /**
@@ -145,7 +145,7 @@ public:
 
 
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact
 
 #if !defined(__INTELLISENSE__)

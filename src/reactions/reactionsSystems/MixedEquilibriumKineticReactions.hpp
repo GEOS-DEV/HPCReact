@@ -11,7 +11,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 /**
@@ -295,7 +295,7 @@ public:
 
 };
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact
 
 #include "MixedEquilibriumKineticReactions_impl.hpp"

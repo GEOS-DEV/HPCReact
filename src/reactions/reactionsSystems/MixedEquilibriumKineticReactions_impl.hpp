@@ -13,7 +13,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 template< typename REAL_TYPE,
@@ -209,7 +209,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   }
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 
 } // namespace hpcReact
 

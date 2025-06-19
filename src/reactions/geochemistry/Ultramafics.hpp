@@ -1,6 +1,6 @@
 #pragma once
 
-#include "reactions/bulkGeneric/Parameters.hpp"
+#include "../reactionsSystems/Parameters.hpp"
 
 namespace hpcReact
 {
@@ -117,9 +117,9 @@ constexpr CArrayWrapper<double, 21> reverseRates =
   };
 };
    
-  using ultramaficSystemAllKineticType     = bulkGeneric::MixedReactionsParameters< double, int, int, 25, 21, 0 >;
-  using ultramaficSystemAllEquilibriumType = bulkGeneric::MixedReactionsParameters< double, int, int, 25, 21, 21 >;
-  using ultramaficSystemType               = bulkGeneric::MixedReactionsParameters< double, int, int, 25, 21, 16 >;
+  using ultramaficSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 0 >;
+  using ultramaficSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 21 >;
+  using ultramaficSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 16 >;
 
   constexpr ultramaficSystemAllKineticType     ultramaficSystemAllKinetic( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates );
   constexpr ultramaficSystemAllEquilibriumType ultramaficSystemAllEquilibrium( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates );

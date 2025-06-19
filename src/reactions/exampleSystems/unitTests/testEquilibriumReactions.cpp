@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 using namespace hpcReact;
-using namespace hpcReact::bulkGeneric;
+using namespace hpcReact::reactionsSystems;
 using namespace hpcReact::unitTest_utilities;
 
 //******************************************************************************

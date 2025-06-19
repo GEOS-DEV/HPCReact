@@ -3,7 +3,7 @@
 #include "common/macros.hpp"
 #include "common/printers.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "reactions/bulkGeneric/KineticReactions.hpp"
+#include "reactions/reactionsSystems/KineticReactions.hpp"
 
 #include <gtest/gtest.h>
 
@@ -28,7 +28,7 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
                                REAL_TYPE const (&expectedReactionRates)[PARAMS_DATA::numReactions()],
                                REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] )
 {
-  using KineticReactionsType = bulkGeneric::KineticReactions< REAL_TYPE,
+  using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                               int,
                                                               int,
                                                               LOGE_CONCENTRATION >;
@@ -104,7 +104,7 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
                               REAL_TYPE const (&expectedSpeciesRatesDerivatives)[PARAMS_DATA::numSpecies()][PARAMS_DATA::numSpecies()] )
 {
 
-  using KineticReactionsType = bulkGeneric::KineticReactions< REAL_TYPE,
+  using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                               int,
                                                               int,
                                                               LOGE_CONCENTRATION >;
@@ -166,7 +166,7 @@ void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
                    REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
-  using KineticReactionsType = bulkGeneric::KineticReactions< REAL_TYPE,
+  using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                               int,
                                                               int,
                                                               LOGE_CONCENTRATION >;

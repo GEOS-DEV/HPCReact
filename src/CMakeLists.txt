@@ -2,22 +2,22 @@
 set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
-     reactions/bulkGeneric/EquilibriumReactions.hpp
-     reactions/bulkGeneric/EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp
-     reactions/bulkGeneric/EquilibriumReactionsReactionExtents_impl.hpp
+     reactions/exampleSystems/GenericSystems.hpp
      reactions/geochemistry/GeochemicalSystems.hpp
      reactions/geochemistry/Carbonate.hpp
      reactions/geochemistry/Ultramafics.hpp
-     reactions/bulkGeneric/KineticReactions.hpp
-     reactions/bulkGeneric/KineticReactions_impl.hpp
-     reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp
-     reactions/bulkGeneric/MixedEquilibriumKineticReactions_impl.hpp
-     reactions/bulkGeneric/Parameters.hpp
-     reactions/bulkGeneric/GenericSystems.hpp
+     reactions/massActions/MassActions.hpp
+     reactions/reactionsSystems/EquilibriumReactions.hpp
+     reactions/reactionsSystems/EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp
+     reactions/reactionsSystems/EquilibriumReactionsReactionExtents_impl.hpp
+     reactions/reactionsSystems/KineticReactions.hpp
+     reactions/reactionsSystems/KineticReactions_impl.hpp
+     reactions/reactionsSystems/MixedEquilibriumKineticReactions.hpp
+     reactions/reactionsSystems/MixedEquilibriumKineticReactions_impl.hpp
+     reactions/reactionsSystems/Parameters.hpp
      reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp
      reactions/unitTestUtilities/kineticReactionsTestUtilities.hpp
      reactions/unitTestUtilities/mixedReactionsTestUtilities.hpp
-     reactions/massActions/MassActions.hpp
      )
 
 set( hpcReact_sources)
@@ -65,7 +65,7 @@ message(STATUS "HPCReact/src CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DI
 # hpcReact_add_code_checks( PREFIX hpcReact
 #                        EXCLUDES "blt/*" )
 
-add_subdirectory( reactions/bulkGeneric/unitTests )
+add_subdirectory( reactions/exampleSystems/unitTests )
 add_subdirectory( reactions/geochemistry/unitTests )
 add_subdirectory( reactions/massActions/unitTests )
 add_subdirectory( common/unitTests )

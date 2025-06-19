@@ -10,7 +10,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 /**
@@ -89,13 +89,14 @@ public:
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_SA,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE inline void
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
                         ARRAY_1D_TO_CONST const & speciesConcentration,
-                        ARRAY_1D_TO_CONST const & surfaceArea,
+                        ARRAY_1D_SA const & surfaceArea,
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & reactionRatesDerivatives )
   {
@@ -249,13 +250,14 @@ private:
   template< typename PARAMS_DATA,
             bool CALCULATE_DERIVATIVES,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_SA,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeReactionRatesQuotient_impl( RealType const & temperature,
                                      PARAMS_DATA const & params,
                                      ARRAY_1D_TO_CONST const & speciesConcentration,
-                                     ARRAY_1D_TO_CONST const & surfaceArea,
+                                     ARRAY_1D_SA const & surfaceArea,
                                      ARRAY_1D & reactionRates,
                                      ARRAY_2D & reactionRatesDerivatives );                           
 
@@ -286,7 +288,7 @@ private:
 
 };
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact
 
 #include "KineticReactions_impl.hpp"

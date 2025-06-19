@@ -16,7 +16,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 
@@ -190,6 +190,7 @@ template< typename REAL_TYPE,
 template< typename PARAMS_DATA,
           bool CALCULATE_DERIVATIVES,
           typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_SA,
           typename ARRAY_1D,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE inline void
@@ -200,7 +201,7 @@ KineticReactions< REAL_TYPE,
                   >::computeReactionRatesQuotient_impl( RealType const &, //temperature,
                                                         PARAMS_DATA const & params,
                                                         ARRAY_1D_TO_CONST const & speciesConcentration,
-                                                        ARRAY_1D_TO_CONST const & surfaceArea,
+                                                        ARRAY_1D_SA const & surfaceArea,
                                                         ARRAY_1D & reactionRates,
                                                         ARRAY_2D & reactionRatesDerivatives )
 {
@@ -275,7 +276,7 @@ KineticReactions< REAL_TYPE,
         }
      } // end of if constexpr ( CALCULATE_DERIVATIVES )     
     } // end of else
-    reactionRates[r] = - rateConstant * surfaceArea[r] * ( 1 - quotient / equilibriumConstant );
+    reactionRates[r] = - rateConstant * surfaceArea[r] * ( 1.0 - quotient / equilibriumConstant );
   } 
 }
 
@@ -457,7 +458,7 @@ KineticReactions< REAL_TYPE,
 
   }
 }
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

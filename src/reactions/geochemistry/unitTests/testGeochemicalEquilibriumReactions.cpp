@@ -91,7 +91,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 {
 
-  using EquilibriumReactionsType = bulkGeneric::EquilibriumReactions< double,
+  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
                                                                       int,
                                                                       int >;
 

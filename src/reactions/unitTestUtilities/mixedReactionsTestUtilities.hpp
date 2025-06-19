@@ -1,9 +1,7 @@
 
 #pragma once
-#include "reactions/bulkGeneric/MixedEquilibriumKineticReactions.hpp"
-#include "reactions/bulkGeneric/EquilibriumReactions.hpp"
-#include "reactions/bulkGeneric/GenericSystems.hpp"
-#include "reactions/geochemistry/GeochemicalSystems.hpp"
+#include "reactions/reactionsSystems/MixedEquilibriumKineticReactions.hpp"
+#include "reactions/reactionsSystems/EquilibriumReactions.hpp"
 #include "common/macros.hpp"
 #include "common/printers.hpp"
 #include "common/nonlinearSolvers.hpp"
@@ -41,11 +39,11 @@ void timeStepTest( PARAMS_DATA const & params,
                               primarySpeciesConcentration.data, 
                               [=] HPCREACT_HOST_DEVICE ( auto * speciesConcentration ) 
   { 
-    using MixedReactionsType = bulkGeneric::MixedEquilibriumKineticReactions< REAL_TYPE,
+    using MixedReactionsType = reactionsSystems::MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                               int,
                                                                               int,
                                                                               LOGE_CONCENTRATION >;
-    using EquilibriumReactionsType = bulkGeneric::EquilibriumReactions< REAL_TYPE,
+    using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                         int,
                                                                         int >;
     
@@ -75,7 +73,7 @@ void timeStepTest( PARAMS_DATA const & params,
     }
     
     EquilibriumReactionsType::enforceEquilibrium_Aggregate( temperature,
-                                                            hpcReact::geochemistry::carbonateSystem.equilibriumReactionsParameters(),
+                                                            params.equilibriumReactionsParameters(),
                                                             logPrimarySpeciesConcentration,
                                                             logPrimarySpeciesConcentration );
                                                                                                          

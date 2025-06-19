@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Parameters.hpp"
+#include "../reactionsSystems/Parameters.hpp"
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 // turn off uncrustify to allow for better readability of the parameters
 // *****UNCRUSTIFY-OFF******
@@ -72,5 +72,5 @@ simpleTestRateParams =
   { 1.0, 0.5 }
 };
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact

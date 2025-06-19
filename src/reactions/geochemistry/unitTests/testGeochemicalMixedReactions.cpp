@@ -19,7 +19,6 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 
   double const initialAggregateSpeciesConcentration[numPrimarySpecies] =
   {
-    3.76e-3, // CaCO3 
     3.76e-1, // H+
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
@@ -30,8 +29,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
   };
 
   double const expectedSpeciesConcentrations[numPrimarySpecies] =
-  {
-    3.3318075516669661e-05,  // CaCO3
+  {  
     2.5894448848121536e-05, // H+
     0.0062660162912796741, // HCO3-
     0.015741214773567921, // Ca+2

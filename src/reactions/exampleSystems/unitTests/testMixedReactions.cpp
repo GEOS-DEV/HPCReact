@@ -11,7 +11,7 @@
 
 
 using namespace hpcReact;
-using namespace hpcReact::bulkGeneric;
+using namespace hpcReact::reactionsSystems;
 
 template< typename REAL_TYPE >
 REAL_TYPE tolerance( REAL_TYPE const a, REAL_TYPE const b, REAL_TYPE const ndigits )
