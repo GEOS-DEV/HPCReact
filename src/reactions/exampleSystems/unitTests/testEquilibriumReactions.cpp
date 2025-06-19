@@ -1,11 +1,10 @@
 
 #include "reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp"
-#include "../GenericSystems.hpp"
+#include "../BulkGeneric.hpp"
 
 #include <gtest/gtest.h>
 
 using namespace hpcReact;
-using namespace hpcReact::reactionsSystems;
 using namespace hpcReact::unitTest_utilities;
 
 //******************************************************************************
@@ -20,7 +19,7 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
     double const expectedJacobian[2][2] =
     { { 1.0e16, -2.0 },
       { -2.0, 4.0e16 } };
-    computeResidualAndJacobianTest< double, 2 >( simpleTestRateParams,
+    computeResidualAndJacobianTest< double, 2 >( bulkGeneric::simpleTestRateParams,
                                                  initialSpeciesConcentration,
                                                  expectedResiduals,
                                                  expectedJacobian );
@@ -36,7 +35,7 @@ TEST( testEquilibriumReactions, testEnforceEquilibrium )
 
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-  testEnforceEquilibrium< double, 2 >( simpleTestRateParams.equilibriumReactionsParameters(),
+  testEnforceEquilibrium< double, 2 >( bulkGeneric::simpleTestRateParams.equilibriumReactionsParameters(),
                                        initialSpeciesConcentration,
                                        expectedSpeciesConcentrations );
 

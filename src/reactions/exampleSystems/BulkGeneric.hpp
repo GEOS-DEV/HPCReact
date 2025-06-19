@@ -4,7 +4,7 @@
 
 namespace hpcReact
 {
-namespace reactionsSystems
+namespace bulkGeneric
 {
 // turn off uncrustify to allow for better readability of the parameters
 // *****UNCRUSTIFY-OFF******
@@ -53,7 +53,7 @@ simpleKineticTestRateParams =
   { 1.0, 0.5 }
 };
 
-using simpleTestType = MixedReactionsParameters< double, int, int, 5, 2, 2 >;
+using simpleTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;
 
 constexpr 
 simpleTestType
@@ -72,5 +72,5 @@ simpleTestRateParams =
   { 1.0, 0.5 }
 };
 
-} // namespace reactionsSystems
+} // namespace bulkGeneric
 } // namespace hpcReact
