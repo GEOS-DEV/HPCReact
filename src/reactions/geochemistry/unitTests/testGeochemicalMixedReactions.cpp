@@ -12,6 +12,11 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 
   constexpr int numPrimarySpecies = carbonateSystemType::numPrimarySpecies();
 
+  double const surfaceArea[carbonateSystemType::numKineticReactions()] =
+  {
+    1.0, // CaCO3
+  };
+
   double const initialAggregateSpeciesConcentration[numPrimarySpecies] =
   {
     3.76e-3, // CaCO3 
@@ -40,6 +45,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
                                 0.2,
                                 10,
                                 initialAggregateSpeciesConcentration,
+                                surfaceArea,
                                 expectedSpeciesConcentrations );
 
 }

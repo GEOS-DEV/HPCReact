@@ -77,7 +77,7 @@ public:
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
                         ARRAY_1D_TO_CONST const & speciesConcentration,
-                        ARRAY_1D & reactionRates, )
+                        ARRAY_1D & reactionRates )
   {
     REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] = { {0.0} };
     computeReactionRates_impl< PARAMS_DATA, false >( temperature,
@@ -89,7 +89,8 @@ public:
 
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
-            typename ARRAY_1D >
+            typename ARRAY_1D,
+            typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE inline void
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
