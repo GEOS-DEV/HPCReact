@@ -2,7 +2,7 @@
 set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
-     reactions/exampleSystems/GenericSystems.hpp
+     reactions/exampleSystems/BulkGeneric.hpp
      reactions/geochemistry/GeochemicalSystems.hpp
      reactions/geochemistry/Carbonate.hpp
      reactions/geochemistry/Ultramafics.hpp

@@ -34,7 +34,7 @@ namespace bulkGeneric
 //   um1Constants };
 
 
-using simpleKineticTestType = MixedReactionsParameters< double, int, int, 5, 2, 0 >;
+using simpleKineticTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 0 >;
 
 constexpr 
 simpleKineticTestType

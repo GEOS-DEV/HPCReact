@@ -40,7 +40,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
   };
 
   timeStepTest< double, true >( carbonateSystem,
-                                0.2,
+                                1.0e-8,
                                 10,
                                 initialAggregateSpeciesConcentration,
                                 surfaceArea,
