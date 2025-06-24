@@ -37,6 +37,7 @@ constexpr CArrayWrapper< double, 19, 26 > soichMatrix =
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,     -4,   0,    0,     1,    0,    1,     0,     1,     0,   3  }  // Albite: NaAlSi₃O₈(s) + 4H⁺ ⇌ Al³⁺ + Na⁺ + 3SiO₂(aq)
 };
 
+// Must convert these. They should not be the log.
 constexpr CArrayWrapper< double, 19 > equilibriumConstants =
 {
    5.9636,   // CaCO₃(aq) + H⁺ ⇌ Ca²⁺ + HCO₃⁻
@@ -106,9 +107,6 @@ constexpr CArrayWrapper< double, 19 > reverseRateConstant =
    1.0,   // Microcline: KAlSi₃O₈(s) + 4H⁺ ⇌ Al³⁺ + K⁺ + 3SiO₂(aq)
    1.0    // Albite: NaAlSi₃O₈(s) + 4H⁺ ⇌ Al³⁺ + Na⁺ + 3SiO₂(aq)
 };
-
-
-
 
 }
 
