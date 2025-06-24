@@ -3,8 +3,9 @@ set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
      reactions/exampleSystems/BulkGeneric.hpp
-     reactions/geochemistry/GeochemicalSystems.hpp
      reactions/geochemistry/Carbonate.hpp
+     reactions/geochemistry/Forge.hpp
+     reactions/geochemistry/GeochemicalSystems.hpp
      reactions/geochemistry/Ultramafics.hpp
      reactions/massActions/MassActions.hpp
      reactions/reactionsSystems/EquilibriumReactions.hpp

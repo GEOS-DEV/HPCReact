@@ -2,6 +2,7 @@
 
 #include "Carbonate.hpp"
 #include "Ultramafics.hpp"
+#include "Forge.hpp"
 
 namespace hpcReact
 {
@@ -10,7 +11,8 @@ namespace geochemistry
 {
   using systemTypes = std::variant< ultramaficSystemType,
                                     carbonateSystemType,
-                                    carbonateSystemAllEquilibriumType >;
+                                    carbonateSystemAllEquilibriumType,
+                                    forgeSystemType >;
 
 } // namespace geochemistry
 } // namespace hpcReact
