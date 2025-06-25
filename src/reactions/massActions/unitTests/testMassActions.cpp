@@ -1,11 +1,12 @@
-#include "../SpeciesUtilities.hpp"
-#include "../ParametersPredefined.hpp"
+#include "../MassActions.hpp"
+#include "reactions/geochemistry/GeochemicalSystems.hpp"
 #include "common/printers.hpp"
 
 #include <gtest/gtest.h>
 
 using namespace hpcReact;
-using namespace hpcReact::bulkGeneric;
+using namespace hpcReact::massActions;
+using namespace hpcReact::geochemistry;
 
 
 
@@ -125,7 +126,7 @@ TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
     for( int k=0; k<numPrimarySpecies; ++k )
     {
       std::cout << "dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations("<< i << ", " << k << " )" <<
-      dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) << std::endl;
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) << std::endl;
     }
   }
 

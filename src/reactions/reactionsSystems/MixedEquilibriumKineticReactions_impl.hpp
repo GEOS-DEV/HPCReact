@@ -2,7 +2,7 @@
 
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "SpeciesUtilities.hpp"
+#include "reactions/massActions/MassActions.hpp"
 
 
 /** @file MixedEquilibriumKineticReactions_impl.hpp
@@ -13,7 +13,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 template< typename REAL_TYPE,
@@ -22,6 +22,7 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_TO_CONST_KINETIC,
           typename ARRAY_1D_PRIMARY,
           typename ARRAY_1D_SECONDARY,
           typename ARRAY_1D_KINETIC,
@@ -35,6 +36,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                   >::updateMixedSystem_impl( RealType const & temperature,
                                                              PARAMS_DATA const & params,
                                                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                                                             ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                              ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
                                                              ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
                                                              ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
@@ -45,26 +47,24 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 {
 
   // 1. Compute new aggregate species from primary species
-  calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
-                                                  INT_TYPE,
-                                                  INDEX_TYPE >( params.equilibriumReactionsParameters(),
-                                                                logPrimarySpeciesConcentrations,
-                                                                logSecondarySpeciesConcentrations,
-                                                                aggregatePrimarySpeciesConcentrations,
-                                                                dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+  massActions::calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
+                                                               INT_TYPE,
+                                                               INDEX_TYPE >( params.equilibriumReactionsParameters(),
+                                                                             logPrimarySpeciesConcentrations,
+                                                                             logSecondarySpeciesConcentrations,
+                                                                             aggregatePrimarySpeciesConcentrations,
+                                                                             dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
 
   if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
   {
-
-
     // 2. Compute the reaction rates for all kinetic reactions
     computeReactionRates( temperature,
                           params,
                           logPrimarySpeciesConcentrations,
                           logSecondarySpeciesConcentrations,
+                          surfaceArea,
                           reactionRates,
                           dReactionRates_dLogPrimarySpeciesConcentrations );
-
 
     // 3. Compute aggregate species rates
     computeAggregateSpeciesRates( params,
@@ -88,6 +88,7 @@ template< typename REAL_TYPE,
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST2,
+          typename ARRAY_1D_TO_CONST_KINETIC,
           typename ARRAY_1D,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE inline void
@@ -99,6 +100,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                 PARAMS_DATA const & params,
                                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                                 ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                                                                ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                                 ARRAY_1D & reactionRates,
                                                                 ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
 
@@ -131,6 +133,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   kineticReactions::computeReactionRates( temperature,
                                           params.kineticReactionsParameters(),
                                           logSpeciesConcentration,
+                                          surfaceArea,
                                           reactionRates,
                                           reactionRatesDerivatives );
 
@@ -207,7 +210,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
 }
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 
 } // namespace hpcReact
 

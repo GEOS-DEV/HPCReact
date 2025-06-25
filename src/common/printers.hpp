@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include "CArrayWrapper.hpp"
 
 template< typename T, int N >
 void print( T const (&a)[N], char const * name, int const numDigits )

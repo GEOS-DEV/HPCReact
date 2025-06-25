@@ -5,7 +5,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 
@@ -195,5 +195,5 @@ EquilibriumReactions< REAL_TYPE,
 }
 
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact

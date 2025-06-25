@@ -2,3 +2,5 @@ build*
 install*
 cmake/blt*
 .vscode*
+.DS_Store
+src/.DS_Store

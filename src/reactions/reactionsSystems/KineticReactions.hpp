@@ -10,7 +10,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 /**
@@ -86,6 +86,47 @@ public:
                                                      reactionRates,
                                                      reactionRatesDerivatives );
   }
+
+  /**
+   * @brief Compute the reaction rates for a given set of species concentrations and surface area.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations
+   * @tparam ARRAY_1D_SA The type of the array of surface area.
+   * @tparam ARRAY_1D The type of the array of reaction rates.
+   * @tparam ARRAY_2D The type of the array of reaction rates derivatives.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param speciesConcentration The array of species concentrations.
+   * @param surfaceArea The array of surface area.
+   * @param reactionRates The array of reaction rates.
+   * @param reactionRatesDerivatives The array of reaction rates derivatives.
+   * @details
+   *   This function computes the reaction rates for a given set of reactions,
+   *   taking into account the surface area of the reactions. If
+   *   CALCULATE_DERIVATIVES is true, it also computes the derivatives of the
+   *   reaction rates with respect to the species concentrations.
+   */
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_SA,
+            typename ARRAY_1D,
+            typename ARRAY_2D >
+  static HPCREACT_HOST_DEVICE inline void
+  computeReactionRates( RealType const & temperature,
+                        PARAMS_DATA const & params,
+                        ARRAY_1D_TO_CONST const & speciesConcentration,
+                        ARRAY_1D_SA const & surfaceArea,
+                        ARRAY_1D & reactionRates,
+                        ARRAY_2D & reactionRatesDerivatives )
+  {
+    computeReactionRatesQuotient_impl< PARAMS_DATA, true >( temperature,
+                                                            params,
+                                                            speciesConcentration,
+                                                            surfaceArea,
+                                                            reactionRates,
+                                                            reactionRatesDerivatives );
+  }
+
 
 
   /**
@@ -209,6 +250,36 @@ private:
                              ARRAY_1D & reactionRates,
                              ARRAY_2D & reactionRatesDerivatives );
 
+/**
+ * @brief
+ *
+ * @tparam PARAMS_DATA
+ * @tparam CALCULATE_DERIVATIVES
+ * @tparam ARRAY_1D_TO_CONST
+ * @tparam ARRAY_1D
+ * @tparam ARRAY_2D
+ * @param temperature
+ * @param params
+ * @param speciesConcentration
+ * @param surfaceArea
+ * @param reactionRates
+ * @param reactionRatesDerivatives
+ * @return HPCREACT_HOST_DEVICE
+ */
+  template< typename PARAMS_DATA,
+            bool CALCULATE_DERIVATIVES,
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_SA,
+            typename ARRAY_1D,
+            typename ARRAY_2D >
+  static HPCREACT_HOST_DEVICE void
+  computeReactionRatesQuotient_impl( RealType const & temperature,
+                                     PARAMS_DATA const & params,
+                                     ARRAY_1D_TO_CONST const & speciesConcentration,
+                                     ARRAY_1D_SA const & surfaceArea,
+                                     ARRAY_1D & reactionRates,
+                                     ARRAY_2D & reactionRatesDerivatives );
+
   /**
    * @brief Compute the kinetic species rates for a given set of kinetic reactions.
    * @tparam PARAMS_DATA The type of the parameters data.
@@ -236,7 +307,7 @@ private:
 
 };
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact
 
 #include "KineticReactions_impl.hpp"
