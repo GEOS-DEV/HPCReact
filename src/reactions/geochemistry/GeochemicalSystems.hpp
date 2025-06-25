@@ -11,10 +11,10 @@ namespace hpcReact
 
 namespace geochemistry
 {
-  using systemTypes = std::variant< ultramaficSystemType,
-                                    carbonateSystemType,
-                                    carbonateSystemAllEquilibriumType,
-                                    forgeSystemType >;
+using systemTypes = std::variant< ultramaficSystemType,
+                                  carbonateSystemType,
+                                  carbonateSystemAllEquilibriumType,
+                                  forgeSystemType >;
 
 } // namespace geochemistry
 } // namespace hpcReact

@@ -27,7 +27,7 @@ struct EquilibriumReactionsParameters
   using RealType = REAL_TYPE;
   using IntType = INT_TYPE;
   using IndexType = INDEX_TYPE;
-  
+
   static constexpr IndexType numSpecies() { return NUM_SPECIES; }
 
   static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -39,7 +39,7 @@ struct EquilibriumReactionsParameters
   static constexpr IndexType numPrimarySpecies() { return numSpecies() - numReactions(); }
 
   static constexpr IndexType numSecondarySpecies() { return numSpecies() - numPrimarySpecies(); }
-  
+
 
   constexpr
   EquilibriumReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
@@ -74,11 +74,11 @@ struct KineticReactionsParameters
   constexpr KineticReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
-                                         CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant ):
+                                        CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
-    m_equilibiriumConstant( equilibriumConstant )  // Initialize to empty array
+    m_equilibiriumConstant( equilibriumConstant ) // Initialize to empty array
   {}
 
 
@@ -127,7 +127,7 @@ struct MixedReactionsParameters
   static constexpr IndexType numEquilibriumReactions() { return NUM_EQ_REACTIONS; }
 
   static constexpr IndexType numSpecies() { return NUM_SPECIES; }
-  
+
   static constexpr IndexType numPrimarySpecies() { return NUM_SPECIES - NUM_EQ_REACTIONS; }
 
   static constexpr IndexType numSecondarySpecies() { return NUM_EQ_REACTIONS; }

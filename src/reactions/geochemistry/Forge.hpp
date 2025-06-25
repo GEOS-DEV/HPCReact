@@ -4,9 +4,9 @@
 
 namespace hpcReact
 {
-
 namespace geochemistry
 {
+// *****UNCRUSTIFY-OFF******
 
 namespace forge
 {
@@ -116,6 +116,6 @@ using forgeSystemType = reactionsSystems::MixedReactionsParameters< double, int,
 constexpr forgeSystemType forgeSystem( forge::soichMatrix, forge::equilibriumConstants, forge::fwRateConstant, forge::reverseRateConstant );
 
 
+// *****UNCRUSTIFY-ON******
 }
-
 }

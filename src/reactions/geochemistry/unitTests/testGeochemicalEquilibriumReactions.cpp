@@ -92,8 +92,8 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 {
 
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
-                                                                      int,
-                                                                      int >;
+                                                                           int,
+                                                                           int >;
 
   constexpr int numPrimarySpecies = hpcReact::geochemistry::carbonateSystemAllEquilibrium.numPrimarySpecies();
 
@@ -103,9 +103,9 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
     3.21e-2, // SO4-2
-    1.89,    // Cl-
+    1.89000, // Cl-
     1.65e-2, // Mg+2
-    1.09     // Na+1
+    1.09000 // Na+1
   };
 
 

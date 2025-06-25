@@ -28,9 +28,9 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 FUNC && derivativeFunc )
 {
   constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
-  constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies(); 
+  constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
 
-  for (INDEX_TYPE i = 0; i < numSecondarySpecies; ++i)
+  for( INDEX_TYPE i = 0; i < numSecondarySpecies; ++i )
   {
     logSecondarySpeciesConcentrations[i] = 0.0;
   }
@@ -62,11 +62,11 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 ARRAY_1D & logSecondarySpeciesConcentrations )
 {
   massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE,
-                                                             INT_TYPE,
-                                                             INDEX_TYPE >( params,
-                                                                           logPrimarySpeciesConcentrations,
-                                                                           logSecondarySpeciesConcentrations,
-                                                                           [](INDEX_TYPE, INDEX_TYPE, REAL_TYPE ){} );
+                                                               INT_TYPE,
+                                                               INDEX_TYPE >( params,
+                                                                             logPrimarySpeciesConcentrations,
+                                                                             logSecondarySpeciesConcentrations,
+                                                                             [](INDEX_TYPE, INDEX_TYPE, REAL_TYPE ){} );
 }
 
 
@@ -85,9 +85,9 @@ void calculateLogSecondarySpeciesConcentrationWrtLogC( PARAMS_DATA const & param
                                                        ARRAY_2D & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations )
 {
   massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
-                                                                                                logPrimarySpeciesConcentrations,
-                                                                                                logSecondarySpeciesConcentrations,
-                                                                                                [&]( const int j, const int k, REAL_TYPE const value )
+                                                                                                  logPrimarySpeciesConcentrations,
+                                                                                                  logSecondarySpeciesConcentrations,
+                                                                                                  [&]( const int j, const int k, REAL_TYPE const value )
   {
     dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[j][k] = value;
   } );

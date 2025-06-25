@@ -101,8 +101,10 @@ public:
    * @param reactionRates The array of reaction rates.
    * @param reactionRatesDerivatives The array of reaction rates derivatives.
    * @details
-   *   This function computes the reaction rates for a given set of reactions, taking into account
-   *   the surface area of the reactions. If CALCULATE_DERIVATIVES is true, it also computes the derivatives of the reaction rates with respect to the species concentrations.
+   *   This function computes the reaction rates for a given set of reactions,
+   *   taking into account the surface area of the reactions. If
+   *   CALCULATE_DERIVATIVES is true, it also computes the derivatives of the
+   *   reaction rates with respect to the species concentrations.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
@@ -249,20 +251,20 @@ private:
                              ARRAY_2D & reactionRatesDerivatives );
 
 /**
- * @brief 
- * 
- * @tparam PARAMS_DATA 
- * @tparam CALCULATE_DERIVATIVES 
- * @tparam ARRAY_1D_TO_CONST 
- * @tparam ARRAY_1D 
- * @tparam ARRAY_2D 
- * @param temperature 
- * @param params 
- * @param speciesConcentration 
- * @param surfaceArea 
- * @param reactionRates 
- * @param reactionRatesDerivatives 
- * @return HPCREACT_HOST_DEVICE 
+ * @brief
+ *
+ * @tparam PARAMS_DATA
+ * @tparam CALCULATE_DERIVATIVES
+ * @tparam ARRAY_1D_TO_CONST
+ * @tparam ARRAY_1D
+ * @tparam ARRAY_2D
+ * @param temperature
+ * @param params
+ * @param speciesConcentration
+ * @param surfaceArea
+ * @param reactionRates
+ * @param reactionRatesDerivatives
+ * @return HPCREACT_HOST_DEVICE
  */
   template< typename PARAMS_DATA,
             bool CALCULATE_DERIVATIVES,
@@ -276,7 +278,7 @@ private:
                                      ARRAY_1D_TO_CONST const & speciesConcentration,
                                      ARRAY_1D_SA const & surfaceArea,
                                      ARRAY_1D & reactionRates,
-                                     ARRAY_2D & reactionRatesDerivatives );                           
+                                     ARRAY_2D & reactionRatesDerivatives );
 
   /**
    * @brief Compute the kinetic species rates for a given set of kinetic reactions.

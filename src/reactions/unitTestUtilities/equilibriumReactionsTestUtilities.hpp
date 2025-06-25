@@ -28,8 +28,8 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
                                      REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions()][PARAMS_DATA::numReactions()] )
 {
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
-                                                                      int,
-                                                                      int >;
+                                                                           int,
+                                                                           int >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies();
   constexpr int numReactions = PARAMS_DATA::numReactions();
@@ -84,8 +84,8 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
                              REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
-                                                                      int,
-                                                                      int >;
+                                                                           int,
+                                                                           int >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
@@ -113,5 +113,5 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
 }
 
 }
-  
+
 } // namespace hpcReact

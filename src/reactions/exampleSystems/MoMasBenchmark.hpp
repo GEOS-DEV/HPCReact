@@ -6,6 +6,8 @@ namespace hpcReact
 {
 namespace MomMasBenchmark
 {
+// *****UNCRUSTIFY-OFF******
+
   using simpleSystemType = reactionsSystems::MixedReactionsParameters< double, int, int, 12, 7, 7 >;
 
   constexpr simpleSystemType simpleSystemParams =
@@ -56,5 +58,6 @@ namespace MomMasBenchmark
   },
 };
 
+// *****UNCRUSTIFY-ON******
 } // namespace MomMasBenchmark
 } // namespace hpcReact

@@ -102,5 +102,6 @@ constexpr CArrayWrapper<double, 11> reverseRates =
   constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
   constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
 
+// *****UNCRUSTIFY-ON******
 } // namespace geochemistry
 } // namespace hpcReact

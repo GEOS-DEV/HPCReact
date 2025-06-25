@@ -126,7 +126,7 @@ TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
     for( int k=0; k<numPrimarySpecies; ++k )
     {
       std::cout << "dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations("<< i << ", " << k << " )" <<
-      dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) << std::endl;
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) << std::endl;
     }
   }
 

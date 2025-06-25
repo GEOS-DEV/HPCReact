@@ -116,7 +116,7 @@ constexpr CArrayWrapper<double, 21> reverseRates =
     2.10E-25    //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
   };
 };
-   
+
   using ultramaficSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 0 >;
   using ultramaficSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 21 >;
   using ultramaficSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 16 >;
@@ -125,5 +125,6 @@ constexpr CArrayWrapper<double, 21> reverseRates =
   constexpr ultramaficSystemAllEquilibriumType ultramaficSystemAllEquilibrium( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates );
   constexpr ultramaficSystemType               ultramaficSystem( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates );
 
+// *****UNCRUSTIFY-ON******
 } // namespace geochemistry
 } // namespace hpcReact

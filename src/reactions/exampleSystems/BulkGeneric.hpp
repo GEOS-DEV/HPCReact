@@ -72,5 +72,6 @@ simpleTestRateParams =
   { 1.0, 0.5 }
 };
 
+// *****UNCRUSTIFY-ON******
 } // namespace bulkGeneric
 } // namespace hpcReact

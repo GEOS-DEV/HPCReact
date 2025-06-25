@@ -29,9 +29,9 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
                                REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] )
 {
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
-                                                              int,
-                                                              int,
-                                                              LOGE_CONCENTRATION >;
+                                                                   int,
+                                                                   int,
+                                                                   LOGE_CONCENTRATION >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies();
   constexpr int numReactions = PARAMS_DATA::numReactions();
@@ -105,9 +105,9 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
 {
 
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
-                                                              int,
-                                                              int,
-                                                              LOGE_CONCENTRATION >;
+                                                                   int,
+                                                                   int,
+                                                                   LOGE_CONCENTRATION >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
@@ -167,9 +167,9 @@ void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
-                                                              int,
-                                                              int,
-                                                              LOGE_CONCENTRATION >;
+                                                                   int,
+                                                                   int,
+                                                                   LOGE_CONCENTRATION >;
 
   constexpr int numSpecies = PARAMS_DATA::numSpecies();
   double const temperature = 298.15;
