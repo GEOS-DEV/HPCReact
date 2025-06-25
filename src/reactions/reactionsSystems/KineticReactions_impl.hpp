@@ -247,7 +247,7 @@ KineticReactions< REAL_TYPE,
         for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
         {
           RealType const s_ri = params.stoichiometricMatrix( r, i );
-          reactionRatesDerivatives( r, i ) = rateConstant * surfaceArea[r] * s_ri * quotient / equilibriumConstant;
+          reactionRatesDerivatives( r, i ) = - rateConstant * surfaceArea[r] * s_ri * quotient / equilibriumConstant;
         }
       } // end of if constexpr ( CALCULATE_DERIVATIVES )
     } // end of if constexpr ( LOGE_CONCENTRATION )
@@ -267,7 +267,7 @@ KineticReactions< REAL_TYPE,
           RealType const s_ri = params.stoichiometricMatrix( r, i );
           if( s_ri > 0.0 || s_ri < 0.0 )
           {
-            reactionRatesDerivatives( r, i ) = rateConstant * surfaceArea[r] * s_ri * quotient / ( equilibriumConstant * speciesConcentration[i] );
+            reactionRatesDerivatives( r, i ) = - rateConstant * surfaceArea[r] * s_ri * quotient / ( equilibriumConstant * speciesConcentration[i] );
           }
           else
           {
@@ -276,7 +276,7 @@ KineticReactions< REAL_TYPE,
         }
      } // end of if constexpr ( CALCULATE_DERIVATIVES )     
     } // end of else
-    reactionRates[r] = - rateConstant * surfaceArea[r] * ( 1.0 - quotient / equilibriumConstant );
+    reactionRates[r] = rateConstant * surfaceArea[r] * ( 1.0 - quotient / equilibriumConstant );
   } 
 }
 
