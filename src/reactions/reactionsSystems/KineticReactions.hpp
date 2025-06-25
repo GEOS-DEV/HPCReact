@@ -87,6 +87,23 @@ public:
                                                      reactionRatesDerivatives );
   }
 
+  /**
+   * @brief Compute the reaction rates for a given set of species concentrations and surface area.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations
+   * @tparam ARRAY_1D_SA The type of the array of surface area.
+   * @tparam ARRAY_1D The type of the array of reaction rates.
+   * @tparam ARRAY_2D The type of the array of reaction rates derivatives.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param speciesConcentration The array of species concentrations.
+   * @param surfaceArea The array of surface area.
+   * @param reactionRates The array of reaction rates.
+   * @param reactionRatesDerivatives The array of reaction rates derivatives.
+   * @details
+   *   This function computes the reaction rates for a given set of reactions, taking into account
+   *   the surface area of the reactions. If CALCULATE_DERIVATIVES is true, it also computes the derivatives of the reaction rates with respect to the species concentrations.
+   */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_SA,
