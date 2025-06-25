@@ -4,6 +4,8 @@
 #include "Ultramafics.hpp"
 #include "Forge.hpp"
 
+#include <variant>
+
 namespace hpcReact
 {
 
