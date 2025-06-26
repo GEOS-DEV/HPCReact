@@ -1,6 +1,6 @@
 HPCReact
 
-[![DOI](https://zenodo.org/badge/880512605.svg)](https://doi.org/10.5281/zenodo.15743474)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15743475.svg)](https://doi.org/10.5281/zenodo.15743475)
 [![CI](https://github.com/GEOS-DEV/HPCReact/actions/workflows/continuousIntegration.yml/badge.svg?branch=main)](https://github.com/GEOS-DEV/HPCReact/actions/workflows/continuousIntegration.yml?query=branch%3Amain)
 [![codecov](https://codecov.io/github/geos-dev/hpcreact/graph/badge.svg?token=VMYDFYCT3Q)](https://codecov.io/github/geos-dev/hpcreact)
 
