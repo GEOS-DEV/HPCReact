@@ -16,7 +16,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 
@@ -183,7 +183,102 @@ KineticReactions< REAL_TYPE,
   } // end of loop over reactions
 }
 
+template< typename REAL_TYPE,
+          typename INT_TYPE,
+          typename INDEX_TYPE,
+          bool LOGE_CONCENTRATION >
+template< typename PARAMS_DATA,
+          bool CALCULATE_DERIVATIVES,
+          typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_SA,
+          typename ARRAY_1D,
+          typename ARRAY_2D >
+HPCREACT_HOST_DEVICE inline void
+KineticReactions< REAL_TYPE,
+                  INT_TYPE,
+                  INDEX_TYPE,
+                  LOGE_CONCENTRATION
+                  >::computeReactionRatesQuotient_impl( RealType const &, //temperature,
+                                                        PARAMS_DATA const & params,
+                                                        ARRAY_1D_TO_CONST const & speciesConcentration,
+                                                        ARRAY_1D_SA const & surfaceArea,
+                                                        ARRAY_1D & reactionRates,
+                                                        ARRAY_2D & reactionRatesDerivatives )
+{
+  if constexpr( !CALCULATE_DERIVATIVES )
+  {
+    HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
+  }
 
+  // loop over each reaction
+  for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
+  {
+    // set reaction rate to zero
+    reactionRates[r] = 0.0;
+
+    if constexpr( CALCULATE_DERIVATIVES )
+    {
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
+      {
+        reactionRatesDerivatives( r, i ) = 0.0;
+      }
+    }
+
+    // get/calculate the forward and reverse rate constants for this reaction
+    RealType const rateConstant = params.rateConstantForward( r ); //* exp( -params.m_activationEnergy[r] / ( constants::R *
+    // temperature ) );
+    RealType const equilibriumConstant = params.equilibriumConstant( r );
+
+    RealType quotient = 1.0;
+
+    if constexpr( LOGE_CONCENTRATION )
+    {
+      RealType logQuotient = 0.0;
+      // build the products for the forward and reverse reaction rates
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
+      {
+        RealType const s_ri = params.stoichiometricMatrix( r, i );
+        logQuotient += s_ri * speciesConcentration[i];
+      }
+      quotient = exp( logQuotient );
+
+      if constexpr( CALCULATE_DERIVATIVES )
+      {
+        for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
+        {
+          RealType const s_ri = params.stoichiometricMatrix( r, i );
+          reactionRatesDerivatives( r, i ) = -rateConstant * surfaceArea[r] * s_ri * quotient / equilibriumConstant;
+        }
+      } // end of if constexpr ( CALCULATE_DERIVATIVES )
+    } // end of if constexpr ( LOGE_CONCENTRATION )
+    else
+    {
+      for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
+      {
+
+        RealType const s_ri = params.stoichiometricMatrix( r, i );
+        RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], s_ri ) : 0.0;
+        quotient *= productTerm_i;
+      }
+      if constexpr( CALCULATE_DERIVATIVES )
+      {
+        for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
+        {
+          RealType const s_ri = params.stoichiometricMatrix( r, i );
+          if( s_ri > 0.0 || s_ri < 0.0 )
+          {
+            reactionRatesDerivatives( r, i ) = -rateConstant * surfaceArea[r] * s_ri * quotient / ( equilibriumConstant * speciesConcentration[i] );
+          }
+          else
+          {
+            reactionRatesDerivatives( r, i ) = 0.0;
+          }
+        }
+      } // end of if constexpr ( CALCULATE_DERIVATIVES )
+    } // end of else
+    reactionRates[r] = rateConstant * surfaceArea[r] * ( 1.0 - quotient / equilibriumConstant );
+  }
+}
 
 // function to  the reaction rate. Includes impact of temperature, concentration, surface area, volume fraction and porosity
 template< typename REAL_TYPE,
@@ -363,7 +458,7 @@ KineticReactions< REAL_TYPE,
 
   }
 }
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact
 
 #include "common/macrosCleanup.hpp"

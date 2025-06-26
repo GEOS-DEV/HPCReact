@@ -11,7 +11,7 @@
 
 namespace hpcReact
 {
-namespace bulkGeneric
+namespace reactionsSystems
 {
 
 /**
@@ -58,6 +58,7 @@ public:
    * @param temperature Temperature of the system (in Kelvin)
    * @param params Parameter object for stoichiometry, rates, etc.
    * @param logPrimarySpeciesConcentrations Log of primary species concentrations
+   * @param surfaceArea surface Aread for kinetic reactions
    * @param logSecondarySpeciesConcentrations Output log concentrations for secondary species
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)
    * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log
@@ -69,6 +70,7 @@ public:
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D_PRIMARY,
             typename ARRAY_1D_SECONDARY,
             typename ARRAY_1D_KINETIC,
@@ -78,6 +80,7 @@ public:
   updateMixedSystem( RealType const & temperature,
                      PARAMS_DATA const & params,
                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                     ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                      ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
                      ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
                      ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
@@ -89,6 +92,7 @@ public:
     updateMixedSystem_impl( temperature,
                             params,
                             logPrimarySpeciesConcentrations,
+                            surfaceArea,
                             logSecondarySpeciesConcentrations,
                             aggregatePrimarySpeciesConcentrations,
                             dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
@@ -111,12 +115,14 @@ public:
    * @param params Parameter data for the reaction system
    * @param logPrimarySpeciesConcentrations Log concentrations of primary species
    * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
+   * @param surfaceArea Surface area for kinetic reactions
    * @param reactionRates Output reaction rates for each kinetic reaction
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE inline void
@@ -124,6 +130,7 @@ public:
                         PARAMS_DATA const & params,
                         ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                         ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                        ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
 
@@ -132,6 +139,7 @@ public:
                                params,
                                logPrimarySpeciesConcentrations,
                                logSecondarySpeciesConcentrations,
+                               surfaceArea,
                                reactionRates,
                                dReactionRates_dLogPrimarySpeciesConcentrations );
   }
@@ -209,6 +217,7 @@ private:
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D_PRIMARY,
             typename ARRAY_1D_SECONDARY,
             typename ARRAY_1D_KINETIC,
@@ -218,6 +227,7 @@ private:
   updateMixedSystem_impl( RealType const & temperature,
                           PARAMS_DATA const & params,
                           ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                          ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                           ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
                           ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
                           ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
@@ -239,6 +249,7 @@ private:
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
@@ -246,6 +257,7 @@ private:
                              PARAMS_DATA const & params,
                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                              ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                             ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                              ARRAY_1D & reactionRates,
                              ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations );
 
@@ -285,7 +297,7 @@ private:
 
 };
 
-} // namespace bulkGeneric
+} // namespace reactionsSystems
 } // namespace hpcReact
 
 #include "MixedEquilibriumKineticReactions_impl.hpp"
