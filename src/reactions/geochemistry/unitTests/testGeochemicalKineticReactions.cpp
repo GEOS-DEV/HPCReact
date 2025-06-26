@@ -1,3 +1,14 @@
+/*
+ * ------------------------------------------------------------------------------------------------------------
+ * SPDX-License-Identifier: (BSD-3-Clause)
+ *
+ * Copyright (c) 2025- Lawrence Livermore National Security LLC
+ * All rights reserved
+ *
+ * See top level LICENSE files for details.
+ * ------------------------------------------------------------------------------------------------------------
+ */
+
 
 #include "reactions/unitTestUtilities/kineticReactionsTestUtilities.hpp"
 #include "../GeochemicalSystems.hpp"
