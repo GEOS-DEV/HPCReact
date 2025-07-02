@@ -40,7 +40,7 @@ constexpr CArrayWrapper<double, 11, 18> stoichMatrix =
  // {     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    -2,     0,     1,     0,     0,     0,     0  }  //   Ca(OH)2​(s) + 2H+ = Ca2+ + 2H2​O (kinetic)
   };
 
-constexpr CArrayWrapper<double, 11, 17> stoichMatrixNosolid = 
+constexpr CArrayWrapper<double, 11, 16> stoichMatrixNosolid = 
   { //   OH-    CO2  CO3-2  CaHCO3+   CaSO4  CaCl+  CaCl2  MgSO4   NaSO4-  H+  HCO3-  Ca+2    SO4-2    Cl-    Mg+2  Na+
     {    -1,     0,     0,      0,     0,     0,     0,     0,     0,     -1,     0,     0,     0,     0,     0,     0  }, //     OH- + H+ = H2O         
     {     0,    -1,     0,      0,     0,     0,     0,     0,     0,      1,     1,     0,     0,     0,     0,     0  }, //    CO2 + H2O = H+ + HCO3-  
@@ -104,7 +104,7 @@ constexpr CArrayWrapper<double, 11> reverseRates =
   }
   using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 18, 11, 0 >;
   using carbonateSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 18, 11, 11 >;
-  using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 11, 10 >;
+  using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 16, 11, 10 >;
 
   constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
   constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
