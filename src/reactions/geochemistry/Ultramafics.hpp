@@ -126,15 +126,40 @@ constexpr CArrayWrapper<double, 21> reverseRates =
     2.83E-44,   //  Mg3Si2O5(OH)4 + 6H+ = 3Mg++ + 2SiO2(aq) + 5H2O
     2.10E-25    //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
   };
+
+constexpr CArrayWrapper<int, 21> mobileSpeciesFlag = 
+  { 
+    1,   //  OH- + H+ = H2O         
+    1,   //  CO2(aq) + H2O = HCO3- + H+  
+    1,   //  CO3-- + H+ = HCO3-       
+    1,   //  Mg2OH+++ + H+ = 2Mg++ + H2O
+    1,   //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O
+    1,   //  MgOH+ + H+ = Mg++ + H2O
+    1,   //  Mg2CO3++ + H+ = 2Mg++ + HCO3-
+    1,   //  MgCO3 + H+ = Mg++ + HCO3-
+    1,   //  MgHCO3+ = Mg++ + HCO3-
+    1,   //  Mg(H3SiO4)2 + 2H+ = Mg++ + SiO2(aq) + 4H2O
+    1,   //  MgH2SiO4 + 2H+ = Mg++ + SiO2(aq) + 2H2O
+    1,   //  MgH3SiO4+ + H+ = Mg++ + SiO2(aq) + 2H2O
+    1,   //  H2SiO4-- + 2H+ = SiO2(aq) + 2H2O
+    1,   //  H3SiO4- + H+ = SiO2(aq) + 2H2O
+    1,   //  H4(H2SiO4)---- + 4H+ = 4SiO2(aq) + 8H2O
+    1,   //  H6(H2SiO4)-- + 2H+ = 4SiO2 + 8H2O
+    1,   //  Mg2SiO4 + 4H+ = 2Mg++ + SiO2(aq) + 2H2O
+    1,   //  MgCO3 + H+ = Mg++ + HCO3-
+    1,   //  SiO2 = SiO2(aq)
+    1,   //  Mg3Si2O5(OH)4 + 6H+ = 3Mg++ + 2SiO2(aq) + 5H2O
+    1    //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
+  };
 };
 
   using ultramaficSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 0 >;
   using ultramaficSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 21 >;
   using ultramaficSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 16 >;
 
-  constexpr ultramaficSystemAllKineticType     ultramaficSystemAllKinetic( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates );
-  constexpr ultramaficSystemAllEquilibriumType ultramaficSystemAllEquilibrium( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates );
-  constexpr ultramaficSystemType               ultramaficSystem( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates );
+  constexpr ultramaficSystemAllKineticType     ultramaficSystemAllKinetic( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
+  constexpr ultramaficSystemAllEquilibriumType ultramaficSystemAllEquilibrium( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
+  constexpr ultramaficSystemType               ultramaficSystem( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
 
 // *****UNCRUSTIFY-ON******
 } // namespace geochemistry

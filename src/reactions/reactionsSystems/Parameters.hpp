@@ -54,17 +54,21 @@ struct EquilibriumReactionsParameters
 
   constexpr
   EquilibriumReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
-                                  CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant ):
+                                  CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant,
+                                  CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
-    m_equilibriumConstant( equilibriumConstant )
+    m_equilibriumConstant( equilibriumConstant ),
+    m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag )
   {}
 
 
   RealType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
   RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
+  IntType mobileSecondarySpeciesFlag( IndexType const r ) const { return m_mobileSecondarySpeciesFlag[r]; }
 
   CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
+  CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
 };
 
 template< typename REAL_TYPE,
@@ -124,11 +128,13 @@ struct MixedReactionsParameters
   constexpr MixedReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
-                                      CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse ):
+                                      CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
+                                      CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_rateConstantForward( rateConstantForward ),
-    m_rateConstantReverse( rateConstantReverse )
+    m_rateConstantReverse( rateConstantReverse ),
+    m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag )
   {}
 
   static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -149,6 +155,7 @@ struct MixedReactionsParameters
   {
     CArrayWrapper< RealType, numEquilibriumReactions(), numSpecies() > eqMatrix{};
     CArrayWrapper< RealType, numEquilibriumReactions() > eqConstants{};
+    CArrayWrapper< IntType, numEquilibriumReactions() > mobileSpeciesFlags{};
 
     for( IntType i = 0; i < numEquilibriumReactions(); ++i )
     {
@@ -157,9 +164,10 @@ struct MixedReactionsParameters
         eqMatrix( i, j ) = m_stoichiometricMatrix( i, j );
       }
       eqConstants( i ) = m_equilibriumConstant( i );
+      mobileSpeciesFlags( i ) = m_mobileSecondarySpeciesFlag( i );
     }
 
-    return { eqMatrix, eqConstants };
+    return { eqMatrix, eqConstants, mobileSpeciesFlags };
   }
 
   constexpr
@@ -229,6 +237,7 @@ struct MixedReactionsParameters
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantForward;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
+  CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
 };
 
 

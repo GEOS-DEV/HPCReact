@@ -72,7 +72,9 @@ public:
    * @param surfaceArea surface Aread for kinetic reactions
    * @param logSecondarySpeciesConcentrations Output log concentrations for secondary species
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)
+   * @param mobileAggregatePrimarySpeciesConcentrations Output mobile aggregate concentrations (per primary)
    * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log
+   * @param dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of mobile aggregate concentrations w.r.t. log
    * primary
    * @param reactionRates Output vector of kinetic reaction rates
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
@@ -94,7 +96,9 @@ public:
                      ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                      ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
                      ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                     ARRAY_1D_PRIMARY & mobileAggregatePrimarySpeciesConcentrations,
                      ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                     ARRAY_2D_PRIMARY & dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                      ARRAY_1D_KINETIC & reactionRates,
                      ARRAY_2D_KINETIC & dReactionRates_dLogPrimarySpeciesConcentrations,
                      ARRAY_1D_PRIMARY & aggregateSpeciesRates,
@@ -106,7 +110,9 @@ public:
                             surfaceArea,
                             logSecondarySpeciesConcentrations,
                             aggregatePrimarySpeciesConcentrations,
+                            mobileAggregatePrimarySpeciesConcentrations,
                             dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                            dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                             reactionRates,
                             dReactionRates_dLogPrimarySpeciesConcentrations,
                             aggregateSpeciesRates,
@@ -219,7 +225,9 @@ private:
    * @param logPrimarySpeciesConcentrations Log of primary species concentrations
    * @param logSecondarySpeciesConcentrations Output log concentrations for secondary species
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)
+   * @param mobileAggregatePrimarySpeciesConcentrations Output mobile aggregate concentrations (per primary)
    * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log
+   * @param dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of mobile aggregate concentrations w.r.t. log
    * primary
    * @param reactionRates Output vector of kinetic reaction rates
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
@@ -241,7 +249,9 @@ private:
                           ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                           ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
                           ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                          ARRAY_1D_PRIMARY & mobileAggregatePrimarySpeciesConcentrations,
                           ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                          ARRAY_2D_PRIMARY & dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                           ARRAY_1D_KINETIC & reactionRates,
                           ARRAY_2D_KINETIC & dReactionRates_dLogPrimarySpeciesConcentrations,
                           ARRAY_1D_PRIMARY & aggregateSpeciesRates,

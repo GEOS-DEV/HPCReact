@@ -67,6 +67,16 @@ namespace MomMasBenchmark
     0.0, 
     0.0 
   },
+
+  // Flag of mobile secondary species
+  { 1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0
+  }
 };
 
 // *****UNCRUSTIFY-ON******
