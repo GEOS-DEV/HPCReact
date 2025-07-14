@@ -50,21 +50,24 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                              ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
                                                              ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                                                             ARRAY_1D_PRIMARY & mobileAggregatePrimarySpeciesConcentrations,
                                                              ARRAY_2D_PRIMARY & dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                                                             ARRAY_2D_PRIMARY & dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                                              ARRAY_1D_KINETIC & reactionRates,
                                                              ARRAY_2D_KINETIC & dReactionRates_dLogPrimarySpeciesConcentrations,
                                                              ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                                                              ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
 {
-
   // 1. Compute new aggregate species from primary species
-  massActions::calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
-                                                               INT_TYPE,
-                                                               INDEX_TYPE >( params.equilibriumReactionsParameters(),
-                                                                             logPrimarySpeciesConcentrations,
-                                                                             logSecondarySpeciesConcentrations,
-                                                                             aggregatePrimarySpeciesConcentrations,
-                                                                             dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+  massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
+                                                                             INT_TYPE,
+                                                                             INDEX_TYPE >( params.equilibriumReactionsParameters(),
+                                                                                           logPrimarySpeciesConcentrations,
+                                                                                           logSecondarySpeciesConcentrations,
+                                                                                           aggregatePrimarySpeciesConcentrations,
+                                                                                           mobileAggregatePrimarySpeciesConcentrations,
+                                                                                           dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                                                                                           dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
 
   if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
   {
