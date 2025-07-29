@@ -38,13 +38,13 @@ constexpr CArrayWrapper<double, 7, 12> stoichMatrix =
 
 constexpr CArrayWrapper<double, 7> equilibriumConstants = 
   { 
-    1.0e-12,   // C1 = -X2
-    1.0,       // C2 = X2 + X3
-    1.0,       // C3 = X2 + X4
-    0.1,       // C4 = -4X2 + X3 + 3X4
-    1.0e35,    // C5 = 4X2 + 3X3 + X4
-    1.0e6,     // CS1 = 3X2 + X3 + S
-    1.0e-1     // CS2 = -3X2 + X4 + 2S
+    1.0e12,   //   C1 + X2 = ??
+    1.0,      //        C2 = X2 + X3
+    1.0,      //        C3 = X2 + X4
+    1.0e1,    //  C4 + 4X2 = X3 + 3X4
+    1.0e-35,  //        C5 = 4X2 + 3X3 + X4
+    1.0e-6,   //       CS1 = 3X2 + X3 + S
+    1.0e1     // CS2 + 3X2 = + X4 + 2S
   };
 
 constexpr CArrayWrapper<double, 7> forwardRates = 

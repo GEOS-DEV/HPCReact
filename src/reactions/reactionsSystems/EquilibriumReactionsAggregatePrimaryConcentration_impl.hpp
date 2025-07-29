@@ -95,6 +95,9 @@ EquilibriumReactions< REAL_TYPE,
 
 
   REAL_TYPE residualNorm = 0.0;
+ //         0:     1e-20       -0           2 -2.5e+11       1e-20        7           2      1.8           1        5  
+  printf( "iter       X1       R0           X2      R1          X3       R2          X4       R3           S       R4\n");
+  printf( "----   ---------------      ---------------      ---------------      ---------------      ---------------\n");
   for( int k=0; k<30; ++k )
   {
     computeResidualAndJacobianAggregatePrimaryConcentrations( temperature,
@@ -110,7 +113,21 @@ EquilibriumReactions< REAL_TYPE,
       residualNorm += residual[i] * residual[i];
     }
     residualNorm = sqrt( residualNorm );
-    printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
+
+      printf( "%2d:  %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g  \n", 
+              k,
+              exp( logPrimarySpeciesConcentration[0] ),
+              residual[0],
+              exp( logPrimarySpeciesConcentration[1] ),
+              residual[1],
+              exp( logPrimarySpeciesConcentration[2] ),
+              residual[2],
+              exp( logPrimarySpeciesConcentration[3] ),
+              residual[3],
+              exp( logPrimarySpeciesConcentration[4] ),
+              residual[4] );
+
+    //printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
     if( residualNorm < 1.0e-12 )
     {
       printf( " converged\n" );
