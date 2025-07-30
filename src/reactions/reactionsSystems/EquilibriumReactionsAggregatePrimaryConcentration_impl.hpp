@@ -79,17 +79,50 @@ EquilibriumReactions< REAL_TYPE,
 {
   HPCREACT_UNUSED_VAR( temperature );
   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
-
-  double residual[numPrimarySpecies] = { 0.0 };
-//  double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = { 0.0 };
   double targetAggregatePrimarySpeciesConcentration[numPrimarySpecies] = { 0.0 };
-  double dLogCp[numPrimarySpecies] = { 0.0 };
-  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > jacobian;
+
 
 
   for( int i=0; i<numPrimarySpecies; ++i )
   {
     targetAggregatePrimarySpeciesConcentration[i] = exp( logPrimarySpeciesConcentration0[i] );
+  }
+
+  enforceEquilibrium_Aggregate( temperature,
+                                params,
+                                targetAggregatePrimarySpeciesConcentration,
+                                logPrimarySpeciesConcentration0,
+                                logPrimarySpeciesConcentration );
+
+}
+
+
+template< typename REAL_TYPE,
+          typename INT_TYPE,
+          typename INDEX_TYPE >
+template< typename PARAMS_DATA,
+          typename ARRAY_1D,
+          typename ARRAY_1D_TO_CONST >
+HPCREACT_HOST_DEVICE inline
+void
+EquilibriumReactions< REAL_TYPE,
+                      INT_TYPE,
+                      INDEX_TYPE >::enforceEquilibrium_Aggregate( REAL_TYPE const & temperature,
+                                                                  PARAMS_DATA const & params,
+                                                                  ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
+                                                                  ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
+                                                                  ARRAY_1D & logPrimarySpeciesConcentration )
+{
+  HPCREACT_UNUSED_VAR( temperature );
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+
+  double residual[numPrimarySpecies] = { 0.0 };
+//  double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = { 0.0 };
+  double dLogCp[numPrimarySpecies] = { 0.0 };
+  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > jacobian;
+
+  for( int i=0; i<numPrimarySpecies; ++i )
+  {
     logPrimarySpeciesConcentration[i] = logPrimarySpeciesConcentration0[i];
   }
 
@@ -98,7 +131,7 @@ EquilibriumReactions< REAL_TYPE,
  //         0:     1e-20       -0           2 -2.5e+11       1e-20        7           2      1.8           1        5  
   printf( "iter       X1       R0           X2      R1          X3       R2          X4       R3           S       R4\n");
   printf( "----   ---------------      ---------------      ---------------      ---------------      ---------------\n");
-  for( int k=0; k<30; ++k )
+  for( int k=0; k<40; ++k )
   {
     computeResidualAndJacobianAggregatePrimaryConcentrations( temperature,
                                                               params,
@@ -144,5 +177,6 @@ EquilibriumReactions< REAL_TYPE,
 
   }
 }
+
 } // namespace reactionsSystems
 } // namespace hpcReact
