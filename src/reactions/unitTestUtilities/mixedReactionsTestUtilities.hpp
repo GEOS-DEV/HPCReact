@@ -70,7 +70,9 @@ void timeStepTest( PARAMS_DATA const & params,
         CArrayWrapper< REAL_TYPE, numSecondarySpecies > logSecondarySpeciesConcentration;
         CArrayWrapper< REAL_TYPE, numPrimarySpecies > aggregatePrimarySpeciesConcentration;
         CArrayWrapper< REAL_TYPE, numPrimarySpecies > aggregatePrimarySpeciesConcentration_n;
+        CArrayWrapper< REAL_TYPE, numPrimarySpecies > mobileAggregatePrimarySpeciesConcentration;
         CArrayWrapper< REAL_TYPE, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration;
+        CArrayWrapper< REAL_TYPE, numPrimarySpecies, numPrimarySpecies > dMobileAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration;
         CArrayWrapper< REAL_TYPE, numKineticReactions > reactionRates;
         CArrayWrapper< REAL_TYPE, numKineticReactions, numPrimarySpecies > dReactionRates_dlogPrimarySpeciesConcentration;
         CArrayWrapper< REAL_TYPE, numPrimarySpecies > aggregateSpeciesRates;
@@ -83,10 +85,10 @@ void timeStepTest( PARAMS_DATA const & params,
           aggregatePrimarySpeciesConcentration[i] = speciesConcentration[i];
         }
 
-        EquilibriumReactionsType::enforceEquilibrium_Aggregate( temperature,
-                                                                params.equilibriumReactionsParameters(),
-                                                                logPrimarySpeciesConcentration,
-                                                                logPrimarySpeciesConcentration );
+        EquilibriumReactionsType::enforceEquilibrium_LogAggregate( temperature,
+                                                                   params.equilibriumReactionsParameters(),
+                                                                   logPrimarySpeciesConcentration,
+                                                                   logPrimarySpeciesConcentration );
 
         /// Time step loop
         double time = 0.0;
@@ -109,7 +111,9 @@ void timeStepTest( PARAMS_DATA const & params,
                                                    surfaceArea,
                                                    logSecondarySpeciesConcentration,
                                                    aggregatePrimarySpeciesConcentration,
+                                                   mobileAggregatePrimarySpeciesConcentration,
                                                    dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
+                                                   dMobileAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
                                                    reactionRates,
                                                    dReactionRates_dlogPrimarySpeciesConcentration,
                                                    aggregateSpeciesRates,
