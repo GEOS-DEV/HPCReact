@@ -72,10 +72,10 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::enforceEquilibrium_Aggregate( REAL_TYPE const & temperature,
-                                                                  PARAMS_DATA const & params,
-                                                                  ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
-                                                                  ARRAY_1D & logPrimarySpeciesConcentration )
+                      INDEX_TYPE >::enforceEquilibrium_LogAggregate( REAL_TYPE const & temperature,
+                                                                     PARAMS_DATA const & params,
+                                                                     ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
+                                                                     ARRAY_1D & logPrimarySpeciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
@@ -131,7 +131,7 @@ EquilibriumReactions< REAL_TYPE,
  //         0:     1e-20       -0           2 -2.5e+11       1e-20        7           2      1.8           1        5  
   printf( "iter       X1       R0           X2      R1          X3       R2          X4       R3           S       R4\n");
   printf( "----   ---------------      ---------------      ---------------      ---------------      ---------------\n");
-  for( int k=0; k<40; ++k )
+  for( int k=0; k<80; ++k )
   {
     computeResidualAndJacobianAggregatePrimaryConcentrations( temperature,
                                                               params,

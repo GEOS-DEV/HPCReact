@@ -85,10 +85,10 @@ void timeStepTest( PARAMS_DATA const & params,
           aggregatePrimarySpeciesConcentration[i] = speciesConcentration[i];
         }
 
-        EquilibriumReactionsType::enforceEquilibrium_Aggregate( temperature,
-                                                                params.equilibriumReactionsParameters(),
-                                                                logPrimarySpeciesConcentration,
-                                                                logPrimarySpeciesConcentration );
+        EquilibriumReactionsType::enforceEquilibrium_LogAggregate( temperature,
+                                                                   params.equilibriumReactionsParameters(),
+                                                                   logPrimarySpeciesConcentration,
+                                                                   logPrimarySpeciesConcentration );
 
         /// Time step loop
         double time = 0.0;
