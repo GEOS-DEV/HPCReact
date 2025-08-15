@@ -151,7 +151,7 @@ constexpr CArrayWrapper<int, 21> mobileSpeciesFlag =
     1,   //  Mg3Si2O5(OH)4 + 6H+ = 3Mg++ + 2SiO2(aq) + 5H2O
     1    //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
   };
-};
+}
 
   using ultramaficSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 0 >;
   using ultramaficSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 21 >;
