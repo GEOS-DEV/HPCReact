@@ -92,9 +92,20 @@ public:
             typename ARRAY_1D_TO_CONST >
   static HPCREACT_HOST_DEVICE
   void
+  enforceEquilibrium_LogAggregate( RealType const & temperature,
+                                   PARAMS_DATA const & params,
+                                   ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                   ARRAY_1D & speciesConcentration );
+
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST >
+  static HPCREACT_HOST_DEVICE
+  void
   enforceEquilibrium_Aggregate( RealType const & temperature,
                                 PARAMS_DATA const & params,
-                                ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
+                                ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
                                 ARRAY_1D & speciesConcentration );
 
   /**

@@ -119,12 +119,35 @@ constexpr CArrayWrapper< double, 19 > reverseRateConstant =
    1.0    // Albite: NaAlSi₃O₈(s) + 4H⁺ ⇌ Al³⁺ + Na⁺ + 3SiO₂(aq)
 };
 
+constexpr CArrayWrapper< int, 19 > mobileSpeciesFlag =
+{
+   1,   // CaCO₃(aq) + H⁺ ⇌ Ca²⁺ + HCO₃⁻
+   1,   // CaHCO₃⁺ ⇌ Ca²⁺ + HCO₃⁻
+   1,   // CaSO₄ ⇌ Ca²⁺ + SO₄²⁻
+   1,   // CaCl⁺ ⇌ Ca²⁺ + Cl⁻
+   1,   // CaCl₂ ⇌ Ca²⁺ + 2Cl⁻ (approximate, same source)
+   1,   // MgHCO₃⁺ ⇌ Mg²⁺ + HCO₃⁻
+   1,   // MgCO₃(aq) + H⁺ ⇌ Mg²⁺ + HCO₃⁻
+   1,   // MgCl⁺ ⇌ Mg²⁺ + Cl⁻
+   1,   // CO₂(aq) + H₂O ⇌ H⁺ + HCO₃⁻
+   1,   // HSO₄⁻ ⇌ H⁺ + SO₄²⁻
+   1,   // KHSO₄ ⇌ H⁺ + K⁺ + SO₄²⁻
+   1,   // HSiO₃⁻ ⇌ H⁺ + SiO₂(aq)
+   1,   // NaHSilO₃ ⇌ H⁺ + Na⁺ + SiO₂(aq)
+   1,   // NaCl ⇌ Na⁺ + Cl⁻
+   1,   // KCl ⇌ K⁺ + Cl⁻
+   1,   // KSO₄⁻ ⇌ K⁺ + SO₄²⁻
+   1,   // Dolomite: CaMg(CO₃)₂(s) + 2H⁺ ⇌ Ca²⁺ + Mg²⁺ + 2HCO₃⁻
+   1,   // Microcline: KAlSi₃O₈(s) + 4H⁺ ⇌ Al³⁺ + K⁺ + 3SiO₂(aq)
+   1    // Albite: NaAlSi₃O₈(s) + 4H⁺ ⇌ Al³⁺ + Na⁺ + 3SiO₂(aq)
+};
+
 }
 
 using forgeSystemType = reactionsSystems::MixedReactionsParameters< double, int, int, 26, 19, 16 >;
 
 
-constexpr forgeSystemType forgeSystem( forge::soichMatrix, forge::equilibriumConstants, forge::fwRateConstant, forge::reverseRateConstant );
+constexpr forgeSystemType forgeSystem( forge::soichMatrix, forge::equilibriumConstants, forge::fwRateConstant, forge::reverseRateConstant, forge::mobileSpeciesFlag );
 
 
 // *****UNCRUSTIFY-ON******
