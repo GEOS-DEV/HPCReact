@@ -69,7 +69,7 @@ constexpr CArrayWrapper<double, 11> equilibriumConstants =
     3.98E+00,   //      CaCl2 = Ca+2 + 2Cl- 
     3.72E-03,   //      MgSO4 = Mg+2 + SO4-2
     1.51E-01,   //     NaSO4- = Na+ + SO4-2 
-    70.55   // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+    1.17E+07   // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
     // 1 
   };        //   Ca(OH)2​(s) + 2H+ = Ca2+ + 2H2​O (kinetic)
 
@@ -85,7 +85,7 @@ constexpr CArrayWrapper<double, 11> forwardRates =
     1.0e7,    //      CaCl2 = Ca+2 + 2Cl- 
     1.0e5,    //      MgSO4 = Mg+2 + SO4-2
     1.0e7,    //     NaSO4- = Na+ + SO4-2 
-    1.55e-6     // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+    1.0e5     // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
 
     // 1 
   };        //   Ca(OH)2​(s) + 2H+ = Ca2+ + 2H2​O (kinetic)
@@ -101,7 +101,7 @@ constexpr CArrayWrapper<double, 11> reverseRates =
     2.51E+06,   //      CaCl2 = Ca+2 + 2Cl- 
     2.69E+07,   //      MgSO4 = Mg+2 + SO4-2
     6.62E+07,   //     NaSO4- = Na+ + SO4-2
-    2.197e-8   // CaCO3 + H+ = Ca+2 + HCO3-
+    8.55E-03   // CaCO3 + H+ = Ca+2 + HCO3-
     //  1           //   Ca(OH)2​(s) + 2H+ = Ca2+ + 2H2​O (kinetic)
   };
 
