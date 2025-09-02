@@ -49,33 +49,35 @@ namespace MomMasBenchmark
   },
 
   // Forward rate constants 
-  { 0.0,
-    0.0, 
-    0.0, 
-    0.0, 
-    0.0, 
-    0.0, 
-    0.0 
+  { 
+    0.0,   // C1 = -X2
+    0.0,   // C2 = X2 + X3
+    0.0,   // C3 = X2 + X4
+    0.0,   // C4 = -4X2 + X3 + 3X4
+    0.0,   // C5 = 4X2 + 3X3 + X4
+    0.0,   // CS1 = 3X2 + X3 + S
+    0.0    // CS2 = -3X2 + X4 + 2S
   },
 
   // Reverse rate constants 
-  { 0.0,
-    0.0, 
-    0.0, 
-    0.0, 
-    0.0, 
-    0.0, 
-    0.0 
+  { 
+    0.0,   // C1 = -X2
+    0.0,   // C2 = X2 + X3
+    0.0,   // C3 = X2 + X4
+    0.0,   // C4 = -4X2 + X3 + 3X4
+    0.0,   // C5 = 4X2 + 3X3 + X4
+    0.0,   // CS1 = 3X2 + X3 + S
+    0.0    // CS2 = -3X2 + X4 + 2S
   },
 
   // Flag of mobile secondary species
-  { 1, // C1 = - X2
+  { 1, // C1 = -X2
     1, // C2 = X2 + X3
     1, // C3 = -X2 + X4
     1, // C4 = -4X2 + X3 + 3X4
     1, // C5 = 4X2 + 3X3 + X4
     0, // CS1 = 3X2 + X3 + S
-    0 // CS2 = -3X2 + X4 + 2S
+    0  // CS2 = -3X2 + X4 + 2S
   }
 };
 

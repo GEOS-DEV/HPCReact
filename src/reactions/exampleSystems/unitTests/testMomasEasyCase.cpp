@@ -11,27 +11,11 @@
 
 
 #include "reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp"
-#include "../Momas.hpp"
+#include "../MoMasBenchmark.hpp"
 
 using namespace hpcReact;
-using namespace hpcReact::geochemistry;
+using namespace hpcReact::MomMasBenchmark;
 using namespace hpcReact::unitTest_utilities;
-
-
-// //******************************************************************************
-// TEST( testEquilibriumReactions, testEnforceEquilibrium )
-// {
-//   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
-//   double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };
-
-
-//   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-//   testEnforceEquilibrium< double, 2 >( simpleTestRateParams.equilibriumReactionsParameters(),
-//                                        initialSpeciesConcentration,
-//                                        expectedSpeciesConcentrations );
-
-// }
-
 
 //******************************************************************************
 
@@ -42,24 +26,24 @@ TEST( testEquilibriumReactions, testMoMasAllEquilibrium )
                                                                            int,
                                                                            int >;
 
-  constexpr int numPrimarySpecies = hpcReact::geochemistry::momasSystemAllEquilibrium.numPrimarySpecies();
+  constexpr int numPrimarySpecies = hpcReact::MomMasBenchmark::simpleSystemParams.numPrimarySpecies();
 
   double const targetAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
   {
-    1.0e-20,     // X1
-    -2.0,    // X2
-    1.0e-20,     // X3
-    2.0,     // X4
-    1.0      // S
+    1.0e-20, // X1
+    -2.0, // X2
+    1.0e-20, // X3
+    2.0, // X4
+    1.0 // S
   };
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
-    1.0e-20,  // X1
-    0.02,     // X2
-    1.0e-20,  // X3
-    1.0,     // X4
-    1.00      // S
+    1.0e-20, // X1
+    0.02, // X2
+    1.0e-20, // X3
+    1.0, // X4
+    1.00 // S
   };
 
   double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
@@ -73,18 +57,18 @@ TEST( testEquilibriumReactions, testMoMasAllEquilibrium )
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
   EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
-                                                          hpcReact::geochemistry::momasSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                          hpcReact::MomMasBenchmark::simpleSystemParams.equilibriumReactionsParameters(),
                                                           targetAggregatePrimarySpeciesConcentration,
                                                           logInitialPrimarySpeciesConcentration,
                                                           logPrimarySpeciesConcentration );
 
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
   {
-    9.7051090442170804E-21, // X1
-    5.0023298955833342E-12, // X2
-    1.9327372426296357E-33, // X3
-    7.3929274619958745E-12, // X4
-    9.8708294125907346E-13  // S
+    9.9999999999999919e-21, // X1
+    0.25971841330881928, // X2
+    1.4603613417111526e-24, // X3
+    0.3495378685828045, // X4
+    0.39074371811222675 // S
   };
 
   for( int r=0; r<numPrimarySpecies; ++r )
