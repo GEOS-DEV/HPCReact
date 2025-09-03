@@ -42,6 +42,7 @@ macro(hpcReact_add_code_checks)
                         --suppress=unusedFunction 
                         --suppress=constStatement 
                         --suppress=unusedStructMember
+                        -DHPCREACT_HOST_DEVICE= 
                         -I../hpcReact/src )
                         
     if( UNCRUSTIFY_FOUND )
