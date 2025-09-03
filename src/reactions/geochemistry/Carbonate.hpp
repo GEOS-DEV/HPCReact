@@ -101,17 +101,31 @@ constexpr CArrayWrapper<double, 11> reverseRates =
     2.51E+06,   //      CaCl2 = Ca+2 + 2Cl- 
     2.69E+07,   //      MgSO4 = Mg+2 + SO4-2
     6.62E+07,   //     NaSO4- = Na+ + SO4-2
-    8.55E-03    // CaCO3 + H+ = Ca+2 + HCO3-
+    8.55E-03   // CaCO3 + H+ = Ca+2 + HCO3-
     //  1           //   Ca(OH)2​(s) + 2H+ = Ca2+ + 2H2​O (kinetic)
+  };
+
+constexpr CArrayWrapper<int, 11> mobileSpeciesFlag = 
+  { 1,   //   OH- + H+ = H2O         
+    1,   //  CO2 + H2O = H+ + HCO3-  
+    1,   // CO3-2 + H+ = HCO3-       
+    1,   //      H2CO3 = H+ + HCO3-  
+    1,   //    CaHCO3+ = Ca+2 + HCO3-
+    1,   //      CaSO4 = Ca+2 + SO4-2
+    1,   //      CaCl+ = Ca+2 + Cl-  
+    1,   //      CaCl2 = Ca+2 + 2Cl- 
+    1,   //      MgSO4 = Mg+2 + SO4-2
+    1,   //     NaSO4- = Na+ + SO4-2
+    1   // CaCO3 + H+ = Ca+2 + HCO3-
   };
   }
   using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 18, 11, 0 >;
   using carbonateSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 18, 11, 11 >;
   using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 11, 10 >;
 
-  constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
-  constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
-  constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
+  constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
+  constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
+  constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
 
 // *****UNCRUSTIFY-ON******
 } // namespace geochemistry

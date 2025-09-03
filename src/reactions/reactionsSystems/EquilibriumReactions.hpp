@@ -92,9 +92,40 @@ public:
             typename ARRAY_1D_TO_CONST >
   static HPCREACT_HOST_DEVICE
   void
+  enforceEquilibrium_LogAggregate( RealType const & temperature,
+                                   PARAMS_DATA const & params,
+                                   ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                   ARRAY_1D & speciesConcentration );
+
+
+  /**
+   * @brief This method enforces equilibrium for a given set of species using
+   *        log of aggregate primary concentrations.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D The type of the array of species concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @param temperature The temperature of the system.
+   * @param params The parameters for the equilibrium reactions.
+   * @param targetAggregatePrimarySpeciesConcentration The target aggregate
+   *        primary species concentration.
+   * @param logPrimarySpeciesConcentration0 The initial value of the log of
+   *        the primary species concentrations.
+   * @param speciesConcentration The species concentrations to be updated.
+   * @details This method uses the log of aggregate primary concentrations to enforce
+   *          equilibrium for a given set of species. It uses the
+   *          computeResidualAndJacobianLogAggregate method to compute the residual and
+   *          jacobian for the system and then uses a direct solver to solve the system.
+   *          The solution is then used to update the species concentrations.
+   */
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST >
+  static HPCREACT_HOST_DEVICE
+  void
   enforceEquilibrium_Aggregate( RealType const & temperature,
                                 PARAMS_DATA const & params,
-                                ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
+                                ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
                                 ARRAY_1D & speciesConcentration );
 
   /**

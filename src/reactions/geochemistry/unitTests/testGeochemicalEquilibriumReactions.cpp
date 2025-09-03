@@ -133,10 +133,10 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
   };
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
-  EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
-                                                          hpcReact::geochemistry::carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                          logInitialPrimarySpeciesConcentration,
-                                                          logPrimarySpeciesConcentration );
+  EquilibriumReactionsType::enforceEquilibrium_LogAggregate( 0,
+                                                             hpcReact::geochemistry::carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                             logInitialPrimarySpeciesConcentration,
+                                                             logPrimarySpeciesConcentration );
 
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
   {
