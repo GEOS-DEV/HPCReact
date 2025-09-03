@@ -175,13 +175,13 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
 
   REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
 
-  calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE, 
-                                                  INT_TYPE, 
-                                                  INDEX_TYPE>( params,
-                                                               logPrimarySpeciesConcentrations,
-                                                               logSecondarySpeciesConcentrations,
-                                                               aggregatePrimarySpeciesConcentrations,
-                                                               dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+  calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
+                                                  INT_TYPE,
+                                                  INDEX_TYPE >( params,
+                                                                logPrimarySpeciesConcentrations,
+                                                                logSecondarySpeciesConcentrations,
+                                                                aggregatePrimarySpeciesConcentrations,
+                                                                dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
 
 }
 
@@ -241,8 +241,9 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
 
         dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                        i+numSecondarySpecies ) *
-                                                                                                            dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration * params.mobileSecondarySpeciesFlag( j );
+                                                                                                                                         i+numSecondarySpecies ) *
+                                                                                                            dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration *
+                                                                                                            params.mobileSecondarySpeciesFlag( j );
       }
     }
   }

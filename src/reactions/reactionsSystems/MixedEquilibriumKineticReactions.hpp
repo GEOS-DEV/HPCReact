@@ -74,7 +74,8 @@ public:
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)
    * @param mobileAggregatePrimarySpeciesConcentrations Output mobile aggregate concentrations (per primary)
    * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log
-   * @param dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of mobile aggregate concentrations w.r.t. log
+   * @param dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of mobile aggregate concentrations
+   * w.r.t. log
    * primary
    * @param reactionRates Output vector of kinetic reaction rates
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
@@ -227,7 +228,8 @@ private:
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)
    * @param mobileAggregatePrimarySpeciesConcentrations Output mobile aggregate concentrations (per primary)
    * @param dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of aggregate concentrations w.r.t. log
-   * @param dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of mobile aggregate concentrations w.r.t. log
+   * @param dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations Derivatives of mobile aggregate concentrations
+   * w.r.t. log
    * primary
    * @param reactionRates Output vector of kinetic reaction rates
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
