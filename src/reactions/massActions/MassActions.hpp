@@ -172,39 +172,78 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
   constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
-  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
 
-  for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
-  {
-    for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
-    {
-      dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations[i][j] = 0.0;
-    }
-  }
+  calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
+                                                  INT_TYPE,
+                                                  INDEX_TYPE >( params,
+                                                                logPrimarySpeciesConcentrations,
+                                                                logSecondarySpeciesConcentrations,
+                                                                aggregatePrimarySpeciesConcentrations,
+                                                                dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+
+}
+
+template< typename REAL_TYPE,
+          typename INT_TYPE,
+          typename INDEX_TYPE,
+          typename PARAMS_DATA,
+          typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D_PRIMARY,
+          typename ARRAY_1D_SECONDARY,
+          typename ARRAY_2D >
+HPCREACT_HOST_DEVICE
+inline
+void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
+                                                                   ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                                                                   ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
+                                                                   ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                                                                   ARRAY_1D_PRIMARY & mobileAggregatePrimarySpeciesConcentrations,
+                                                                   ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
+                                                                   ARRAY_2D & dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
+{
+  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
   calculateLogSecondarySpeciesConcentration< REAL_TYPE,
                                              INT_TYPE,
                                              INDEX_TYPE >( params,
                                                            logPrimarySpeciesConcentrations,
                                                            logSecondarySpeciesConcentrations );
+  for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
+  {
+    for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
+    {
+      dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations[i][j] = 0.0;
+      dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations[i][j] = 0.0;
+    }
+  }
 
   for( int i = 0; i < numPrimarySpecies; ++i )
   {
     REAL_TYPE const speciesConcentration_i = exp( logPrimarySpeciesConcentrations[i] );
     aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
+    mobileAggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
     dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
+    dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
+
     for( int j = 0; j < numSecondarySpecies; ++j )
     {
       REAL_TYPE const secondarySpeciesConcentrations_j = exp( logSecondarySpeciesConcentrations[j] );
       aggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
+      mobileAggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j * params.mobileSecondarySpeciesFlag( j );
       for( int k=0; k<numPrimarySpecies; ++k )
       {
         REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
         dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
                                                                                                                                    i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
+
+        dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
+                                                                                                                                         i+numSecondarySpecies ) *
+                                                                                                            dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration *
+                                                                                                            params.mobileSecondarySpeciesFlag( j );
       }
     }
   }

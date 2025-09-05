@@ -94,15 +94,28 @@ constexpr CArrayWrapper<double, 10> reverseRates =
     3.00E-08   // CaCO3 + H+ = Ca+2 + HCO3-
   };
 
+constexpr CArrayWrapper<int, 10> mobileSpeciesFlag = 
+  { 1,   //   OH- + H+ = H2O         
+    1,   //  CO2 + H2O = H+ + HCO3-  
+    1,   // CO3-2 + H+ = HCO3-       
+    1,   //    CaHCO3+ = Ca+2 + HCO3-
+    1,   //      CaSO4 = Ca+2 + SO4-2
+    1,   //      CaCl+ = Ca+2 + Cl-  
+    1,   //      CaCl2 = Ca+2 + 2Cl- 
+    1,   //      MgSO4 = Mg+2 + SO4-2
+    1,   //     NaSO4- = Na+ + SO4-2
+    1   // CaCO3 + H+ = Ca+2 + HCO3-
+  };
+
 }
 
 using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 10, 0 >;
 using carbonateSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 10, 10 >;
 using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 16, 10, 9 >;
 
-constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
-constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
-constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates );
+constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
+constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
+constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
 
 // *****UNCRUSTIFY-ON******
 } // namespace geochemistry
