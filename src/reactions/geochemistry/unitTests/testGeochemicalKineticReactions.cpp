@@ -22,12 +22,11 @@ using namespace hpcReact::unitTest_utilities;
 
 TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
 {
-  double const initialSpeciesConcentration[18] =
+  double const initialSpeciesConcentration[17] =
   {
     1.0e-16, // OH-
     1.0e-16, // CO2
     1.0e-16, // CO3-2
-    1.0e-16, // H2CO3
     1.0e-16, // CaHCO3+
     1.0e-16, // CaSO4
     1.0e-16, // CaCl+
@@ -44,31 +43,29 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
     1.09 // Na+1
   };
 
-  double const expectedReactionRates[11] = { -0.001424736, //             OH- + H+ = H2O
+  double const expectedReactionRates[10] = { -0.001424736, //             OH- + H+ = H2O
                                              -12610.7392, //              CO2 + H2O = H+ + HCO3-
                                              -0.175591624, //             CO3-2 + H+ = HCO3-
-                                             -473.6096, //                H2CO3 = H+ + HCO3-
                                              -269197.19999999984, //      CaHCO3+ = Ca+2 + HCO3-
                                              -18012.914999999986, //      CaSO4 = Ca+2 + SO4-2
                                              -1.56526019999999e6, //      CaCl+ = Ca+2 + Cl-
                                              -346983.07769999903, //      CaCl2 = Ca+2 + 2Cl-
                                              -14247.58499999999, //       MgSO4 = Mg+2 + SO4-2
                                              -2.316271799999999e6, //     NaSO4- = Na+ + SO4-2
-                                             -0.00012441275624000003 // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+                                             -4.3653599999994173e-10 // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
   };
-  double const expectedReactionRatesDerivatives[11][18] =
+  double const expectedReactionRatesDerivatives[10][17] =
   {
-    { 5.264e10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.000014, 0, 0, 0, 0, 0, 0 },
-    { 0, 0.039, 0, 0, 0, 0, 0, 0, 0, 0, 0, -33539.2, -33539.2, 0, 0, 0, 0, 0 },
-    { 0, 0, 3.76e9, 0, 0, 0, 0, 0, 0, 0, 0, 1.e-6, -0.467, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0.57, 0, 0, 0, 0, 0, 0, 0, -1259.6, -1259.6, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 1.5e6, 0, 0, 0, 0, 0, 0, 0, -715950., -6.956e6, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 100000., 0, 0, 0, 0, 0, 0, 0, -465449.99999999994, -561150., 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 1.e8, 0, 0, 0, 0, 0, 0, -4.0446e7, 0, -828180., 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 1.e7, 0, 0, 0, 0, 0, -8.965971e6, 0, -367177.86, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 100000., 0, 0, 0, 0, 0, -443850., 0, -863489.9999999999, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.e7, 0, 0, 0, 0, -7.2158e7, 0, 0, -2.12502e6 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 37600., 1.e-11, -0.000330885, -0.0032148000000000003, 0, 0, 0, 0 }
+    { 5.264e10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.000014, 0, 0, 0, 0, 0, 0 },
+    { 0, 0.039, 0, 0, 0, 0, 0, 0, 0, 0, -33539.2, -33539.2, 0, 0, 0, 0, 0 },
+    { 0, 0, 3.76e9, 0, 0, 0, 0, 0, 0, 0, 1.e-6, -0.467, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 1.5e6, 0, 0, 0, 0, 0, 0, 0, -715950., -6.956e6, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 100000., 0, 0, 0, 0, 0, 0, 0, -465449.99999999994, -561150., 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 1.e8, 0, 0, 0, 0, 0, 0, -4.0446e7, 0, -828180., 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 1.e7, 0, 0, 0, 0, 0, -8.965971e6, 0, -367177.86, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 100000., 0, 0, 0, 0, 0, -443850., 0, -863489.9999999999, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 1.e7, 0, 0, 0, 0, -7.2158e7, 0, 0, -2.12502e6 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.8279999999999995e-07, 1.e-11, -1.1609999999999998e-09, -1.1280000000000004e-08, 0, 0, 0, 0 }
 
   };
 
@@ -125,12 +122,11 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
 
 TEST( testKineticReactions, testTimeStep_carbonateSystemAllKinetic )
 {
-  double const initialSpeciesConcentration[18] =
+  double const initialSpeciesConcentration[17] =
   {
     1.0e-16, // OH-
     1.0e-16, // CO2
     1.0e-16, // CO3-2
-    1.0e-16, // H2CO3
     1.0e-16, // CaHCO3+
     1.0e-16, // CaSO4
     1.0e-16, // CaCl+
@@ -147,11 +143,10 @@ TEST( testKineticReactions, testTimeStep_carbonateSystemAllKinetic )
     1.09 // Na+1
   };
 
-  double const expectedSpeciesConcentrations[18] =
+  double const expectedSpeciesConcentrations[17] =
   { 2.327841695586879e-11, // OH-
-    3.745973700632716e-01, // CO2
+    0.37555955033916549, // CO2
     3.956656978189456e-11, // CO3-2
-    9.629355924567627e-04, // H2CO3
     6.739226982791492e-05, // CaHCO3+
     5.298329882666738e-03, // CaSO4
     5.844517547638333e-03, // CaCl+

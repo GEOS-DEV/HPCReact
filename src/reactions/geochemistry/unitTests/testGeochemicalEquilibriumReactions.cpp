@@ -38,12 +38,12 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 {
   using namespace hpcReact::geochemistry;
 
-  double const initialSpeciesConcentration[18] =
+  double const initialSpeciesConcentration[17] =
   {
     1.0e-16, // OH-
     1.0e-16, // CO2
     1.0e-16, // CO3-2
-    1.0e-16, // H2CO3
+    //1.0e-16, // H2CO3
     1.0e-16, // CaHCO3+
     1.0e-16, // CaSO4
     1.0e-16, // CaCl+
@@ -60,25 +60,24 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
     1.09 // Na+1
   };
 
-  double const expectedSpeciesConcentrations[18] =
-  { 2.327841695586879e-11, // OH-
-    3.745973700632716e-01, // CO2
-    3.956656978189456e-11, // CO3-2
-    9.629355924567627e-04, // H2CO3
-    6.739226982791492e-05, // CaHCO3+
-    5.298329882666738e-03, // CaSO4
-    5.844517547638333e-03, // CaCl+
-    1.277319392670652e-02, // CaCl2
-    6.618125707964991e-03, // MgSO4
-    1.769217213462983e-02, // NaSO4-
-    1.065032288527957e-09, // CaCO3
-    4.396954721488358e-04, // H+
-    3.723009698453808e-04, // HCO3-
-    1.471656530812871e-02, // Ca+2
-    2.491372274738741e-03, // SO4-2
-    1.858609094598949e+00, // Cl-
-    9.881874292035110e-03, // Mg+2
-    1.072307827865370e+00 // Na+1
+  double const expectedSpeciesConcentrations[17] =
+  { 2.1579694253441686e-11, // OH-
+    0.3755789961165058, // CO2
+    3.4214835005538611e-11, // CO3-2
+    1.9160014879413049e-05, // CaHCO3+
+    0.0025013721967110923, // CaSO4
+    0.030083903919781853, // CaCl+
+    0.0028032598559295028, // CaCl2
+    0.0063383337566393907, // MgSO4
+    0.019567697287351467, // NaSO4-
+    4.754873524374959e-05, // CaCO3
+    0.00046855267453226469, // H+
+    0.00035429509915661095, // HCO3-
+    0.0032447552774548935, // Ca+2
+    0.0036925967592983458, // SO4-2
+    1.8543095763683592, // Cl-
+    0.01016166624336071, // Mg+2
+    1.0704323027126488 // Na+1
   };
 
   std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
@@ -140,13 +139,13 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
   {
-    4.396954721488358e-04, // H+
-    3.723009698453808e-04, // HCO3-
-    1.471656530812871e-02, // Ca+2
-    2.491372274738741e-03, // SO4-2
-    1.858609094598949e+00, // Cl-
-    9.881874292035110e-03, // Mg+2
-    1.072307827865370e+00 // Na+1
+    0.00046855267453254149, // H+
+    0.00035429509915645743, // HCO3-
+    0.0032447552774548518, // Ca+2
+    0.0036925967592983211, // SO4-2
+    1.8543095763683592, // Cl-
+    0.010161666243360675, // Mg+2
+    1.0704323027126488 // Na+1
   };
 
   for( int r=0; r<numPrimarySpecies; ++r )
