@@ -146,13 +146,13 @@ TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
 
   double const expectedAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
   {
-    0.37055804878406567,  // H+
-    0.37106495066575157,  // HCO3-
-    0.17223864844413511,  // Ca+2
-    0.02752976816027522,  // SO4-2
-    2.0209171930670973,   // Cl-
+    0.37055804878406567, // H+
+    0.37106495066575157, // HCO3-
+    0.17223864844413511, // Ca+2
+    0.02752976816027522, // SO4-2
+    2.0209171930670973, // Cl-
     0.014040561392310339, // Mg+2
-    1.0855331644610589    // Na+1
+    1.0855331644610589 // Na+1
   };
 
   for( int i=0; i<numPrimarySpecies; ++i )
