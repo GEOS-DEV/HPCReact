@@ -98,7 +98,7 @@ constexpr mediumCaseType mediumCaseParams =
     {  0,   0,   0,   0,   0,   0,  -1,   0,   0,      0,  -8,  0,  2,  0 },  // C7 = -8X2 + 2X4
     {  0,   0,   0,   0,   0,   0,   0,  -1,   0,      0,   3,  1,  0,  1 },  // CS1 = 3X2 + X3 + S
     {  0,   0,   0,   0,   0,   0,   0,   0,  -1,      0,  -3,  0,  1,  2 },  // CS2 = -3X2 + X4 + 2S
-    {  0,   0,   0,   0,   0,   0,   0,   0,   0,      0,  -3,  0,  2,  0 },  // Cc = -3X2 + 2X4 (kinetic)
+    {  0,   0,   0,   0,   0,   0,   0,   0,   0,      0,  -3,  0,  1,  0 },  // Cc = -3X2 + X4 (kinetic)
   },
 
   // Equilibrium constants K
@@ -112,7 +112,7 @@ constexpr mediumCaseType mediumCaseParams =
     1.0e4,    //  C7 + 8X2 = 2X4
     1.0e-6,   //       CS1 = 3X2 + X3 + S
     1.0e1,    // CS2 + 3X2 = X4 + 2S
-    5,        //  Cc + 3X2 = 2X4 (kinetic)
+    5         //  Cc + 3X2 = X4 (kinetic)
   },
 
   // Forward rate constants 
@@ -126,7 +126,7 @@ constexpr mediumCaseType mediumCaseParams =
     0.0,   // C7 = -8X2 + 2X4
     0.0,   // CS1 = 3X2 + X3 + S
     0.0,   // CS2 = -3X2 + X4 + 2S
-    10.0    // Cc = -3X2 + 2X4 (kinetic)
+    10.0    // Cc = -3X2 + X4 (kinetic)
   },
 
   // Reverse rate constants 
@@ -140,7 +140,7 @@ constexpr mediumCaseType mediumCaseParams =
     0.0,   // C7 = -8X2 + 2X4
     0.0,   // CS1 = 3X2 + X3 + S
     0.0,   // CS2 = -3X2 + X4 + 2S
-    0.01    // Cc = -3X2 + 2X4 (kinetic)
+    0.01    // Cc = -3X2 + X4 (kinetic)
   },
 
   // Flag of mobile secondary species
@@ -153,7 +153,7 @@ constexpr mediumCaseType mediumCaseParams =
     1, // C7 = -8X2 + 2X4
     0, // CS1 = 3X2 + X3 + S
     0, // CS2 = -3X2 + X4 + 2S
-    1  // Cc = -3X2 + 2X4 (kinetic)
+    1  // Cc = -3X2 + X4 (kinetic)
   }
 };
 
