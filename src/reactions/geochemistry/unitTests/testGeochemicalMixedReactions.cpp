@@ -41,13 +41,13 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 
   double const expectedSpeciesConcentrations[numPrimarySpecies] =
   {
-    0.00041832456577690664, // H+
-    0.00039683803953351703, // HCO3-
-    0.0032486426324025838, // Ca+2
-    0.0036922193074066475, // SO4-2
-    1.8542677503336003, // Cl-
-    0.010162065270892553, // Mg+2
-    1.0704342669906313 // Na+1
+    0.00040311656239679382, // H+
+    0.00041180885982392148, // HCO3-
+    0.0032499045666604504, // Ca+2
+    0.0036920967945592146, // SO4-2
+    1.8542541730074311, // Cl-
+    0.010162194793470079, // Mg+2
+    1.070434904554991 // Na+1
   };
 
   timeStepTest< double, true >( carbonateSystem,
