@@ -19,21 +19,20 @@ using namespace hpcReact::unitTest_utilities;
 
 //******************************************************************************
 
-TEST( testEquilibriumReactions, testMoMasAllEquilibrium )
+TEST( testEquilibriumReactions, testMoMasMediumEquilibrium )
 {
-
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
                                                                            int,
                                                                            int >;
 
-  constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::easyCaseParams.numPrimarySpecies();
+  constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::mediumCaseParams.numPrimarySpecies();
 
   double const targetAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
   {
     1.0e-20, // X1
-    -2.0, // X2
+    -3.0, // X2
     1.0e-20, // X3
-    2.0, // X4
+    1.0, // X4
     1.0 // S
   };
 
@@ -43,7 +42,7 @@ TEST( testEquilibriumReactions, testMoMasAllEquilibrium )
     0.02, // X2
     1.0e-20, // X3
     1.0, // X4
-    1.00 // S
+    1.0 // S
   };
 
   double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
@@ -57,7 +56,7 @@ TEST( testEquilibriumReactions, testMoMasAllEquilibrium )
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
   EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
-                                                          hpcReact::MoMasBenchmark::easyCaseParams.equilibriumReactionsParameters(),
+                                                          hpcReact::MoMasBenchmark::mediumCaseParams.equilibriumReactionsParameters(),
                                                           targetAggregatePrimarySpeciesConcentration,
                                                           logInitialPrimarySpeciesConcentration,
                                                           logPrimarySpeciesConcentration );
@@ -65,10 +64,10 @@ TEST( testEquilibriumReactions, testMoMasAllEquilibrium )
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
   {
     9.9999999999999919e-21, // X1
-    0.25971841330881928, // X2
-    1.4603613417111526e-24, // X3
-    0.3495378685828045, // X4
-    0.39074371811222675 // S
+    0.14796989521717838, // X2
+    5.7165444793692536e-24, // X3
+    0.025616412699749774, // X4
+    0.53958559521499294 // S
   };
 
   for( int r=0; r<numPrimarySpecies; ++r )
