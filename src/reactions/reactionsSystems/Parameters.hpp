@@ -100,8 +100,7 @@ struct KineticReactionsParameters
   RealType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
   RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
   RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
-  // RealType equilibriumConstant( IndexType const r ) const { return m_rateConstantForward[r] / m_rateConstantReverse[r]; }
-   RealType equilibriumConstant( IndexType const r ) const { return m_equilibiriumConstant[r]; } // Just for MoMaS medium now
+  RealType equilibriumConstant( IndexType const r ) const { return m_rateConstantForward[r] / m_rateConstantReverse[r]; }
 
 
   CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;

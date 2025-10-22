@@ -236,9 +236,8 @@ KineticReactions< REAL_TYPE,
     }
 
     // get/calculate the forward and reverse rate constants for this reaction
-    // RealType const rateConstant = params.rateConstantForward( r ); //* exp( -params.m_activationEnergy[r] / ( constants::R *
+    RealType const rateConstant = params.rateConstantForward( r ); //* exp( -params.m_activationEnergy[r] / ( constants::R *
     // temperature ) );
-    RealType rateConstant;
     RealType const equilibriumConstant = params.equilibriumConstant( r );
 
     RealType quotient = 1.0;
@@ -253,8 +252,6 @@ KineticReactions< REAL_TYPE,
         logQuotient += s_ri * speciesConcentration[i];
       }
       quotient = exp( logQuotient );
-
-      rateConstant = quotient < equilibriumConstant ? params.rateConstantForward( r ) : params.rateConstantReverse( r );
 
       if constexpr( CALCULATE_DERIVATIVES )
       {
@@ -274,8 +271,6 @@ KineticReactions< REAL_TYPE,
         RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], s_ri ) : 0.0;
         quotient *= productTerm_i;
       }
-
-      rateConstant = quotient < equilibriumConstant ? params.rateConstantForward( r ) : params.rateConstantReverse( r );
       
       if constexpr( CALCULATE_DERIVATIVES )
       {
