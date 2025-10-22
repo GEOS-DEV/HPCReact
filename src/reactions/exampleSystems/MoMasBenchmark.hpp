@@ -140,7 +140,7 @@ constexpr mediumCaseType mediumCaseParams =
     0.0,   // C7 = -8X2 + 2X4
     0.0,   // CS1 = 3X2 + X3 + S
     0.0,   // CS2 = -3X2 + X4 + 2S
-    0.01    // Cc = -3X2 + X4 (kinetic)
+    2.0    // Cc = -3X2 + X4 (kinetic)
   },
 
   // Flag of mobile secondary species
