@@ -3,6 +3,7 @@ set( testSourceFiles
      testEquilibriumReactions.cpp
      testKineticReactions.cpp
      testMomasEasyCase.cpp
+     testMomasMediumCase.cpp
    )
 
 set( dependencyList hpcReact gtest )
