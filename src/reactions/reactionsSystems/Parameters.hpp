@@ -129,12 +129,14 @@ struct MixedReactionsParameters
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
-                                      CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag ):
+                                      CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag,
+                                      IntType const reactionRatesUpdateOption = 1 ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
-    m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag )
+    m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag ),
+    m_reactionRatesUpdateOption( reactionRatesUpdateOption )
   {}
 
   static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -232,12 +234,15 @@ struct MixedReactionsParameters
   RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
   RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
   RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
+  IntType reactionRatesUpdateOption() const { return m_reactionRatesUpdateOption; }
 
   CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantForward;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
   CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
+
+  IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form. 
 };
 
 
