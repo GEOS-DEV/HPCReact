@@ -271,7 +271,7 @@ KineticReactions< REAL_TYPE,
         RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], s_ri ) : 0.0;
         quotient *= productTerm_i;
       }
-      
+
       if constexpr( CALCULATE_DERIVATIVES )
       {
         for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )

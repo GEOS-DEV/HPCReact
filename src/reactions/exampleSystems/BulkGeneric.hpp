@@ -63,7 +63,9 @@ simpleKineticTestRateParams =
   // reverse rate constants
   { 1.0, 0.5 },
   // flag of mobile secondary species
-  { 1, 1 }
+  { 1, 1 },
+  // Use the forward and reverse to calculate the kinetic reaction rates
+  0
 };
 
 using simpleTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;
@@ -84,7 +86,9 @@ simpleTestRateParams =
   // reverse rate constants
   { 1.0, 0.5 },
   // flag of mobile secondary species
-  { 1, 1 }
+  { 1, 1 },
+  // Use the forward and reverse to calculate the kinetic reaction rates
+  0
 };
 
 // *****UNCRUSTIFY-ON******

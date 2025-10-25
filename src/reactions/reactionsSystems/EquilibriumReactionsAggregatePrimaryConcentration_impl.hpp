@@ -115,9 +115,9 @@ EquilibriumReactions< REAL_TYPE,
 {
   if constexpr( PARAMS_DATA::numSecondarySpecies() <= 0 )
   {
-    return; 
+    return;
   }
-  
+
   HPCREACT_UNUSED_VAR( temperature );
   constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 

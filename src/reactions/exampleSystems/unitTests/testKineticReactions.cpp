@@ -24,16 +24,19 @@ using namespace hpcReact::unitTest_utilities;
 TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
+  double const surfaceArea[] = { 0.0, 0.0 };
   double const expectedReactionRates[] = { 1.0, 0.25 };
   double const expectedReactionRatesDerivatives[][5] =
   { { 2.0, -0.5, 0.0, 0.0, 0.0 },
     { 0.0, 0.0, 0.5, 0.25, 0.0 } };
   computeReactionRatesTest< double, false >( bulkGeneric::simpleKineticTestRateParams.kineticReactionsParameters(),
                                              initialSpeciesConcentration,
+                                             surfaceArea, // No use. Just to pass something here
                                              expectedReactionRates,
                                              expectedReactionRatesDerivatives );
   computeReactionRatesTest< double, true >( bulkGeneric::simpleKineticTestRateParams.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
+                                            surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
 }

@@ -36,6 +36,7 @@ template< typename REAL_TYPE,
           typename PARAMS_DATA >
 void computeReactionRatesTest( PARAMS_DATA const & params,
                                REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                               REAL_TYPE const (&surfaceArea)[PARAMS_DATA::numReactions()],
                                REAL_TYPE const (&expectedReactionRates)[PARAMS_DATA::numReactions()],
                                REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] )
 {
@@ -79,6 +80,7 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   KineticReactionsType::computeReactionRates( temperature,
                                               params,
                                               speciesConcentration,
+                                              surfaceArea,
                                               reactionRates,
                                               reactionRatesDerivatives );
 

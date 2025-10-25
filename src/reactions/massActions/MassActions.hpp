@@ -76,7 +76,7 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
   {
     return;
   }
-  
+
   massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE,
                                                                INT_TYPE,
                                                                INDEX_TYPE >( params,

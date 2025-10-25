@@ -134,7 +134,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                 ARRAY_1D & reactionRates,
                                                                 ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
 
-{  
+{
   constexpr IntType numSpecies          = PARAMS_DATA::numSpecies();
   constexpr IntType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
   constexpr IntType numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
@@ -160,27 +160,12 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   CArrayWrapper< RealType, numKineticReactions, numSpecies > reactionRatesDerivatives;
 
-  if( params.reactionRatesUpdateOption() == 0 )
-  {
-    kineticReactions::computeReactionRates( temperature,
-                                            params.kineticReactionsParameters(),
-                                            logSpeciesConcentration,
-                                            reactionRates,
-                                            reactionRatesDerivatives );
-  }
-  else if( params.reactionRatesUpdateOption() == 1 )
-  {
-    kineticReactions::computeReactionRates( temperature,
-                                            params.kineticReactionsParameters(),
-                                            logSpeciesConcentration,
-                                            surfaceArea,
-                                            reactionRates,
-                                            reactionRatesDerivatives );
-  }
-  else
-  {
-    throw std::runtime_error( "Error: No such option implemented so far for reaction rate calculation.");
-  }
+  kineticReactions::computeReactionRates( temperature,
+                                          params.kineticReactionsParameters(),
+                                          logSpeciesConcentration,
+                                          surfaceArea,
+                                          reactionRates,
+                                          reactionRatesDerivatives );
 
   // Compute the reaction rates derivatives w.r.t. log primary species concentrations
   for( IntType i = 0; i < numKineticReactions; ++i )
