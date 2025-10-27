@@ -13,18 +13,23 @@
 
 
 
-#if defined( __CUDACC__ ) || defined( __HIPCC__ )
+#if defined( __CUDACC__ )
 #define HPCREACT_USE_DEVICE
-#define HPCREACT_HOST_DEVICE __host__ __device__
-#else
-#define HPCREACT_HOST_DEVICE
+#define HPCREACT_USE_CUDA
+#elif defined( __HIPCC__ )
+#define HPCREACT_USE_DEVICE
+#define HPCREACT_USE_HIP
 #endif
 
 
 #if defined( HPCREACT_USE_DEVICE )
 #define HPCREACT_GLOBAL __global__
+#define HPCREACT_DEVICE __device__
+#define HPCREACT_HOST_DEVICE __host__ __device__
 #else
 #define HPCREACT_GLOBAL
+#define HPCREACT_DEVICE
+#define HPCREACT_HOST_DEVICE
 #endif
 
 /// This macro is used to ignore warnings that that a variable is

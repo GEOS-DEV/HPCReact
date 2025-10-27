@@ -62,7 +62,8 @@ struct LinearSystem
   REAL_TYPE x[N];
 };
 
-TEST( testDirectSystemSolve, test3x3 )
+
+void test3x3_helper()
 {
   // **Define a Sample NxN Linear System**
 
@@ -76,7 +77,7 @@ TEST( testDirectSystemSolve, test3x3 )
     { 0.0, 0.0, 0.0 } // Solution
   };
 
-  pmpl::genericKernelWrapper( 1, &linearSystem, [&]( auto * copyOfLinearSystem )
+  pmpl::genericKernelWrapper( 1, &linearSystem, [] HPCREACT_DEVICE ( auto * const copyOfLinearSystem )
   {
     solveNxN_pivoted< double, 3 >( copyOfLinearSystem->A, copyOfLinearSystem->b, copyOfLinearSystem->x );
   } );
@@ -84,8 +85,12 @@ TEST( testDirectSystemSolve, test3x3 )
   EXPECT_NEAR( linearSystem.x[0], 0.0, std::numeric_limits< double >::epsilon()*100 );
   EXPECT_NEAR( linearSystem.x[1], 1.0, std::numeric_limits< double >::epsilon()*100 );
   EXPECT_NEAR( linearSystem.x[2], 4.0, std::numeric_limits< double >::epsilon()*100 );
-//  std::cout << "Solution: x = [" << linearSystem.x[0] << ", " << linearSystem.x[1] << ", " << linearSystem.x[2] << "]" << std::endl;
 
+}
+
+TEST( testDirectSystemSolve, test3x3 )
+{
+  test3x3_helper();
 }
 
 
