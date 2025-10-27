@@ -149,10 +149,6 @@ public:
                                                               reactionRates,
                                                               reactionRatesDerivatives );
     }
-    else
-    {
-      throw std::runtime_error( "Error: No such option implemented so far for reaction rate calculation." );
-    }
   }
 
 
