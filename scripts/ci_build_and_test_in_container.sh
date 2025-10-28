@@ -17,13 +17,13 @@ else
     exit 1
 fi
 
-echo "Using package manager: $PACKAGE_MANAGER"
+# echo "Using package manager: $PACKAGE_MANAGER"
 
-if [ "$PACKAGE_MANAGER" == "apt" ]; then
-    apt update && apt-get install -y libblas-dev liblapack-dev texlive-full
-elif [ "$PACKAGE_MANAGER" == "yum" ]; then
-    yum update && yum install -y blas lapack 
-fi
+# if [ "$PACKAGE_MANAGER" == "apt" ]; then
+#     apt update && apt-get install -y libblas-dev liblapack-dev texlive-full
+# elif [ "$PACKAGE_MANAGER" == "yum" ]; then
+#     yum update && yum install -y blas lapack 
+# fi
 
 # The or_die function run the passed command line and
 # exits the program in case of non zero error code

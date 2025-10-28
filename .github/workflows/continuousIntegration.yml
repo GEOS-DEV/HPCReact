@@ -50,7 +50,7 @@ jobs:
           lfs: false
       - name: Check doxygen
         env:
-          DOCKER_REPOSITORY: geosx/ubuntu:24.04-${{ needs.get_docker_image_tag_hash.outputs.DOCKER_IMAGE_TAG_HASH }}
+          DOCKER_REPOSITORY: geosx/ubuntu:24.04-clang-${{ needs.get_docker_image_tag_hash.outputs.DOCKER_IMAGE_TAG_HASH }}
           HOST_CONFIG: hostconfigs/environment.cmake
           CMAKE_CXX_COMPILER: /usr/bin/clang++
           CMAKE_C_COMPILER: /usr/bin/clang
@@ -71,7 +71,7 @@ jobs:
           lfs: false
       - name: code_checks
         env:
-          DOCKER_REPOSITORY: geosx/ubuntu:24.04-${{ needs.get_docker_image_tag_hash.outputs.DOCKER_IMAGE_TAG_HASH }}
+          DOCKER_REPOSITORY: geosx/ubuntu:24.04-clang-${{ needs.get_docker_image_tag_hash.outputs.DOCKER_IMAGE_TAG_HASH }}
           HOST_CONFIG: hostconfigs/environment.cmake
           CMAKE_CXX_COMPILER: /usr/bin/clang++
           CMAKE_C_COMPILER: /usr/bin/clang
