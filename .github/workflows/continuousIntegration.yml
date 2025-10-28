@@ -89,6 +89,34 @@ jobs:
       fail-fast: false
       matrix:
         include:
+                  - name: rocky-gcc-dbg (rockylinux8, gcc 14, Release)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/g++
+            CMAKE_C_COMPILER: /usr/bin/gcc
+            CMAKE_BUILD_TYPE: Debug
+
+          - name: rocky-gcc-rel (rockylinux8, gcc 14, Release)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/g++
+            CMAKE_C_COMPILER: /usr/bin/gcc
+            CMAKE_BUILD_TYPE: Release
+
+          - name: rocky-clang-dbg (rockylinux8, clang-15, Debug)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-clang
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/clang++
+            CMAKE_C_COMPILER: /usr/bin/clang
+            CMAKE_BUILD_TYPE: Debug
+
+          - name: rocky-clang-rel (rockylinux8, clang-15, Release)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-clang
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/clang++
+            CMAKE_C_COMPILER: /usr/bin/clang
+            CMAKE_BUILD_TYPE: Release
+            
           - name: ubuntu24-gcc11-dbg (ubuntu-24, gcc 11.4.0, Release)
             DOCKER_REPOSITORY: geosx/ubuntu:24.04-gcc
             RUNS_ON: ubuntu-24.04
@@ -116,36 +144,6 @@ jobs:
             CMAKE_CXX_COMPILER: /usr/bin/clang++
             CMAKE_C_COMPILER: /usr/bin/clang
             CMAKE_BUILD_TYPE: Release
-
-
-          - name: rocky-gcc-dbg (rockylinux8, gcc 14, Release)
-            DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
-            RUNS_ON: ubuntu-24.04
-            CMAKE_CXX_COMPILER: /usr/bin/g++
-            CMAKE_C_COMPILER: /usr/bin/gcc
-            CMAKE_BUILD_TYPE: Debug
-
-          - name: rocky-gcc-rel (rockylinux8, gcc 14, Release)
-            DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
-            RUNS_ON: ubuntu-24.04
-            CMAKE_CXX_COMPILER: /usr/bin/g++
-            CMAKE_C_COMPILER: /usr/bin/gcc
-            CMAKE_BUILD_TYPE: Release
-
-          - name: rocky-clang-dbg (rockylinux8, clang-15, Debug)
-            DOCKER_REPOSITORY: geosx/rockylinux:8-clang
-            RUNS_ON: ubuntu-24.04
-            CMAKE_CXX_COMPILER: /usr/bin/clang++
-            CMAKE_C_COMPILER: /usr/bin/clang
-            CMAKE_BUILD_TYPE: Debug
-
-          - name: rocky-clang-rel (rockylinux8, clang-15, Release)
-            DOCKER_REPOSITORY: geosx/rockylinux:8-clang
-            RUNS_ON: ubuntu-24.04
-            CMAKE_CXX_COMPILER: /usr/bin/clang++
-            CMAKE_C_COMPILER: /usr/bin/clang
-            CMAKE_BUILD_TYPE: Release
-
 
           - name: ubuntu24-gcc11-cuda12-rel (ubuntu-24, gcc 11.4.0, cuda-12.9.1, Release)
             DOCKER_REPOSITORY: geosx/ubuntu:24.04-gcc-cuda12.9
