@@ -20,7 +20,7 @@ jobs:
       - name: Extract docker image tag hash
         id: extract_docker_image_tag_hash
         run: |
-          echo "DOCKER_IMAGE_TAG_HASH=d70ac785bd9f9bd8c85a60026669a5fa861f3842" >> "$GITHUB_OUTPUT"
+          echo "DOCKER_IMAGE_TAG_HASH=8222ff90b7e0083101204ce7f2c476ec23785a03" >> "$GITHUB_OUTPUT"
 
   # code_style:
   #   needs: [check_pull_request_is_not_a_draft]
@@ -117,6 +117,36 @@ jobs:
             CMAKE_C_COMPILER: /usr/bin/clang
             CMAKE_BUILD_TYPE: Release
 
+
+          - name: rocky-gcc-dbg (rockylinux8, gcc 14, Release)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/g++
+            CMAKE_C_COMPILER: /usr/bin/gcc
+            CMAKE_BUILD_TYPE: Debug
+
+          - name: rocky-gcc-rel (rockylinux8, gcc 14, Release)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/g++
+            CMAKE_C_COMPILER: /usr/bin/gcc
+            CMAKE_BUILD_TYPE: Release
+
+          - name: rocky-clang-dbg (rockylinux8, clang-15, Debug)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-clang
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/clang++
+            CMAKE_C_COMPILER: /usr/bin/clang
+            CMAKE_BUILD_TYPE: Debug
+
+          - name: rocky-clang-rel (rockylinux8, clang-15, Release)
+            DOCKER_REPOSITORY: geosx/rockylinux:8-clang
+            RUNS_ON: ubuntu-24.04
+            CMAKE_CXX_COMPILER: /usr/bin/clang++
+            CMAKE_C_COMPILER: /usr/bin/clang
+            CMAKE_BUILD_TYPE: Release
+
+
           - name: ubuntu24-gcc11-cuda12-rel (ubuntu-24, gcc 11.4.0, cuda-12.9.1, Release)
             DOCKER_REPOSITORY: geosx/ubuntu:24.04-gcc-cuda12.9
             RUNS_ON: streak2
@@ -140,7 +170,7 @@ jobs:
             DOCKER_RUN_ARGS: "--cpus=4 --memory=64g --runtime=nvidia --gpus all"
 
           - name: ubuntu24-clang14-cuda12-rel (ubuntu-24, clang-14.0.0, cuda-12.9.1, Release)
-            DOCKER_REPOSITORY: geosx/ubuntu:24.04-cuda12.9
+            DOCKER_REPOSITORY: geosx/ubuntu:24.04-clang-cuda12.9
             RUNS_ON: streak2
             CMAKE_CXX_COMPILER: /usr/bin/clang++
             CMAKE_C_COMPILER: /usr/bin/clang
@@ -151,7 +181,7 @@ jobs:
             DOCKER_RUN_ARGS: "--cpus=4 --memory=64g --runtime=nvidia --gpus all"
 
           - name: ubuntu24-clang14-cuda12-dbg (ubuntu-24, clang-14.0.0, cuda-12.9.1, Debug)
-            DOCKER_REPOSITORY: geosx/ubuntu:24.04-cuda12.9
+            DOCKER_REPOSITORY: geosx/ubuntu:24.04-clang-cuda12.9
             RUNS_ON: streak2
             CMAKE_CXX_COMPILER: /usr/bin/clang++
             CMAKE_C_COMPILER: /usr/bin/clang
