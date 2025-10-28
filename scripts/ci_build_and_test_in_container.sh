@@ -2,20 +2,20 @@
 env
 
 
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
-        PACKAGE_MANAGER="apt"
-    elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rhel fedora rocky centos" ]]; then
-        PACKAGE_MANAGER="yum"
-    else
-        echo "Unsupported OS: $ID"
-        exit 1
-    fi
-else
-    echo "/etc/os-release not found. Unable to determine OS."
-    exit 1
-fi
+# if [ -f /etc/os-release ]; then
+#     . /etc/os-release
+#     if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
+#         PACKAGE_MANAGER="apt"
+#     elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rhel fedora rocky centos" ]]; then
+#         PACKAGE_MANAGER="yum"
+#     else
+#         echo "Unsupported OS: $ID"
+#         exit 1
+#     fi
+# else
+#     echo "/etc/os-release not found. Unable to determine OS."
+#     exit 1
+# fi
 
 # echo "Using package manager: $PACKAGE_MANAGER"
 
