@@ -92,15 +92,15 @@ jobs:
           - name: rocky-gcc-dbg (rockylinux8, gcc 14, Release)
             DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
             RUNS_ON: ubuntu-24.04
-            CMAKE_CXX_COMPILER: /usr/bin/g++
-            CMAKE_C_COMPILER: /usr/bin/gcc
+            CMAKE_CXX_COMPILER: /opt/rh/gcc-toolset-13/root/usr/bin/g++
+            CMAKE_C_COMPILER: /opt/rh/gcc-toolset-13/root/usr/bin/gcc
             CMAKE_BUILD_TYPE: Debug
 
           - name: rocky-gcc-rel (rockylinux8, gcc 14, Release)
             DOCKER_REPOSITORY: geosx/rockylinux:8-gcc
             RUNS_ON: ubuntu-24.04
-            CMAKE_CXX_COMPILER: /usr/bin/g++
-            CMAKE_C_COMPILER: /usr/bin/gcc
+            CMAKE_CXX_COMPILER: /opt/rh/gcc-toolset-13/root/usr/bin/g++
+            CMAKE_C_COMPILER: /opt/rh/gcc-toolset-13/root/usr/bin/gcc
             CMAKE_BUILD_TYPE: Release
 
           - name: rocky-clang-dbg (rockylinux8, clang-15, Debug)
@@ -227,8 +227,8 @@ jobs:
         env:
           DOCKER_REPOSITORY: geosx/ubuntu:24.04-gcc-${{ needs.get_docker_image_tag_hash.outputs.DOCKER_IMAGE_TAG_HASH }}
           HOST_CONFIG: hostconfigs/environment.cmake
-          CMAKE_CXX_COMPILER: /usr/bin/g++
-          CMAKE_C_COMPILER: /usr/bin/gcc
+          CMAKE_CXX_COMPILER: /opt/rh/gcc-toolset-13/root/usr/bin/g++
+          CMAKE_C_COMPILER: /opt/rh/gcc-toolset-13/root/usr/bin/gcc
           CMAKE_BUILD_TYPE: Debug
           BUILD_AND_TEST_ARGS: "--build-exe --code-coverage"
         run: ./scripts/ci_build_and_test.sh

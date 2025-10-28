@@ -50,8 +50,8 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
                                                                            int,
                                                                            int >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
-  constexpr int numReactions = PARAMS_DATA::numReactions();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numReactions = PARAMS_DATA::numReactions();
 
   double const temperature = 298.15;
 
@@ -113,7 +113,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
                                                                            int,
                                                                            int >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
   double const temperature = 298.15;
 

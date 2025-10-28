@@ -42,8 +42,8 @@ struct CalculateLogSecondarySpeciesConcentrationData
 
 void test_calculateLogSecondarySpeciesConcentration_helper()
 {
-  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
-  constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
+  static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  static constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
 
   CalculateLogSecondarySpeciesConcentrationData<numPrimarySpecies, numSecondarySpecies> data;
 
@@ -142,7 +142,7 @@ struct CalculateAggregatePrimaryConcentrationsWrtLogCHelperData
 
 void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
 {
-  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
 
   CalculateAggregatePrimaryConcentrationsWrtLogCHelperData<numPrimarySpecies> data;
 

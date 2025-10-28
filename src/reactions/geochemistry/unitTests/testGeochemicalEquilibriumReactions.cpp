@@ -105,7 +105,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
                                                                            int,
                                                                            int >;
 
-  constexpr int numPrimarySpecies = hpcReact::geochemistry::carbonateSystemAllEquilibrium.numPrimarySpecies();
+  static constexpr int numPrimarySpecies = hpcReact::geochemistry::carbonateSystemAllEquilibrium.numPrimarySpecies();
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {

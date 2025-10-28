@@ -26,7 +26,7 @@ void testMoMasMediumEquilibriumHelper()
                                                                            int,
                                                                            int >;
 
-  constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::mediumCaseParams.numPrimarySpecies();
+  static constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::mediumCaseParams.numPrimarySpecies();
 
 
 

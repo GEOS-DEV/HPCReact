@@ -27,7 +27,7 @@ void testMoMasAllEquilibriumHelper()
                                                                            int,
                                                                            int >;
 
-  constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::easyCaseParams.numPrimarySpecies();
+  static constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::easyCaseParams.numPrimarySpecies();
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
 

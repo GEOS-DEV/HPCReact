@@ -59,9 +59,9 @@ void timeStepTest( PARAMS_DATA const & params,
                                                                                  int >;
 
         // constexpr int numSpecies = PARAMS_DATA::numSpecies();
-        constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
-        constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
-        constexpr int numKineticReactions = PARAMS_DATA::numKineticReactions();
+        static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
+        static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+        static constexpr int numKineticReactions = PARAMS_DATA::numKineticReactions();
 
         // define variables
         double const temperature = 298.15;

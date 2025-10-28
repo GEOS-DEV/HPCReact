@@ -368,8 +368,8 @@ KineticReactions< REAL_TYPE,
                                                   ARRAY_1D & speciesRates,
                                                   ARRAY_2D & speciesRatesDerivatives )
 {
-//  constexpr int numReactions = PARAMS_DATA::numReactions();
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+//  static constexpr int numReactions = PARAMS_DATA::numReactions();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
 
 
