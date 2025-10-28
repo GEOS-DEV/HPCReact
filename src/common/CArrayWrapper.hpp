@@ -39,7 +39,6 @@ template< typename T, int DIM0 >
 struct CArrayWrapper< T, DIM0 >
 {
   // default constructor
-  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper() = default;
 
   /**
@@ -127,7 +126,6 @@ template< typename T, int DIM0, int DIM1 >
 struct CArrayWrapper< T, DIM0, DIM1 >
 {
   // default constructor
-  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper() = default;
 
   /**
@@ -243,7 +241,6 @@ template< typename T, int DIM0, int DIM1, int DIM2 >
 struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
 {
   // default constructor
-  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper() = default;
 
   /**

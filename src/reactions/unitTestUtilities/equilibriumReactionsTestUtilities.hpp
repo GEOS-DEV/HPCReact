@@ -59,7 +59,7 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
   for( int i = 0; i < numSpecies; ++i )
   {
     data.speciesConcentration[i] = initialSpeciesConcentration[i];
-  }
+  } 
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
   {
