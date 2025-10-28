@@ -11,7 +11,9 @@
 
 #include "../MassActions.hpp"
 #include "reactions/geochemistry/GeochemicalSystems.hpp"
+#include "common/pmpl.hpp"
 #include "common/printers.hpp"
+
 
 #include <gtest/gtest.h>
 
@@ -20,12 +22,11 @@ using namespace hpcReact::massActions;
 using namespace hpcReact::geochemistry;
 
 
-
-TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
+template< int numPrimarySpecies, int numSecondarySpecies >
+struct CalculateLogSecondarySpeciesConcentrationData
 {
-  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
-  constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
-
+  double logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
+  double dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{0}};
   double const logPrimarySpeciesSolution[numPrimarySpecies] =
   {
     log( 0.00043969547214915125 ),
@@ -36,14 +37,36 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
     log( 0.009881874292035079 ),
     log( 1.0723078278653704 )
   };
+};
 
-  double logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
 
-  calculateLogSecondarySpeciesConcentration< double,
-                                             int,
-                                             int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                    logPrimarySpeciesSolution,
-                                                    logSecondarySpeciesConcentrations );
+void test_calculateLogSecondarySpeciesConcentration_helper()
+{
+  constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
+
+  CalculateLogSecondarySpeciesConcentrationData<numPrimarySpecies, numSecondarySpecies> data;
+
+  pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
+  {
+    calculateLogSecondarySpeciesConcentration< double,
+                                              int,
+                                              int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                      dataCopy->logPrimarySpeciesSolution,
+                                                      dataCopy->logSecondarySpeciesConcentrations );
+
+
+
+    calculateLogSecondarySpeciesConcentrationWrtLogC< double,
+                                                      int,
+                                                      int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                            dataCopy->logPrimarySpeciesSolution,
+                                                            dataCopy->logSecondarySpeciesConcentrations,
+                                                            dataCopy->dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+  });
+
+
+
 
   double expectedSecondarySpeciesConcentrations[numSecondarySpecies] =
   {
@@ -61,22 +84,10 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
 
   for( int j=0; j<numSecondarySpecies; ++j )
   {
-    EXPECT_NEAR( exp( logSecondarySpeciesConcentrations[j] ),
+    EXPECT_NEAR( exp( data.logSecondarySpeciesConcentrations[j] ),
                  expectedSecondarySpeciesConcentrations[j],
                  1.0e-8 );
   }
-
-
-  double dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{0}};
-
-  calculateLogSecondarySpeciesConcentrationWrtLogC< double,
-                                                    int,
-                                                    int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                           logPrimarySpeciesSolution,
-                                                           logSecondarySpeciesConcentrations,
-                                                           dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
-
-
 
   double expected_dLogSdLogC[numSecondarySpecies][numPrimarySpecies] =
   {
@@ -97,52 +108,51 @@ TEST( testUtilities, test_calculateLogSecondarySpeciesConcentration )
   {
     for( int j=0; j<numPrimarySpecies; ++j )
     {
-      EXPECT_NEAR( dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[i][j],
+      EXPECT_NEAR( data.dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[i][j],
                    expected_dLogSdLogC[i][j],
                    1.0e-8 );
     }
   }
 }
 
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration )
+{
+  test_calculateLogSecondarySpeciesConcentration_helper();
+}
 
-TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
+
+template< int numPrimarySpecies >
+struct CalculateAggregatePrimaryConcentrationsWrtLogCHelperData
+{
+  double const primarySpeciesSolution[numPrimarySpecies] =
+  {
+    log(0.00043969547214915125),
+    log(0.00037230096984514874),
+    log(0.014716565308128551),
+    log(0.0024913722747387217),
+    log(1.8586090945989489),
+    log(0.009881874292035079),
+    log(1.0723078278653704)
+  };
+
+  double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = {0};
+  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations;
+
+};
+
+void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
 {
   constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
 
-  double primarySpeciesSolution[numPrimarySpecies] =
+  CalculateAggregatePrimaryConcentrationsWrtLogCHelperData<numPrimarySpecies> data;
+
+  pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
   {
-    0.00043969547214915125,
-    0.00037230096984514874,
-    0.014716565308128551,
-    0.0024913722747387217,
-    1.8586090945989489,
-    0.009881874292035079,
-    1.0723078278653704
-  };
-
-  for( int i=0; i<numPrimarySpecies; ++i )
-  {
-    primarySpeciesSolution[i] = log( primarySpeciesSolution[i] );
-  }
-
-
-  double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = {0};
-
-
-  CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations;
-  for( int i = 0; i < numPrimarySpecies; ++i )
-  {
-    for( int k=0; k<numPrimarySpecies; ++k )
-    {
-      std::cout << "dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations("<< i << ", " << k << " )" <<
-        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) << std::endl;
-    }
-  }
-
-  calculateAggregatePrimaryConcentrationsWrtLogC< double, int, int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                                      primarySpeciesSolution,
-                                                                      aggregatePrimarySpeciesConcentration,
-                                                                      dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+    calculateAggregatePrimaryConcentrationsWrtLogC< double, int, int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                                        dataCopy->primarySpeciesSolution,
+                                                                        dataCopy->aggregatePrimarySpeciesConcentration,
+                                                                        dataCopy->dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+  });
 
   double const expectedAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
   {
@@ -157,7 +167,7 @@ TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
 
   for( int i=0; i<numPrimarySpecies; ++i )
   {
-    EXPECT_NEAR( aggregatePrimarySpeciesConcentration[i],
+    EXPECT_NEAR( data.aggregatePrimarySpeciesConcentration[i],
                  expectedAggregatePrimarySpeciesConcentration[i],
                  1.0e-8 );
   }
@@ -178,11 +188,16 @@ TEST( testUtilities, testcalculateAggregatePrimaryConcentrationsWrtLogC )
   {
     for( int j=0; j<numPrimarySpecies; ++j )
     {
-      EXPECT_NEAR( dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, j ),
+      EXPECT_NEAR( data.dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, j ),
                    expected_dAggregatePrimarySpeciesConcentration_dLogPrimarySpeciesConcentrations[i][j],
                    1.0e-8 );
     }
   }
+}
+
+TEST( testMassActions, testcalculateAggregatePrimaryConcentrationsWrtLogC )
+{
+  testcalculateAggregatePrimaryConcentrationsWrtLogCHelper();
 }
 
 

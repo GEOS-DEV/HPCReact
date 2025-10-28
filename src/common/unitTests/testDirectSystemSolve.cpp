@@ -16,43 +16,6 @@
 #include <gtest/gtest.h>
 
 using namespace hpcReact;
-// TEST( testDirectSystemSolve, test3x3 )
-// {
-//   // **Define a Sample NxN Linear System**
-//   double A_host[9] =
-//   {
-//     1.0,  2.0,  3.0,
-//     2.0, -1.0,  1.0,
-//     3.0,  4.0,  5.0
-//   };
-//   double b_host[3] = { 14.0, 3.0, 24.0 }; // Right-hand side
-//   double x_host[3]; // Solution
-
-//   // **Allocate Memory on the GPU**
-//   double *d_A, *d_b, *d_x;
-//   cudaMalloc(&d_A, sizeof(A_host));
-//   cudaMalloc(&d_b, sizeof(b_host));
-//   cudaMalloc(&d_x, sizeof(x_host));
-
-//   // **Copy Data to the GPU**
-//   cudaMemcpy(d_A, A_host, sizeof(A_host), cudaMemcpyHostToDevice);
-//   cudaMemcpy(d_b, b_host, sizeof(b_host), cudaMemcpyHostToDevice);
-
-//   // **Launch Kernel (1 block, 1 thread per system)**
-//   kernel_solveNxN_pivoted<double,3><<<1, 1>>>(d_A, d_b, d_x, 1);
-
-//   // **Copy Result Back to Host**
-//   cudaMemcpy(x_host, d_x, sizeof(x_host), cudaMemcpyDeviceToHost);
-
-//   // **Print the Solution**
-//   std::cout << "Solution: x = [" << x_host[0] << ", " << x_host[1] << ", " << x_host[2] << "]" << std::endl;
-
-//   // **Free GPU Memory**
-//   cudaFree(d_A);
-//   cudaFree(d_b);
-//   cudaFree(d_x);
-
-// }
 
 template< typename REAL_TYPE, int N >
 struct LinearSystem
@@ -92,47 +55,6 @@ TEST( testDirectSystemSolve, test3x3 )
 {
   test3x3_helper();
 }
-
-
-#if 0
-TEST( testDirectSystemSolve, test3x3_CUDA )
-{
-  // **Define a Sample NxN Linear System**
-  double A_host[9] =
-  {
-    1.0, 2.0, 3.0,
-    2.0, -1.0, 1.0,
-    3.0, 4.0, 5.0
-  };
-  double b_host[3] = { 14.0, 3.0, 24.0 }; // Right-hand side
-  double x_host[3]; // Solution
-
-  // **Allocate Memory on the GPU**
-  double *d_A, *d_b, *d_x;
-  cudaMalloc( &d_A, sizeof(A_host));
-  cudaMalloc( &d_b, sizeof(b_host));
-  cudaMalloc( &d_x, sizeof(x_host));
-
-  // **Copy Data to the GPU**
-  cudaMemcpy( d_A, A_host, sizeof(A_host), cudaMemcpyHostToDevice );
-  cudaMemcpy( d_b, b_host, sizeof(b_host), cudaMemcpyHostToDevice );
-
-  // **Launch Kernel (1 block, 1 thread per system)**
-  kernel_solveNxN_pivoted< double, 3 ><<<1, 1>>>(d_A, d_b, d_x, 1);
-
-  // **Copy Result Back to Host**
-  cudaMemcpy( x_host, d_x, sizeof(x_host), cudaMemcpyDeviceToHost );
-
-  // **Print the Solution**
-  std::cout << "Solution: x = [" << x_host[0] << ", " << x_host[1] << ", " << x_host[2] << "]" << std::endl;
-
-  // **Free GPU Memory**
-  cudaFree( d_A );
-  cudaFree( d_b );
-  cudaFree( d_x );
-
-}
-#endif
 
 
 int main( int argc, char * * argv )

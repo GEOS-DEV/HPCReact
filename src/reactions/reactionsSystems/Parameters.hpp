@@ -86,6 +86,7 @@ struct KineticReactionsParameters
 
   HPCREACT_HOST_DEVICE static constexpr IndexType numReactions() { return NUM_REACTIONS; }
 
+  HPCREACT_HOST_DEVICE
   constexpr KineticReactionsParameters( CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,

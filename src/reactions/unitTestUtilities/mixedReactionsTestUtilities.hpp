@@ -48,7 +48,7 @@ void timeStepTest( PARAMS_DATA const & params,
 
   pmpl::genericKernelWrapper( PARAMS_DATA::numPrimarySpecies(),
                               primarySpeciesConcentration.data,
-                              [=] HPCREACT_HOST_DEVICE ( auto * speciesConcentration )
+                              [=] HPCREACT_HOST_DEVICE ( decltype(primarySpeciesConcentration.data) speciesConcentration )
       {
         using MixedReactionsType = reactionsSystems::MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                                        int,
@@ -81,7 +81,7 @@ void timeStepTest( PARAMS_DATA const & params,
         // Initialize species concentrations
         for( int i = 0; i < numPrimarySpecies; ++i )
         {
-          logPrimarySpeciesConcentration[i] = ::log( speciesConcentration[i] );
+          logPrimarySpeciesConcentration[i] = log( speciesConcentration[i] );
           aggregatePrimarySpeciesConcentration[i] = speciesConcentration[i];
         }
 
@@ -101,7 +101,7 @@ void timeStepTest( PARAMS_DATA const & params,
             aggregatePrimarySpeciesConcentration_n[i] = aggregatePrimarySpeciesConcentration[i];
           }
 
-          auto computeResidualAndJacobian = [&] HPCREACT_HOST_DEVICE ( REAL_TYPE const (&X)[numPrimarySpecies],
+          auto computeResidualAndJacobian = [&] ( REAL_TYPE const (&X)[numPrimarySpecies],
                                                                        REAL_TYPE ( &r )[numPrimarySpecies],
                                                                        REAL_TYPE ( &J )[numPrimarySpecies][numPrimarySpecies] )
           {

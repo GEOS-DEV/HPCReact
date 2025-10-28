@@ -13,7 +13,8 @@
 
 #include "macros.hpp"
 #include "symmetricMatrix.hpp"
-#include <cmath>
+
+#include <math.h>
 
 namespace hpcReact
 {

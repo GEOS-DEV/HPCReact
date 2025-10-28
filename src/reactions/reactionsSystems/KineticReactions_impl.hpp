@@ -15,7 +15,7 @@
 #include "common/CArrayWrapper.hpp"
 #include "common/DirectSystemSolve.hpp"
 
-#include <cmath>
+#include <math.h>
 #include <string>
 #include <iostream>
 
@@ -374,9 +374,9 @@ KineticReactions< REAL_TYPE,
 
 
   REAL_TYPE residualNorm = 0.0;
-  for( int k=0; k<10; ++k ) // newton loop
+  for( int k=0; k<20; ++k ) // newton loop
   {
-    // printf( "iteration %2d: \n", k );
+//    printf( "iteration %2d: \n", k );
 
     computeSpeciesRates( temperature,
                          params,
