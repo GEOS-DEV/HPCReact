@@ -8,34 +8,38 @@ elif [ -f /usr/lib/x86_64-linux-gnu/libblas.so ]; then
   BLAS_LIB=/usr/lib/x86_64-linux-gnu/libblas.so
   LAPACK_LIB=/usr/lib/x86_64-linux-gnu/liblapack.so
 else
-  echo "BLAS/LAPACK not found"; exit 1
+  echo "BLAS/LAPACK not found"; 
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
+        PACKAGE_MANAGER="apt"
+    elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rocky" ]]; then
+        PACKAGE_MANAGER="yum"
+    else
+        echo "Unsupported OS: $ID"
+        exit 1
+    fi
+  else
+    echo "/etc/os-release not found. Unable to determine OS."
+    exit 1
+  fi
+
+  echo "Using package manager: $PACKAGE_MANAGER"
+
+  if [ "$PACKAGE_MANAGER" == "apt" ]; then
+      apt update && apt-get install -y libblas-dev liblapack-dev
+  elif [ "$PACKAGE_MANAGER" == "yum" ]; then
+      yum update && yum install -y blas lapack 
+  fi
+
 fi
 
 
-# if [ -f /etc/os-release ]; then
-#     . /etc/os-release
-#     if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
-#         PACKAGE_MANAGER="apt"
-#     elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rhel fedora rocky centos" ]]; then
-#         PACKAGE_MANAGER="yum"
-#     else
-#         echo "Unsupported OS: $ID"
-#         exit 1
-#     fi
-# else
-#     echo "/etc/os-release not found. Unable to determine OS."
-#     exit 1
-# fi
 
 
 
-# echo "Using package manager: $PACKAGE_MANAGER"
 
-# if [ "$PACKAGE_MANAGER" == "apt" ]; then
-#     apt update && apt-get install -y libblas-dev liblapack-dev texlive-full
-# elif [ "$PACKAGE_MANAGER" == "yum" ]; then
-#     yum update && yum install -y blas lapack 
-# fi
+
 
 # The or_die function run the passed command line and
 # exits the program in case of non zero error code
