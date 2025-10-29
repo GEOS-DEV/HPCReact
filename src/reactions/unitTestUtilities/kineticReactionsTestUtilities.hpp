@@ -12,6 +12,7 @@
 #pragma once
 #include "common/DirectSystemSolve.hpp"
 #include "common/macros.hpp"
+#include "common/pmpl.hpp"
 #include "common/printers.hpp"
 #include "common/CArrayWrapper.hpp"
 #include "reactions/reactionsSystems/KineticReactions.hpp"
@@ -31,6 +32,28 @@ REAL_TYPE tolerance( REAL_TYPE const a, REAL_TYPE const b, REAL_TYPE const ndigi
 }
 
 //******************************************************************************
+
+/**
+ * POD struct for transferring data between host and device for computeReactionRatesTest.
+ * @tparam numReactions Number of reactions.
+ * @tparam numSpecies Number of species.
+ */
+template< int numReactions, int numSpecies >
+struct ComputeReactionRatesTestData
+{
+  /// The species concentration
+  double speciesConcentration[numSpecies];
+
+  /// The reaction rates
+  double reactionRates[numReactions] = { 0.0 };
+
+  /// The reaction rates derivatives
+  CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
+
+  /// The surface area
+  double surfaceArea[numReactions];
+};
+
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
@@ -45,11 +68,11 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
                                                                    int,
                                                                    LOGE_CONCENTRATION >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
-  constexpr int numReactions = PARAMS_DATA::numReactions();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numReactions = PARAMS_DATA::numReactions();
 
   double const temperature = 298.15;
-  double speciesConcentration[numSpecies];
+  ComputeReactionRatesTestData< numReactions, numSpecies > data;
 
   REAL_TYPE magScale = 0;
   for( int r=0; r<numSpecies; ++r )
@@ -62,33 +85,36 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = log( initialSpeciesConcentration[i] );
+      data.speciesConcentration[i] = log( initialSpeciesConcentration[i] );
     }
   }
   else
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = initialSpeciesConcentration[i];
+      data.speciesConcentration[i] = initialSpeciesConcentration[i];
     }
   }
 
-  double reactionRates[numReactions] = { 0.0 };
-  CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
+  for( int r = 0; r < numReactions; ++r )
+  {
+    data.surfaceArea[r] = surfaceArea[r];
+  }
 
 
-  KineticReactionsType::computeReactionRates( temperature,
-                                              params,
-                                              speciesConcentration,
-                                              surfaceArea,
-                                              reactionRates,
-                                              reactionRatesDerivatives );
-
-
+  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  {
+    KineticReactionsType::computeReactionRates( temperature,
+                                                params,
+                                                dataCopy->speciesConcentration,
+                                                dataCopy->surfaceArea,
+                                                dataCopy->reactionRates,
+                                                dataCopy->reactionRatesDerivatives );
+  });
 
   for( int r=0; r<numReactions; ++r )
   {
-    EXPECT_NEAR( reactionRates[r], expectedReactionRates[r], std::max( magScale, fabs( expectedReactionRates[r] ) ) * 1.0e-8 );
+    EXPECT_NEAR( data.reactionRates[r], expectedReactionRates[r], std::max( magScale, fabs( expectedReactionRates[r] ) ) * 1.0e-8 );
   }
 
 
@@ -99,15 +125,33 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
     {
       if constexpr( LOGE_CONCENTRATION )
       {
-        reactionRatesDerivatives( r, i ) = reactionRatesDerivatives( r, i ) * exp( -speciesConcentration[i] );
+        data.reactionRatesDerivatives( r, i ) = data.reactionRatesDerivatives( r, i ) * exp( -data.speciesConcentration[i] );
       }
-      EXPECT_NEAR( reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], std::max( magScale, fabs( expectedReactionRatesDerivatives[r][i] ) ) * 1.0e-8 );
+      EXPECT_NEAR( data.reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], std::max( magScale, fabs( expectedReactionRatesDerivatives[r][i] ) ) * 1.0e-8 );
     }
   }
 }
 
 
 //******************************************************************************
+
+/**
+ * POD struct for transferring data between host and device for computeSpeciesRatesTest.
+ * @tparam numSpecies Number of species.
+ */
+template< int numSpecies >
+struct ComputeSpeciesRatesTestData
+{
+  /// The species concentrations
+  double speciesConcentration[numSpecies];
+
+  /// The species rates
+  double speciesRates[numSpecies] = { 0.0 };
+
+  /// The species rates derivatives
+  CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
+};
+
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
@@ -122,38 +166,39 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
                                                                    int,
                                                                    LOGE_CONCENTRATION >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
   double const temperature = 298.15;
-  double speciesConcentration[numSpecies];
-  double speciesRates[numSpecies] = { 0.0 };
-  CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
+  ComputeSpeciesRatesTestData< numSpecies > data;
 
   if constexpr( LOGE_CONCENTRATION )
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = log( initialSpeciesConcentration[i] );
+      data.speciesConcentration[i] = log( initialSpeciesConcentration[i] );
     }
   }
   else
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = initialSpeciesConcentration[i];
+      data.speciesConcentration[i] = initialSpeciesConcentration[i];
     }
   }
 
-  KineticReactionsType::computeSpeciesRates( temperature,
-                                             params,
-                                             speciesConcentration,
-                                             speciesRates,
-                                             speciesRatesDerivatives );
+  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  {
+    KineticReactionsType::computeSpeciesRates( temperature,
+                                               params,
+                                               dataCopy->speciesConcentration,
+                                               dataCopy->speciesRates,
+                                               dataCopy->speciesRatesDerivatives );
+  });
 
 
   for( int r=0; r<numSpecies; ++r )
   {
-    EXPECT_NEAR( speciesRates[r], expectedSpeciesRates[r], 1.0e-8 );
+    EXPECT_NEAR( data.speciesRates[r], expectedSpeciesRates[r], 1.0e-8 );
   }
 
   for( int i = 0; i < numSpecies; ++i )
@@ -162,14 +207,29 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
     {
       if constexpr( LOGE_CONCENTRATION )
       {
-        speciesRatesDerivatives( i, j ) = speciesRatesDerivatives( i, j ) * exp( -speciesConcentration[j] );
+        data.speciesRatesDerivatives( i, j ) = data.speciesRatesDerivatives( i, j ) * exp( -data.speciesConcentration[j] );
       }
-      EXPECT_NEAR( speciesRatesDerivatives( i, j ), expectedSpeciesRatesDerivatives[i][j], 1.0e-8 );
+      EXPECT_NEAR( data.speciesRatesDerivatives( i, j ), expectedSpeciesRatesDerivatives[i][j], 1.0e-8 );
     }
   }
 }
 
 //******************************************************************************
+
+/**
+ * POD struct for transferring data between host and device for timeStepTest.
+ * @tparam numSpecies Number of species.
+ */
+template< int numSpecies >
+struct TimeStepTestData
+{
+  /// The species concentrations
+  double speciesConcentration[numSpecies];
+
+  /// The current time
+  double time = 0.0;
+};
+
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
@@ -184,58 +244,62 @@ void timeStepTest( PARAMS_DATA const & params,
                                                                    int,
                                                                    LOGE_CONCENTRATION >;
 
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
   double const temperature = 298.15;
+  TimeStepTestData< numSpecies > data;
 
-  double speciesConcentration[numSpecies];
   if constexpr( LOGE_CONCENTRATION )
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = log( initialSpeciesConcentration[i] );
+      data.speciesConcentration[i] = log( initialSpeciesConcentration[i] );
     }
   }
   else
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = initialSpeciesConcentration[i];
+      data.speciesConcentration[i] = initialSpeciesConcentration[i];
     }
   }
 
 
-  double time = 0.0;
-  for( int t = 0; t < numSteps; ++t )
+  data.time = 0.0;
+
+  pmpl::genericKernelWrapper( 1, &data, [params, temperature, dt, numSteps] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     double speciesConcentration_n[numSpecies];
-    for( int i=0; i<numSpecies; ++i )
-    {
-      speciesConcentration_n[i] = speciesConcentration[i];
-    }
-
     double speciesRates[numSpecies] = { 0.0 };
     CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
 
-    KineticReactionsType::timeStep( dt,
-                                    temperature,
-                                    params,
-                                    speciesConcentration_n,
-                                    speciesConcentration,
-                                    speciesRates,
-                                    speciesRatesDerivatives );
+    for( int t = 0; t < numSteps; ++t )
+    {
+      printf("Time step %d \n ", t);
+      for( int i=0; i<numSpecies; ++i )
+      {
+        speciesConcentration_n[i] = dataCopy->speciesConcentration[i];
+      }
+      KineticReactionsType::timeStep( dt,
+                                      temperature,
+                                      params,
+                                      speciesConcentration_n,
+                                      dataCopy->speciesConcentration,
+                                      speciesRates,
+                                      speciesRatesDerivatives );
+      dataCopy->time += dt;
+    }
+  });
 
-    time += dt;
-  }
 
-  EXPECT_NEAR( time, dt*numSteps, 1.0e-8 );
+  EXPECT_NEAR( data.time, dt*numSteps, 1.0e-8 );
 
   for( int i = 0; i < numSpecies; ++i )
   {
     if constexpr( LOGE_CONCENTRATION )
     {
-      speciesConcentration[i] = exp( speciesConcentration[i] );
+      data.speciesConcentration[i] = exp( data.speciesConcentration[i] );
     }
-    EXPECT_NEAR( speciesConcentration[i], expectedSpeciesConcentrations[i], 1.0e-4 );
+    EXPECT_NEAR( data.speciesConcentration[i], expectedSpeciesConcentrations[i], 1.0e-4 );
   }
 }
 

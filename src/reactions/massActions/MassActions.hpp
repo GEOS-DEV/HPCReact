@@ -38,8 +38,8 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 ARRAY_1D & logSecondarySpeciesConcentrations,
                                                 FUNC && derivativeFunc )
 {
-  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
-  constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
+  static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
 
   for( INDEX_TYPE i = 0; i < numSecondarySpecies; ++i )
   {
@@ -125,8 +125,8 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                                      ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
-  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
-  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  static constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+  static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
 
   calculateLogSecondarySpeciesConcentration< REAL_TYPE,
@@ -176,7 +176,7 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                                      ARRAY_1D & aggregatePrimarySpeciesConcentrations,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
-  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
   if constexpr( numSecondarySpecies > 0 )
   {
@@ -215,8 +215,8 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
                                                                    ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
                                                                    ARRAY_2D & dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
-  constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
-  constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  static constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+  static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
   calculateLogSecondarySpeciesConcentration< REAL_TYPE,
                                              INT_TYPE,

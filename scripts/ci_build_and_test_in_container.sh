@@ -3,27 +3,46 @@ env
 
 
 if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
-        PACKAGE_MANAGER="apt"
-    elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rhel fedora rocky centos" ]]; then
-        PACKAGE_MANAGER="yum"
-    else
-        echo "Unsupported OS: $ID"
-        exit 1
-    fi
+  . /etc/os-release
+  if [[ "$ID" == "ubuntu" ]]; then
+      PACKAGE_MANAGER="apt"
+  elif [[ "$ID" == "rocky" ]]; then
+      PACKAGE_MANAGER="yum"
+  else
+      echo "Unsupported OS: $ID"
+      exit 1
+  fi
 else
-    echo "/etc/os-release not found. Unable to determine OS."
-    exit 1
+  echo "/etc/os-release not found. Unable to determine OS."
+  exit 1
 fi
 
-echo "Using package manager: $PACKAGE_MANAGER"
 
-if [ "$PACKAGE_MANAGER" == "apt" ]; then
-    apt update && apt-get install -y libblas-dev liblapack-dev texlive-full
-elif [ "$PACKAGE_MANAGER" == "yum" ]; then
-    yum update && yum install -y blas lapack 
+if [ -f /usr/lib64/libblas.so.3 ]; then
+  BLAS_LIB=/usr/lib64/libblas.so.3
+  LAPACK_LIB=/usr/lib64/liblapack.so.3
+elif [ -f /usr/lib/x86_64-linux-gnu/libblas.so ]; then
+  BLAS_LIB=/usr/lib/x86_64-linux-gnu/libblas.so
+  LAPACK_LIB=/usr/lib/x86_64-linux-gnu/liblapack.so
+else
+  echo "BLAS/LAPACK not found"; 
+
+  echo "Using package manager: $PACKAGE_MANAGER"
+
+  if [ "$PACKAGE_MANAGER" == "apt" ]; then
+      apt update && apt-get install -y libblas-dev liblapack-dev
+  elif [ "$PACKAGE_MANAGER" == "yum" ]; then
+      yum update && yum install -y blas lapack 
+  fi
+
 fi
+
+
+
+
+
+
+
 
 # The or_die function run the passed command line and
 # exits the program in case of non zero error code
@@ -62,7 +81,9 @@ or_die python3 scripts/config-build.py \
                -hc ${HOST_CONFIG} \
                -bt ${CMAKE_BUILD_TYPE} \
                -bp ${HPCREACT_BUILD_DIR} \
-               -ip ${HPCREACT_INSTALL_DIR}\
+               -ip ${HPCREACT_INSTALL_DIR} \
+               -DBLAS_LIBRARIES=${BLAS_LIB} \
+               -DLAPACK_LIBRARIES=${LAPACK_LIB} \
                -DENABLE_COVERAGE:BOOL=${ENABLE_COVERAGE}
 
 or_die cd ${HPCREACT_BUILD_DIR}
@@ -75,6 +96,13 @@ fi
 
 # Documentation check
 if [[ "$*" == *--test-doxygen* ]]; then
+
+  if [ "$PACKAGE_MANAGER" == "apt" ]; then
+      apt update && apt-get install -y texlive-full
+  elif [ "$PACKAGE_MANAGER" == "yum" ]; then
+      yum update && yum install -y texlive 
+  fi
+
   or_die ctest --output-on-failure -R "testDoxygenCheck"
   exit 0
 fi
@@ -89,13 +117,13 @@ fi
 
 if [[ "$*" == *--code-coverage* ]]; then
   or_die make -j ${NPROC} VERBOSE=1
-  or_die make hpcReact_coverage
+  or_die make hpcReact_coverage VERBOSE=1
   cp -r ${HPCREACT_BUILD_DIR}/hpcReact_coverage.info.cleaned /tmp/hpcReact/hpcReact_coverage.info.cleaned
 fi
 
 
 if [[ "$*" == *--build-exe* ]]; then
-  or_die make -j ${NPROC}
+  or_die make -j ${NPROC} VERBOSE=1
 
   if [[ "$*" != *--disable-unit-tests* ]]; then
     or_die ctest --output-on-failure -E "testUncrustifyCheck|testDoxygenCheck|testCppCheck|testClangTidy"

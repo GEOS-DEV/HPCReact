@@ -19,6 +19,9 @@ if( NOT is_submodule )
 
     set( BLT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/cmake/blt CACHE PATH "" )
     set( BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard" FORCE )
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+
     set( ENABLE_WARNINGS_AS_ERRORS "ON" CACHE PATH "" )
 
     option( HPCREACT_ENABLE_UNIT_TESTS "Builds tests" ON )

@@ -53,6 +53,7 @@ struct CArrayWrapper< T, DIM0 >
    *
    * @note No runtime bounds checking is performed on the initializer size.
    */
+  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper( std::initializer_list< T > init )
   {
     // static_assert(init.size() == DIM0, "Size mismatch"); // needs c++20
@@ -66,6 +67,7 @@ struct CArrayWrapper< T, DIM0 >
    * @brief Copy constructor.
    * @param src The source CArrayWrapper to copy from.
    */
+  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper( CArrayWrapper const & src )
   {
     for( std::size_t i = 0; i < DIM0; i++ )
@@ -79,6 +81,7 @@ struct CArrayWrapper< T, DIM0 >
    * @param dim The index (must be in range [0, DIM0)).
    * @return Reference to the element at the specified index.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T & operator()( int const dim ) { return data[dim]; }
 
   /**
@@ -86,6 +89,7 @@ struct CArrayWrapper< T, DIM0 >
    * @param dim The index (must be in range [0, DIM0)).
    * @return Const reference to the element at the specified index.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T const & operator()( int const dim ) const { return data[dim]; }
 
   /**
@@ -93,6 +97,7 @@ struct CArrayWrapper< T, DIM0 >
    * @param dim The index (must be in range [0, DIM0)).
    * @return Reference to the element at the specified index.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T & operator[]( int const dim ) { return data[dim]; }
 
   /**
@@ -100,6 +105,7 @@ struct CArrayWrapper< T, DIM0 >
    * @param dim The index (must be in range [0, DIM0)).
    * @return Const reference to the element at the specified index.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T const & operator[]( int const dim ) const { return data[dim]; }
 
   /// The underlying 1D C-style array.
@@ -126,6 +132,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    * @brief Copy constructor.
    * @param src The source CArrayWrapper to copy from.
    */
+  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper( CArrayWrapper const & src )
   {
     for( std::size_t i = 0; i < DIM0; i++ )
@@ -150,6 +157,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    *
    * @note No runtime bounds checking is performed on the initializer dimensions.
    */
+  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper( std::initializer_list< std::initializer_list< T > > init )
   {
     // static_assert(init.size() == DIM0, "Size mismatch"); // needs c++20
@@ -172,6 +180,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    * @param dim1 Index in the second dimension (range [0, DIM1)).
    * @return Reference to the element at the specified 2D location.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T & operator()( int const dim0, int const dim1 )
   {
     return data[dim0][dim1];
@@ -183,6 +192,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    * @param dim1 Index in the second dimension (range [0, DIM1)).
    * @return Const reference to the element at the specified 2D location.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T const & operator()( int const dim0, int const dim1 ) const
   {
     return data[dim0][dim1];
@@ -195,6 +205,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    *
    * This allows usage like `obj[dim0][dim1]`.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T       ( & operator[]( int const dim0 ))[DIM1]
   {
     return data[dim0];
@@ -205,6 +216,7 @@ struct CArrayWrapper< T, DIM0, DIM1 >
    * @param dim0 The row index (range [0, DIM0)).
    * @return Const reference to an array of type T[DIM1].
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T const (&operator[]( int const dim0 ) const)[DIM1]
   {
     return data[dim0];
@@ -254,6 +266,7 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
    * @note This constructor does not perform size validation. Incorrect initializer sizes
    *       may lead to undefined behavior.
    */
+  HPCREACT_HOST_DEVICE
   constexpr CArrayWrapper( std::initializer_list< std::initializer_list< std::initializer_list< T > > > init )
   {
     // static_assert(init.size() == DIM0, "Size mismatch"); // needs c++20
@@ -286,6 +299,7 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
    * @note Currently, this function incorrectly indexes data[dim0][dim1], missing dim2.
    *       It should be `data[dim0][dim1][dim2]`. Please correct if intended.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T & operator()( int const dim0, int const dim1, int const dim2 )
   {
     // NOTE: This looks like a bug in your original code. Should be data[dim0][dim1][dim2].
@@ -299,6 +313,7 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
    * @param dim2 Index in the third dimension (range [0, DIM2)).
    * @return Const reference to the element at the specified 3D location.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T const & operator()( int const dim0, int const dim1, int const dim2 ) const
   {
     // NOTE: Same potential bug as above. Should be data[dim0][dim1][dim2].
@@ -312,6 +327,7 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
    *
    * This allows usage like `obj[dim0][dim1][dim2]`.
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T ( & operator[]( int const dim0 ))[DIM1][DIM2]
   {
     return data[dim0];
@@ -322,6 +338,7 @@ struct CArrayWrapper< T, DIM0, DIM1, DIM2 >
    * @param dim0 The slice index (range [0, DIM0)).
    * @return Const reference to an array of type T[DIM1][DIM2].
    */
+  HPCREACT_HOST_DEVICE
   constexpr HPCREACT_HOST_DEVICE inline T const (&operator[]( int const dim0 ) const)[DIM1][DIM2]
   {
     return data[dim0];

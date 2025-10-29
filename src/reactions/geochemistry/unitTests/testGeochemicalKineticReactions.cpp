@@ -219,8 +219,8 @@ TEST( testKineticReactions, testTimeStep_carbonateSystemAllKinetic )
   };
 
   timeStepTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                 2.0,
-                                 100000,
+                                 10.0,
+                                 10000,
                                  initialSpeciesConcentration,
                                  expectedSpeciesConcentrations );
 

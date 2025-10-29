@@ -14,6 +14,11 @@ fi
 # but that would not have solved the problem for the TPLs (we would require extra action to copy them to the mount point).
 CONTAINER_NAME=hpcReact_build
 
+set -x
+cat /etc/docker/daemon.json || echo "no mirror configured"
+docker info | grep -A2 Registry
+docker pull registry-1.docker.io/${DOCKER_REPOSITORY}
+
 docker run \
   --rm \
   --volume=${BUILD_DIR}:${BUILD_DIR_MOUNT_POINT} \

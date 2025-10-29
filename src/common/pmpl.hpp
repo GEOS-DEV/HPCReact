@@ -13,24 +13,26 @@
 
 #include "common/macros.hpp"
 
+#include <cstdio>
 #include <utility>
+#include <iostream>
 
 
 namespace hpcReact
 {
 #if defined(HPCREACT_USE_DEVICE)
   #if defined(HPCREACT_USE_CUDA)
-#define deviceMalloc( PTR, BYTES ) cudaMalloc( PTR, BYTES );
-#define deviceMallocManaged( PTR, BYTES ) cudaMallocManaged( PTR, BYTES );
-#define deviceDeviceSynchronize() cudaDeviceSynchronize();
-#define deviceMemCpy( DST, SRC, BYTES, KIND ) cudaMemcpy( DST, SRC, BYTES, KIND );
-#define deviceFree( PTR ) cudaFree( PTR );
+    #define deviceMalloc( PTR, BYTES ) cudaMalloc( PTR, BYTES );
+    #define deviceMallocManaged( PTR, BYTES ) cudaMallocManaged( PTR, BYTES );
+    #define deviceDeviceSynchronize() cudaDeviceSynchronize();
+    #define deviceMemCpy( DST, SRC, BYTES, KIND ) cudaMemcpy( DST, SRC, BYTES, KIND );
+    #define deviceFree( PTR ) cudaFree( PTR );
   #elif defined(HPCREACT_USE_HIP)
-#define deviceMalloc( PTR, BYTES ) hipMalloc( PTR, BYTES );
-#define deviceMallocManaged( PTR, BYTES ) hipMallocManaged( PTR, BYTES );
-#define deviceDeviceSynchronize() hipDeviceSynchronize();
-#define deviceMemCpy( DST, SRC, BYTES, KIND ) hipMemcpy( DST, SRC, BYTES, KIND );
-#define deviceFree( PTR ) hipFree( PTR );
+    #define deviceMalloc( PTR, BYTES ) hipMalloc( PTR, BYTES );
+    #define deviceMallocManaged( PTR, BYTES ) hipMallocManaged( PTR, BYTES );
+    #define deviceDeviceSynchronize() hipDeviceSynchronize();
+    #define deviceMemCpy( DST, SRC, BYTES, KIND ) hipMemcpy( DST, SRC, BYTES, KIND );
+    #define deviceFree( PTR ) hipFree( PTR );
   #endif
 #endif
 
@@ -121,13 +123,20 @@ HPCREACT_GLOBAL void genericKernel( LAMBDA func, DATA_TYPE * const data )
 template< typename DATA_TYPE, typename LAMBDA >
 void genericKernelWrapper( int const N, DATA_TYPE * const hostData, LAMBDA && func )
 {
-
 #if defined(HPCREACT_USE_DEVICE)
   DATA_TYPE * deviceData;
   deviceMalloc( &deviceData, N * sizeof(DATA_TYPE) );
   deviceMemCpy( deviceData, hostData, N * sizeof(DATA_TYPE), cudaMemcpyHostToDevice );
   genericKernel <<< 1, 1 >>> ( std::forward< LAMBDA >( func ), deviceData );
+
+  cudaError_t e = cudaGetLastError();
+  if (e != cudaSuccess) { fprintf(stderr, "launch error: %s\n", cudaGetErrorString(e)); abort(); }
+
   deviceDeviceSynchronize();
+
+  e = cudaGetLastError();
+  if (e != cudaSuccess) { fprintf(stderr, "post-sync error: %s\n", cudaGetErrorString(e)); abort(); }
+
   deviceMemCpy( hostData, deviceData, N * sizeof(DATA_TYPE), cudaMemcpyDeviceToHost );
   deviceFree( deviceData );
 #else

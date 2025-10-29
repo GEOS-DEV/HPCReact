@@ -21,7 +21,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 {
   using namespace hpcReact::geochemistry;
 
-  constexpr int numPrimarySpecies = carbonateSystemType::numPrimarySpecies();
+  static constexpr int numPrimarySpecies = carbonateSystemType::numPrimarySpecies();
 
   double const surfaceArea[carbonateSystemType::numKineticReactions()] =
   {

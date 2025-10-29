@@ -13,12 +13,14 @@
 
 #include "macros.hpp"
 #include "symmetricMatrix.hpp"
-#include <cmath>
+
+#include <math.h>
 
 namespace hpcReact
 {
 
 template< typename REAL_TYPE, int N >
+HPCREACT_HOST_DEVICE
 bool isPositiveDefinite( REAL_TYPE const (&A)[N][N] )
 {
   REAL_TYPE temp[N][N];
@@ -52,6 +54,7 @@ bool isPositiveDefinite( REAL_TYPE const (&A)[N][N] )
 
 
 template< typename REAL_TYPE, int N >
+HPCREACT_HOST_DEVICE
 void solveNxN_Cholesky( REAL_TYPE const (&A)[N][N], REAL_TYPE const (&b)[N], REAL_TYPE (& x)[N] )
 {
   REAL_TYPE L[N][N] = {{0}};
@@ -96,6 +99,7 @@ void solveNxN_Cholesky( REAL_TYPE const (&A)[N][N], REAL_TYPE const (&b)[N], REA
 
 
 template< typename REAL_TYPE, int N >
+HPCREACT_HOST_DEVICE
 void solveNxN_Cholesky( symmetricMatrix< REAL_TYPE, int, N > const & A,
                         REAL_TYPE const (&b)[N],
                         REAL_TYPE (& x)[N] )
