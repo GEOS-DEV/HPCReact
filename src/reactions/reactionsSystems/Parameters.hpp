@@ -105,7 +105,7 @@ struct KineticReactionsParameters
   HPCREACT_HOST_DEVICE RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_rateConstantForward[r] / m_rateConstantReverse[r]; }
 
-  IntType reactionRatesUpdateOption() const { return m_reactionRatesUpdateOption; }
+  HPCREACT_HOST_DEVICE IntType reactionRatesUpdateOption() const { return m_reactionRatesUpdateOption; }
 
   CArrayWrapper< RealType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantForward;
