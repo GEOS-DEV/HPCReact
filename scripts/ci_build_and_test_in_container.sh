@@ -1,6 +1,23 @@
 #!/bin/bash
 env
 
+
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
+      PACKAGE_MANAGER="apt"
+  elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rocky" ]]; then
+      PACKAGE_MANAGER="yum"
+  else
+      echo "Unsupported OS: $ID"
+      exit 1
+  fi
+else
+  echo "/etc/os-release not found. Unable to determine OS."
+  exit 1
+fi
+
+
 if [ -f /usr/lib64/libblas.so.3 ]; then
   BLAS_LIB=/usr/lib64/libblas.so.3
   LAPACK_LIB=/usr/lib64/liblapack.so.3
@@ -9,20 +26,6 @@ elif [ -f /usr/lib/x86_64-linux-gnu/libblas.so ]; then
   LAPACK_LIB=/usr/lib/x86_64-linux-gnu/liblapack.so
 else
   echo "BLAS/LAPACK not found"; 
-  if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
-        PACKAGE_MANAGER="apt"
-    elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rocky" ]]; then
-        PACKAGE_MANAGER="yum"
-    else
-        echo "Unsupported OS: $ID"
-        exit 1
-    fi
-  else
-    echo "/etc/os-release not found. Unable to determine OS."
-    exit 1
-  fi
 
   echo "Using package manager: $PACKAGE_MANAGER"
 
@@ -93,6 +96,13 @@ fi
 
 # Documentation check
 if [[ "$*" == *--test-doxygen* ]]; then
+
+  if [ "$PACKAGE_MANAGER" == "apt" ]; then
+      apt update && apt-get install -y texlive-full
+  elif [ "$PACKAGE_MANAGER" == "yum" ]; then
+      yum update && yum install -y texlive 
+  fi
+
   or_die ctest --output-on-failure -R "testDoxygenCheck"
   exit 0
 fi
