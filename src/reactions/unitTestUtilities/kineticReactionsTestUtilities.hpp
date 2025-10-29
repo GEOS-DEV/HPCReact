@@ -124,11 +124,21 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
 
 
 //******************************************************************************
+
+/**
+ * POD struct for transferring data between host and device for computeSpeciesRatesTest.
+ * @tparam numSpecies Number of species.
+ */
 template< int numSpecies >
 struct ComputeSpeciesRatesTestData
 {
+  /// The species concentrations
   double speciesConcentration[numSpecies];
+
+  /// The species rates
   double speciesRates[numSpecies] = { 0.0 };
+
+  /// The species rates derivatives
   CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
 };
 
@@ -195,10 +205,18 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
 }
 
 //******************************************************************************
+
+/**
+ * POD struct for transferring data between host and device for timeStepTest.
+ * @tparam numSpecies Number of species.
+ */
 template< int numSpecies >
 struct TimeStepTestData
 {
+  /// The species concentrations
   double speciesConcentration[numSpecies];
+
+  /// The current time
   double time = 0.0;
 };
 
