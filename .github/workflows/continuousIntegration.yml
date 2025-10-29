@@ -214,7 +214,7 @@ jobs:
       run: ./scripts/ci_build_and_test.sh
 
   code_coverage:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     needs:
       - get_docker_image_tag_hash
     steps:
@@ -225,7 +225,7 @@ jobs:
           lfs: false
       - name: run code coverage
         env:
-          DOCKER_REPOSITORY: geosx/ubuntu:24.04-gcc-${{ needs.get_docker_image_tag_hash.outputs.DOCKER_IMAGE_TAG_HASH }}
+          DOCKER_REPOSITORY: geosx/ubuntu:22.04-${{ needs.get_docker_image_tag_hash.outputs.DOCKER_IMAGE_TAG_HASH }}
           HOST_CONFIG: hostconfigs/environment.cmake
           CMAKE_CXX_COMPILER: /usr/bin/g++
           CMAKE_C_COMPILER: /usr/bin/gcc
