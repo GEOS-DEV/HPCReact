@@ -2,7 +2,12 @@
 set( testSourceFiles
      testDirectSystemSolve.cpp )
 
+
 set( dependencyList hpcReact gtest )
+
+if( ENABLE_CUDA )
+    list( APPEND dependencyList cuda )
+endif()
 
 # Add gtest C++ based tests
 foreach(test ${testSourceFiles})

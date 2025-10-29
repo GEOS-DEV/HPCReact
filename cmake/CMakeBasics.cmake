@@ -26,4 +26,10 @@ blt_append_custom_compiler_flag( FLAGS_VAR CMAKE_CXX_FLAGS_DEBUG
                                  CLANG "-fstandalone-debug"
                                 )
 
+if( ENABLE_COVERAGE )
+  blt_append_custom_compiler_flag( FLAGS_VAR CMAKE_CXX_FLAGS_DEBUG
+                                   GNU   "-O0 -fno-inline -fno-inline-functions -fno-inline-functions-called-once"
+                                  )
+endif()
+
 set( CAMP_ENABLE_TESTS OFF CACHE BOOL "")

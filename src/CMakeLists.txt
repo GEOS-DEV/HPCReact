@@ -26,14 +26,15 @@ set( hpcReact_sources)
 find_package(LAPACK REQUIRED)
 find_package(BLAS REQUIRED)
 
-
-
-#target_link_libraries(MyExecutable PRIVATE LAPACK::LAPACK)
      
-set( hpcReack_dependencies
+set( hpcReact_dependencies
      LAPACK::LAPACK
      BLAS::BLAS
      )
+
+if( ENABLE_CUDA )
+  list( APPEND hpcReact_dependencies cuda )
+endif()
 
 blt_add_library( NAME             hpcReact
 #                 SOURCES          ${hpcReact_sources}

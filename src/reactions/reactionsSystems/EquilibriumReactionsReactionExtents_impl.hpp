@@ -43,8 +43,8 @@ EquilibriumReactions< REAL_TYPE,
 {
 
   HPCREACT_UNUSED_VAR( temperature );
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
-  constexpr int numReactions = PARAMS_DATA::numReactions();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numReactions = PARAMS_DATA::numReactions();
 
   // initialize the species concentration
   RealType speciesConcentration[numSpecies];
@@ -126,8 +126,8 @@ EquilibriumReactions< REAL_TYPE,
                                                                 ARRAY_1D & speciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
-  constexpr int numReactions = PARAMS_DATA::numReactions();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numReactions = PARAMS_DATA::numReactions();
   double residual[numReactions] = { 0.0 };
   double xi[numReactions] = { 0.0 };
   double dxi[numReactions] = { 0.0 };

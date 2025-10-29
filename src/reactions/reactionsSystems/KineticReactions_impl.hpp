@@ -15,7 +15,7 @@
 #include "common/CArrayWrapper.hpp"
 #include "common/DirectSystemSolve.hpp"
 
-#include <cmath>
+#include <math.h>
 #include <string>
 #include <iostream>
 
@@ -368,15 +368,15 @@ KineticReactions< REAL_TYPE,
                                                   ARRAY_1D & speciesRates,
                                                   ARRAY_2D & speciesRatesDerivatives )
 {
-//  constexpr int numReactions = PARAMS_DATA::numReactions();
-  constexpr int numSpecies = PARAMS_DATA::numSpecies();
+//  static constexpr int numReactions = PARAMS_DATA::numReactions();
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
 
 
   REAL_TYPE residualNorm = 0.0;
-  for( int k=0; k<10; ++k ) // newton loop
+  for( int k=0; k<20; ++k ) // newton loop
   {
-    // printf( "iteration %2d: \n", k );
+//    printf( "iteration %2d: \n", k );
 
     computeSpeciesRates( temperature,
                          params,

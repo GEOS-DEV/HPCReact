@@ -19,47 +19,54 @@ using namespace hpcReact::unitTest_utilities;
 
 //******************************************************************************
 
-TEST( testEquilibriumReactions, testMoMasMediumEquilibrium )
+
+void testMoMasMediumEquilibriumHelper()
 {
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
                                                                            int,
                                                                            int >;
 
-  constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::mediumCaseParams.numPrimarySpecies();
+  static constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::mediumCaseParams.numPrimarySpecies();
 
-  double const targetAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
-  {
-    1.0e-20, // X1
-    -3.0, // X2
-    1.0e-20, // X3
-    1.0, // X4
-    1.0 // S
-  };
 
-  double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
-  {
-    1.0e-20, // X1
-    0.02, // X2
-    1.0e-20, // X3
-    1.0, // X4
-    1.0 // S
-  };
-
-  double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
-  {
-    log( initialPrimarySpeciesConcentration[0] ),
-    log( initialPrimarySpeciesConcentration[1] ),
-    log( initialPrimarySpeciesConcentration[2] ),
-    log( initialPrimarySpeciesConcentration[3] ),
-    log( initialPrimarySpeciesConcentration[4] )
-  };
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
-  EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
-                                                          hpcReact::MoMasBenchmark::mediumCaseParams.equilibriumReactionsParameters(),
-                                                          targetAggregatePrimarySpeciesConcentration,
-                                                          logInitialPrimarySpeciesConcentration,
-                                                          logPrimarySpeciesConcentration );
+
+  pmpl::genericKernelWrapper( numPrimarySpecies, logPrimarySpeciesConcentration, [] HPCREACT_DEVICE ( auto * const logPrimarySpeciesConcentrationCopy )
+  {
+    double const targetAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
+    {
+      1.0e-20, // X1
+      -3.0, // X2
+      1.0e-20, // X3
+      1.0, // X4
+      1.0 // S
+    };
+
+    double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
+    {
+      1.0e-20, // X1
+      0.02, // X2
+      1.0e-20, // X3
+      1.0, // X4
+      1.0 // S
+    };
+
+    double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
+    {
+      log( initialPrimarySpeciesConcentration[0] ),
+      log( initialPrimarySpeciesConcentration[1] ),
+      log( initialPrimarySpeciesConcentration[2] ),
+      log( initialPrimarySpeciesConcentration[3] ),
+      log( initialPrimarySpeciesConcentration[4] )
+    };
+    
+    EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
+                                                            hpcReact::MoMasBenchmark::mediumCaseParams.equilibriumReactionsParameters(),
+                                                            targetAggregatePrimarySpeciesConcentration,
+                                                            logInitialPrimarySpeciesConcentration,
+                                                            logPrimarySpeciesConcentrationCopy );
+  });
 
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
   {
@@ -76,6 +83,11 @@ TEST( testEquilibriumReactions, testMoMasMediumEquilibrium )
   }
 
 
+}
+
+TEST( testEquilibriumReactions, testMoMasMediumEquilibrium )
+{
+  testMoMasMediumEquilibriumHelper();
 }
 
 int main( int argc, char * * argv )

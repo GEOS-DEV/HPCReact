@@ -13,6 +13,7 @@
 #include "reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp"
 #include "../BulkGeneric.hpp"
 
+
 #include <gtest/gtest.h>
 
 using namespace hpcReact;
@@ -30,6 +31,7 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
     double const expectedJacobian[2][2] =
     { { 1.0e16, -2.0 },
       { -2.0, 4.0e16 } };
+
     computeResidualAndJacobianTest< double, 2 >( bulkGeneric::simpleTestRateParams,
                                                  initialSpeciesConcentration,
                                                  expectedResiduals,

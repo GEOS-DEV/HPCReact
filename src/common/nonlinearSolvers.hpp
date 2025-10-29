@@ -13,7 +13,7 @@
 
 #include "macros.hpp"
 #include "DirectSystemSolve.hpp"
-#include <cmath>
+#include <math.h>
 
 namespace hpcReact
 {
