@@ -1,6 +1,16 @@
 #!/bin/bash
 env
 
+if [ -f /usr/lib64/libblas.so.3 ]; then
+  BLAS_LIB=/usr/lib64/libblas.so.3
+  LAPACK_LIB=/usr/lib64/liblapack.so.3
+elif [ -f /usr/lib/x86_64-linux-gnu/libblas.so ]; then
+  BLAS_LIB=/usr/lib/x86_64-linux-gnu/libblas.so
+  LAPACK_LIB=/usr/lib/x86_64-linux-gnu/liblapack.so
+else
+  echo "BLAS/LAPACK not found"; exit 1
+fi
+
 
 # if [ -f /etc/os-release ]; then
 #     . /etc/os-release
@@ -16,6 +26,8 @@ env
 #     echo "/etc/os-release not found. Unable to determine OS."
 #     exit 1
 # fi
+
+
 
 # echo "Using package manager: $PACKAGE_MANAGER"
 
@@ -62,7 +74,9 @@ or_die python3 scripts/config-build.py \
                -hc ${HOST_CONFIG} \
                -bt ${CMAKE_BUILD_TYPE} \
                -bp ${HPCREACT_BUILD_DIR} \
-               -ip ${HPCREACT_INSTALL_DIR}\
+               -ip ${HPCREACT_INSTALL_DIR} \
+               -DBLAS_LIBRARIES=${BLAS_LIB} \
+               -DLAPACK_LIBRARIES=${LAPACK_LIB} \
                -DENABLE_COVERAGE:BOOL=${ENABLE_COVERAGE}
 
 or_die cd ${HPCREACT_BUILD_DIR}
