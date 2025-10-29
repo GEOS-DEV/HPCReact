@@ -29,11 +29,21 @@ REAL_TYPE tolerance( REAL_TYPE const a, REAL_TYPE const b )
   return std::numeric_limits< double >::epsilon() * std::max( fabs( a ), fabs( b ) ) * 10;
 }
 
+/**
+ * POD struct for transferring data between host and device for computeResidualAndJacobianTest.
+ * @tparam numReactions Number of reactions.
+ * @tparam numSpecies Number of species.
+ */
 template< int numReactions, int numSpecies >
 struct ComputeResidualAndJacobianTestData 
 {
-  CArrayWrapper< double, numReactions, numReactions > jacobian;
+  /// The reaction residuals
   double residual[numReactions] = { 0.0 };
+
+  /// The residual derivatives wrt reactions
+  CArrayWrapper< double, numReactions, numReactions > jacobian;
+
+  /// the species concentrations
   double speciesConcentration[numSpecies];
 };
 
@@ -95,10 +105,17 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
 
 //******************************************************************************
 
+/**
+ * POD struct for transferring data between host and device for testEnforceEquilibrium.
+ * @tparam numSpecies Number of species.
+ */
 template< int numSpecies >
 struct TestEnforceEquilibriumData
 {
+  /// The initial species concentrations
   double speciesConcentration0[numSpecies];
+  
+  /// The final species concentrations
   double speciesConcentration[numSpecies];
 };
 

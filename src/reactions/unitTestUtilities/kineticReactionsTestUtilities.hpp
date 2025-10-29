@@ -32,11 +32,22 @@ REAL_TYPE tolerance( REAL_TYPE const a, REAL_TYPE const b, REAL_TYPE const ndigi
 }
 
 //******************************************************************************
+
+/**
+ * POD struct for transferring data between host and device for computeReactionRatesTest.
+ * @tparam numReactions Number of reactions.
+ * @tparam numSpecies Number of species.
+ */
 template< int numReactions, int numSpecies >
 struct ComputeReactionRatesTestData
 {
+  /// The species concentration
   double speciesConcentration[numSpecies];
+
+  /// The reaction rates
   double reactionRates[numReactions] = { 0.0 };
+
+  /// The reaction rates derivatives
   CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
 };
 
