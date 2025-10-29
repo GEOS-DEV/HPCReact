@@ -64,6 +64,7 @@ fi
 
 if [[ "$*" == *--code-coverage* ]]; then
   ENABLE_COVERAGE=ON
+  export LCOV_GCOV=/usr/bin/gcov-13
 else
   ENABLE_COVERAGE=OFF
 fi
@@ -103,7 +104,7 @@ fi
 
 if [[ "$*" == *--code-coverage* ]]; then
   or_die make -j ${NPROC} VERBOSE=1
-  or_die make hpcReact_coverage
+  LCOV_GCOV=/usr/bin/gcov-13 GENINFO_IGNORE_ERRORS=mismatch or_die make hpcReact_coverage
   cp -r ${HPCREACT_BUILD_DIR}/hpcReact_coverage.info.cleaned /tmp/hpcReact/hpcReact_coverage.info.cleaned
 fi
 
