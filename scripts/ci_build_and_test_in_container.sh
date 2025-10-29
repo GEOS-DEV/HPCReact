@@ -4,9 +4,9 @@ env
 
 if [ -f /etc/os-release ]; then
   . /etc/os-release
-  if [[ "$ID" == "ubuntu" || "$ID_LIKE" == "debian" ]]; then
+  if [[ "$ID" == "ubuntu" ]]; then
       PACKAGE_MANAGER="apt"
-  elif [[ "$ID" == "rhel" || "$ID_LIKE" == "rocky" ]]; then
+  elif [[ "$ID" == "rocky" ]]; then
       PACKAGE_MANAGER="yum"
   else
       echo "Unsupported OS: $ID"
