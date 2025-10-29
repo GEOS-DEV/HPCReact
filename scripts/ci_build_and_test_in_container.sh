@@ -103,16 +103,6 @@ fi
 
 if [[ "$*" == *--code-coverage* ]]; then
   or_die make -j ${NPROC} VERBOSE=1
-
-  # create a wrapper that forces the flag
-  install -d /usr/local/bin
-  cat >/usr/local/bin/geninfo <<'EOF'
-  #!/usr/bin/env bash
-  exec /usr/bin/geninfo --ignore-errors mismatch "$@"
-  EOF
-  chmod +x /usr/local/bin/geninfo
-
-
   or_die make hpcReact_coverage VERBOSE=1
   cp -r ${HPCREACT_BUILD_DIR}/hpcReact_coverage.info.cleaned /tmp/hpcReact/hpcReact_coverage.info.cleaned
 fi
