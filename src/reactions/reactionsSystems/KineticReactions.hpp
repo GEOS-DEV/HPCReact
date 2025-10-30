@@ -13,6 +13,8 @@
 
 #include "common/macros.hpp"
 
+#include <stdexcept>
+
 /** @file KineticReactions.hpp
  *  @brief Header file for the KineticReactions class.
  *  @author HPC-REACT Team
@@ -130,12 +132,23 @@ public:
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & reactionRatesDerivatives )
   {
-    computeReactionRatesQuotient_impl< PARAMS_DATA, true >( temperature,
-                                                            params,
-                                                            speciesConcentration,
-                                                            surfaceArea,
-                                                            reactionRates,
-                                                            reactionRatesDerivatives );
+    if( params.reactionRatesUpdateOption() == 0 )
+    {
+      computeReactionRates_impl< PARAMS_DATA, true >( temperature,
+                                                      params,
+                                                      speciesConcentration,
+                                                      reactionRates,
+                                                      reactionRatesDerivatives );
+    }
+    else if( params.reactionRatesUpdateOption() == 1 )
+    {
+      computeReactionRatesQuotient_impl< PARAMS_DATA, true >( temperature,
+                                                              params,
+                                                              speciesConcentration,
+                                                              surfaceArea,
+                                                              reactionRates,
+                                                              reactionRatesDerivatives );
+    }
   }
 
 

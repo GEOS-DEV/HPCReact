@@ -49,6 +49,9 @@ struct ComputeReactionRatesTestData
 
   /// The reaction rates derivatives
   CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
+
+  /// The surface area
+  double surfaceArea[numReactions];
 };
 
 template< typename REAL_TYPE,
@@ -56,6 +59,7 @@ template< typename REAL_TYPE,
           typename PARAMS_DATA >
 void computeReactionRatesTest( PARAMS_DATA const & params,
                                REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
+                               REAL_TYPE const (&surfaceArea)[PARAMS_DATA::numReactions()],
                                REAL_TYPE const (&expectedReactionRates)[PARAMS_DATA::numReactions()],
                                REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] )
 {
@@ -92,12 +96,18 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
     }
   }
 
+  for( int r = 0; r < numReactions; ++r )
+  {
+    data.surfaceArea[r] = surfaceArea[r];
+  }
+
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     KineticReactionsType::computeReactionRates( temperature,
                                                 params,
                                                 dataCopy->speciesConcentration,
+                                                dataCopy->surfaceArea,
                                                 dataCopy->reactionRates,
                                                 dataCopy->reactionRatesDerivatives );
   });

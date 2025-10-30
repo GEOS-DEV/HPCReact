@@ -43,6 +43,18 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
     1.09 // Na+1
   };
 
+  double const surfaceArea[10] = { 0.0, // OH- + H+ = H2O
+                                   0.0, // CO2 + H2O = H+ + HCO3-
+                                   0.0, // CO3-2 + H+ = HCO3-
+                                   0.0, // CaHCO3+ = Ca+2 + HCO3-
+                                   0.0, // CaSO4 = Ca+2 + SO4-2
+                                   0.0, // CaCl+ = Ca+2 + Cl-
+                                   0.0, // CaCl2 = Ca+2 + 2Cl-
+                                   0.0, // MgSO4 = Mg+2 + SO4-2
+                                   0.0, // NaSO4- = Na+ + SO4-2
+                                   0.0, // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+  };
+
   double const expectedReactionRates[10] = { -0.001424736, //             OH- + H+ = H2O
                                              -12610.7392, //              CO2 + H2O = H+ + HCO3-
                                              -0.175591624, //             CO3-2 + H+ = HCO3-
@@ -71,15 +83,58 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
 
   computeReactionRatesTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                              initialSpeciesConcentration,
+                                             surfaceArea, // No use. Just to pass something here
                                              expectedReactionRates,
                                              expectedReactionRatesDerivatives );
   computeReactionRatesTest< double, true >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
+                                            surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
 }
 
+TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
+{
+  double const initialSpeciesConcentration[16] =
+  {
+    1.0e-16, // OH-
+    1.0e-16, // CO2
+    1.0e-16, // CO3-2
+    1.0e-16, // CaHCO3+
+    1.0e-16, // CaSO4
+    1.0e-16, // CaCl+
+    1.0e-16, // CaCl2
+    1.0e-16, // MgSO4
+    1.0e-16, // NaSO4-
+    3.76e-1, // H+
+    3.76e-1, // HCO3-
+    3.87e-2, // Ca+2
+    3.21e-2, // SO4-2
+    1.89, // Cl-
+    1.65e-2, // Mg+2
+    1.09 // Na+1
+  };
 
+  double const surfaceArea[1] = { 1e6 }; // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+
+  double const expectedReactionRates[1] = { 1.5488389999999999 }; // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+
+  double const expectedReactionRatesDerivatives[1][16] =
+  {
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.0877659574468075e-03, -3.0877659574468075e-03, -2.9999999999999997e-02, 0, 0, 0, 0 }
+  };
+
+  computeReactionRatesTest< double, false >( carbonateSystem.kineticReactionsParameters(),
+                                             initialSpeciesConcentration,
+                                             surfaceArea,
+                                             expectedReactionRates,
+                                             expectedReactionRatesDerivatives );
+  computeReactionRatesTest< double, true >( carbonateSystem.kineticReactionsParameters(),
+                                            initialSpeciesConcentration,
+                                            surfaceArea,
+                                            expectedReactionRates,
+                                            expectedReactionRatesDerivatives );
+}
 
 //******************************************************************************
 

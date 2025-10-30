@@ -58,16 +58,32 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                                                              ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
 {
-  // 1. Compute new aggregate species from primary species
-  massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
-                                                                             INT_TYPE,
-                                                                             INDEX_TYPE >( params.equilibriumReactionsParameters(),
-                                                                                           logPrimarySpeciesConcentrations,
-                                                                                           logSecondarySpeciesConcentrations,
-                                                                                           aggregatePrimarySpeciesConcentrations,
-                                                                                           mobileAggregatePrimarySpeciesConcentrations,
-                                                                                           dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
-                                                                                           dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+  if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
+  {
+    // 1. Compute new aggregate species from primary species
+    massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
+                                                                               INT_TYPE,
+                                                                               INDEX_TYPE >( params.equilibriumReactionsParameters(),
+                                                                                             logPrimarySpeciesConcentrations,
+                                                                                             logSecondarySpeciesConcentrations,
+                                                                                             aggregatePrimarySpeciesConcentrations,
+                                                                                             mobileAggregatePrimarySpeciesConcentrations,
+                                                                                             dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                                                                                             dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+  }
+  else
+  {
+    constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+
+    for( int i = 0; i < numPrimarySpecies; ++i )
+    {
+      REAL_TYPE const speciesConcentration_i = exp( logPrimarySpeciesConcentrations[i] );
+      aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
+      mobileAggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
+      dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
+      dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
+    }
+  }
 
   if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
   {

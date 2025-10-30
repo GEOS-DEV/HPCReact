@@ -72,6 +72,11 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                 ARRAY_1D & logSecondarySpeciesConcentrations )
 {
+  if constexpr( PARAMS_DATA::numSecondarySpecies() <= 0 )
+  {
+    return;
+  }
+
   massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE,
                                                                INT_TYPE,
                                                                INDEX_TYPE >( params,
@@ -173,15 +178,22 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
 {
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
-  REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
+  if constexpr( numSecondarySpecies > 0 )
+  {
+    REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
 
-  calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
-                                                  INT_TYPE,
-                                                  INDEX_TYPE >( params,
-                                                                logPrimarySpeciesConcentrations,
-                                                                logSecondarySpeciesConcentrations,
-                                                                aggregatePrimarySpeciesConcentrations,
-                                                                dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+    calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
+                                                    INT_TYPE,
+                                                    INDEX_TYPE >( params,
+                                                                  logPrimarySpeciesConcentrations,
+                                                                  logSecondarySpeciesConcentrations,
+                                                                  aggregatePrimarySpeciesConcentrations,
+                                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+  }
+  else
+  {
+    GEOS_UNUSED_VAR( logPrimarySpeciesConcentrations, aggregatePrimarySpeciesConcentrations, dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+  }
 
 }
 
