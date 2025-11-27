@@ -2,6 +2,7 @@
 set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
+     constitutive/activity/Bdot.hpp
      reactions/exampleSystems/BulkGeneric.hpp
      reactions/geochemistry/Carbonate.hpp
      reactions/geochemistry/Forge.hpp
@@ -67,10 +68,11 @@ message(STATUS "HPCReact/src CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DI
 # hpcReact_add_code_checks( PREFIX hpcReact
 #                        EXCLUDES "blt/*" )
 
+add_subdirectory( common/unitTests )
+add_subdirectory( constitutive/unitTests)
 add_subdirectory( reactions/exampleSystems/unitTests )
 add_subdirectory( reactions/geochemistry/unitTests )
 add_subdirectory( reactions/massActions/unitTests )
-add_subdirectory( common/unitTests )
 add_subdirectory( docs )
 
 hpcReact_add_code_checks( PREFIX hpcReact
