@@ -19,7 +19,7 @@ namespace ChainGeneric
 {
 // *****UNCRUSTIFY-OFF******
 
-  using serialAllKineticType = reactionsSystems::MixedReactionsParameters< double, int, int, 3, 3, 0 >;
+  using serialAllKineticType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 3, 3, 0 >;
 
   constexpr serialAllKineticType serialAllKineticParams =
   {

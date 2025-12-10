@@ -19,8 +19,8 @@ namespace MoMasBenchmark
 {
 // *****UNCRUSTIFY-OFF******
 
-  using easyCaseType = reactionsSystems::MixedReactionsParameters< double, int, int, 12, 7, 7 >;
-  using mediumCaseType = reactionsSystems::MixedReactionsParameters< double, int, int, 14, 10, 9 >; 
+  using easyCaseType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 12, 7, 7 >;
+  using mediumCaseType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 14, 10, 9 >; 
 
   constexpr easyCaseType easyCaseParams =
 {
