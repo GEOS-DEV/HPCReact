@@ -22,9 +22,9 @@ namespace hpcReact
 
 namespace geochemistry
 {
-using systemTypes = std::variant< ultramaficSystemType,
-                                  carbonateSystemType,
+using systemTypes = std::variant< carbonateSystemType,
                                   carbonateSystemAllEquilibriumType,
+                                  ultramaficSystemType,
                                   forgeSystemType >;
 
 } // namespace geochemistry

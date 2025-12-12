@@ -130,7 +130,7 @@ void timeStepTest( PARAMS_DATA const & params,
             }
           };
 
-          nonlinearSolvers::newtonRaphson< numPrimarySpecies >( logPrimarySpeciesConcentration, computeResidualAndJacobian );
+          nonlinearSolvers::newtonRaphson< numPrimarySpecies >( logPrimarySpeciesConcentration, computeResidualAndJacobian, 50 );
 
           time += dt;
         }
