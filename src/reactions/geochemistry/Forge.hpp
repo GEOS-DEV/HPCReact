@@ -57,24 +57,24 @@ constexpr CArrayWrapper< double, 24, 29 > stoichMatrix =
 constexpr CArrayWrapper< double, 24 > equilibriumConstants =
 {
    104351.8133, // CaCO₃(aq) + H⁺ ⇌ Ca²⁺ + HCO₃⁻
-   3.98107E-03, // CaHCO₃⁺ ⇌ Ca²⁺ + HCO₃⁻
-   3.6915E-04,  // CaSO₄ ⇌ Ca²⁺ + SO₄²⁻
-   0.2930,      // CaCl⁺ ⇌ Ca²⁺ + Cl⁻
-   0.1228,      // CaCl₂ ⇌ Ca²⁺ + 2Cl⁻ (approximate, same source)
-   0.0038,      // MgHCO₃⁺ ⇌ Mg²⁺ + HCO₃⁻
+   3.9739, //3.98107E-03, // CaHCO₃⁺ ⇌ Ca²⁺ + HCO₃⁻
+   0.3685, //3.6915E-04,  // CaSO₄ ⇌ Ca²⁺ + SO₄²⁻
+   292.4726, //0.2930     // CaCl⁺ ⇌ Ca²⁺ + Cl⁻
+   1.2236e+05, //0.1228     // CaCl₂ ⇌ Ca²⁺ + 2Cl⁻ (approximate, same source)
+   3.7932, //0.0038     // MgHCO₃⁺ ⇌ Mg²⁺ + HCO₃⁻
    7.4559E+05,  // MgCO₃(aq) + H⁺ ⇌ Mg²⁺ + HCO₃⁻
-   0.0726,      // MgCl⁺ ⇌ Mg²⁺ + Cl⁻
-   6.3548E-08,  // CO₂(aq) + H₂O ⇌ H⁺ + HCO₃⁻
-   3.4017E-05,  // HSO₄⁻ ⇌ H⁺ + SO₄²⁻
-   3.7068E-05,  // KHSO₄ ⇌ H⁺ + K⁺ + SO₄²⁻
-   6.9088E+08,  // HSiO₃⁻ ⇌ H⁺ + SiO₂(aq)
-   4.5520E+07,  // NaHSiO₃ ⇌ H⁺ + Na⁺ + SiO₂(aq)
-   0.8067,      // NaCl ⇌ Na⁺ + Cl⁻
-   1.6398,      // KCl ⇌ K⁺ + Cl⁻
-   0.0121,      // KSO₄⁻ ⇌ K⁺ + SO₄²⁻
-   14.6994,     // AlOH²⁺ + H⁺ ⇌ Al³⁺ + H₂O
-   3.8530E+03,  // Al(OH)₂⁺ + 2H⁺ ⇌ Al³⁺ + 2H₂O
-   1.9213E+11,  // OH⁻ + H⁺ ⇌ H₂O
+   72.4693,  //0.0726    // MgCl⁺ ⇌ Mg²⁺ + Cl⁻
+   6.3434e-05, //6.3548E-08  // CO₂(aq) + H₂O ⇌ H⁺ + HCO₃⁻
+   0.0340, //3.4017E-05,  // HSO₄⁻ ⇌ H⁺ + SO₄²⁻
+   36.9347, //3.7068E-05,  // KHSO₄ ⇌ H⁺ + K⁺ + SO₄²⁻
+   6.8964e+11, // 6.9088E+08,  // HSiO₃⁻ ⇌ H⁺ + SiO₂(aq)
+   4.5356e+13, //4.5520E+07,  // NaHSiO₃ ⇌ H⁺ + Na⁺ + SiO₂(aq)
+   805.2479, //0.8067,      // NaCl ⇌ Na⁺ + Cl⁻
+   1.6368e+03, //1.6398,      // KCl ⇌ K⁺ + Cl⁻
+   12.0782, //0.0121,      // KSO₄⁻ ⇌ K⁺ + SO₄²⁻
+   0.0147, //14.6994,     // AlOH²⁺ + H⁺ ⇌ Al³⁺ + H₂O
+   0.0039, //3.8530E+03,  // Al(OH)₂⁺ + 2H⁺ ⇌ Al³⁺ + 2H₂O
+   1.9282e+05, //1.9213E+11,  // OH⁻ + H⁺ ⇌ H₂O
    0.0036,      // SiO2(s) ⇌ SiO2(aq)
    6.6130E+15,  // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
    1.3047E+05,  // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
@@ -106,8 +106,8 @@ constexpr CArrayWrapper< double, 24 > fwRateConstant =
    2.7043E-08,  // SiO2(s) ⇌ SiO2(aq)
    3.0145E-11,  // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
    1.0801E-08,  // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
-   1.1283e-10,         // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
-   1.8137e-12          // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
+   1.1283e-10,  // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
+   1.8137e-12   // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
 };
 
 
@@ -132,11 +132,11 @@ constexpr CArrayWrapper< double, 24 > reverseRateConstant =
    0.0,   // AlOH²⁺ + H⁺ ⇌ Al³⁺ + H₂O
    0.0,   // Al(OH)₂⁺ + 2H⁺ ⇌ Al³⁺ + 2H₂O
    0.0,   // OH⁻ + H⁺ ⇌ H₂O
-   7.5119E-06,  // SiO2(s) ⇌ SiO2(aq)
-   4.5584E-27,  // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
-   8.2785E-14,  // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
-   6.3858E-07,  // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
-   5.7645E-08   // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
+   7.4240e-09, //7.5119E-06,  // SiO2(s) ⇌ SiO2(aq)
+   4.5420e-21, //4.5584E-27,  // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
+   8.2341e-05, //8.2785E-14,  // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
+   6.3975e-10, //6.3858E-07,  // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
+   57.3348     //5.7645E-08   // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
 };
 
 constexpr CArrayWrapper< int, 24 > mobileSpeciesFlag =

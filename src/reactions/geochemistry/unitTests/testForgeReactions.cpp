@@ -30,34 +30,34 @@ TEST( testForgeReactions, testTimeStep_forgeSystem )
 
   double const initialAggregateSpeciesConcentration[numPrimarySpecies] =
   {
-    5e-08, // H+
-    8.3991e-0, // Ca+2
-    0.00014146, // Mg+2
-    0.0034061, // Na+
-    0.00020949, // K+
-    2.3494e-08, // Al+++
-    0.0016047, // HCO3-
-    0.00038069, // SO4-2
-    0.0010018, // Cl-
-    4.4047e-06 //SiO2(aq)
+    1.9964e-04, // H+
+    0.1050, // Ca+2
+    0.1209, // Mg+2
+    3.4000, // Na+
+    0.1250, // K+
+    5.4367e-04, // Al+++
+    2.60, // HCO3-
+    0.380, // SO4-2
+    1.0, // Cl-
+    0.0103 //SiO2(aq)
   };
 
   double const expectedSpeciesConcentrations[numPrimarySpecies] =
   {
-    5e-08, // H+
-    8.3991e-0, // Ca+2
-    0.00014146, // Mg+2
-    0.0034061, // Na+
-    0.00020949, // K+
-    2.3494e-08, // Al+++
-    0.0016047, // HCO3-
-    0.00038069, // SO4-2
-    0.0010018, // Cl-
-    4.4047e-06 //SiO2(aq)
+    1.9964e-04, // H+
+    0.1050, // Ca+2
+    0.1209, // Mg+2
+    3.4000, // Na+
+    0.1250, // K+
+    5.4367e-04, // Al+++
+    2.60, // HCO3-
+    0.380, // SO4-2
+    1.0, // Cl-
+    0.0103 //SiO2(aq)
   };
 
   timeStepTest< double, true >( forgeSystem,
-                                1.e-3,
+                                1.e-5,
                                 10,
                                 initialAggregateSpeciesConcentration,
                                 surfaceArea,
