@@ -50,7 +50,7 @@ constexpr CArrayWrapper< double, 24, 29 > stoichMatrix =
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,   -10,   0,    3,     0,    1,    1,     0,     0,     0,   3  }, // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -8,   1,    0,     0,    0,    2,     0,     0,     0,   2  }, // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -4,   0,    0,     0,    1,    1,     0,     0,     0,   3  }, // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
-  {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -6,   0,    0,     0,    0,    1,     0,     0,     0,   2  }  // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
+  {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -6,   0,    0,     0,    0,    2,     0,     0,     0,   2  }  // Al2Si2O5(OH)4(s) + 6H+ ⇌ 2Al3+ + 2 SiO2 + 5H2O
 };
 
 // Must convert these. They should not be the log.
@@ -79,7 +79,7 @@ constexpr CArrayWrapper< double, 24 > equilibriumConstants =
    6.6130E+15,  // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
    1.3047E+05,  // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
    1.7669E-04,  // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
-   3.1463E-05   // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
+   3.1463E-05   // Al2Si2O5(OH)4(s) + 6H+ ⇌ 2Al3+ + 2 SiO2 + 5H2O
 };
 
 constexpr CArrayWrapper< double, 24 > fwRateConstant =
@@ -107,7 +107,7 @@ constexpr CArrayWrapper< double, 24 > fwRateConstant =
    3.0145E-11,  // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
    1.0801E-08,  // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
    1.1283e-10,  // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
-   1.8137e-12   // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
+   1.8137e-12   // Al2Si2O5(OH)4(s) + 6H+ ⇌ 2Al3+ + 2 SiO2 + 5H2O
 };
 
 
@@ -136,7 +136,7 @@ constexpr CArrayWrapper< double, 24 > reverseRateConstant =
    4.5420e-21, //4.5584E-27,  // KAlMg3Si3O10(OH)2(s) + 10H+ ⇌ Al3+ + K+ + 3Mg2+ + 3SiO2(aq) + 6H2O
    8.2341e-05, //8.2785E-14,  // CaAl2(SiO4)2(s) + 8H+ ⇌ Ca2+ + 2 Al3+ + 2 SiO2(aq) + 4H2O
    6.3975e-10, //6.3858E-07,  // KAlSi3O8(s) + 4H+ ⇌ Al3+ + K+ + 3 SiO2 + 2H2O
-   57.3348     //5.7645E-08   // Al2Si2O5(OH)4(s) + 6H+ ⇌ Al3+ + 2 SiO2 + 5H2O
+   0.0574     //5.7645E-08   // Al2Si2O5(OH)4(s) + 6H+ ⇌ 2Al3+ + 2 SiO2 + 5H2O
 };
 
 constexpr CArrayWrapper< int, 24 > mobileSpeciesFlag =
