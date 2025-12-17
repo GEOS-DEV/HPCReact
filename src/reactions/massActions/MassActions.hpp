@@ -154,7 +154,7 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
       aggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
       for( int k=0; k<numPrimarySpecies; ++k )
       {
-        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::ln10() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
+        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::dWrtLogConst() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
         dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
       }
@@ -247,7 +247,7 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
       mobileAggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j * params.mobileSecondarySpeciesFlag( j );
       for( int k=0; k<numPrimarySpecies; ++k )
       {
-        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::ln10() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
+        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::dWrtLogConst() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
         dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
 

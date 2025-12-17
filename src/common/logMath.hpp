@@ -32,10 +32,10 @@ struct LogExp
   template< typename T >
   HPCREACT_HOST_DEVICE
   static constexpr inline 
-  T dLogConst()
+  T dWrtLogConst()
   {
     if constexpr ( Base == LogBase::e ) { return T(1.0); }
-    else                                { return T(1.0/ln10()); }
+    else                                { return T(ln10()); }
   }
 
 
