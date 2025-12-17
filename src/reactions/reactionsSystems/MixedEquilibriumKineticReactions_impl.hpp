@@ -29,8 +29,7 @@ namespace reactionsSystems
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE,
-          bool LOGE_CONCENTRATION >
+          typename INDEX_TYPE>
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST_KINETIC,
@@ -42,8 +41,7 @@ template< typename PARAMS_DATA,
 HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
-                                  INDEX_TYPE,
-                                  LOGE_CONCENTRATION
+                                  INDEX_TYPE
                                   >::updateMixedSystem_impl( RealType const & temperature,
                                                              PARAMS_DATA const & params,
                                                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
@@ -77,7 +75,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
     for( int i = 0; i < numPrimarySpecies; ++i )
     {
-      REAL_TYPE const speciesConcentration_i = exp( logPrimarySpeciesConcentrations[i] );
+      REAL_TYPE const speciesConcentration_i = logmath::exp( logPrimarySpeciesConcentrations[i] );
       aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
       mobileAggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
       dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
@@ -113,8 +111,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE,
-          bool LOGE_CONCENTRATION >
+          typename INDEX_TYPE>
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST2,
@@ -124,8 +121,7 @@ template< typename PARAMS_DATA,
 HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
-                                  INDEX_TYPE,
-                                  LOGE_CONCENTRATION
+                                  INDEX_TYPE
                                   >::computeReactionRates_impl( RealType const & temperature,
                                                                 PARAMS_DATA const & params,
                                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
@@ -177,9 +173,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
       for( IntType k = 0; k < numSecondarySpecies; ++k )
       {
         RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = params.stoichiometricMatrix( k, j + numSecondarySpecies );
-
-        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) +=
-          reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
+        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) += reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
       }
     }
   }
@@ -187,8 +181,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE,
-          bool LOGE_CONCENTRATION >
+          typename INDEX_TYPE>
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST2,
@@ -199,8 +192,7 @@ template< typename PARAMS_DATA,
 HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
-                                  INDEX_TYPE,
-                                  LOGE_CONCENTRATION
+                                  INDEX_TYPE
                                   >::computeAggregateSpeciesRates_impl( PARAMS_DATA const & params,
                                                                         ARRAY_1D_TO_CONST const & speciesConcentration,
                                                                         ARRAY_1D_TO_CONST2 const & reactionRates,

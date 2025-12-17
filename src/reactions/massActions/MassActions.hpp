@@ -12,6 +12,7 @@
 #pragma once
 
 #include "common/macros.hpp"
+#include "common/logMath.hpp"
 #include <math.h>
 #include <functional>
 #include <iostream>
@@ -49,10 +50,10 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
   for( int j=0; j<numSecondarySpecies; ++j )
   {
     REAL_TYPE const gamma = 1;
-    logSecondarySpeciesConcentrations[j] = -log( params.equilibriumConstant( j ) ) - log( gamma );
+    logSecondarySpeciesConcentrations[j] = -logmath::log( params.equilibriumConstant( j ) ) - logmath::log( gamma );
     for( int k=0; k<numPrimarySpecies; ++k )
     {
-      logSecondarySpeciesConcentrations[j] += params.stoichiometricMatrix( j, k+numSecondarySpecies ) * ( logPrimarySpeciesConcentrations[k] + log( gamma ) );
+      logSecondarySpeciesConcentrations[j] += params.stoichiometricMatrix( j, k+numSecondarySpecies ) * ( logPrimarySpeciesConcentrations[k] + logmath::log( gamma ) );
       derivativeFunc( j, k, params.stoichiometricMatrix( j, k+numSecondarySpecies ) );
     }
   }
@@ -144,18 +145,17 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
 
   for( int i = 0; i < numPrimarySpecies; ++i )
   {
-    REAL_TYPE const speciesConcentration_i = exp( logPrimarySpeciesConcentrations[i] );
+    REAL_TYPE const speciesConcentration_i = logmath::exp( logPrimarySpeciesConcentrations[i] );
     aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
     dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
     for( int j = 0; j < numSecondarySpecies; ++j )
     {
-      REAL_TYPE const secondarySpeciesConcentrations_j = exp( logSecondarySpeciesConcentrations[j] );
+      REAL_TYPE const secondarySpeciesConcentrations_j = logmath::exp( logSecondarySpeciesConcentrations[j] );
       aggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
       for( int k=0; k<numPrimarySpecies; ++k )
       {
-        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
-        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                   i+numSecondarySpecies ) *
+        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::ln10() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
       }
     }
@@ -234,7 +234,7 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
 
   for( int i = 0; i < numPrimarySpecies; ++i )
   {
-    REAL_TYPE const speciesConcentration_i = exp( logPrimarySpeciesConcentrations[i] );
+    REAL_TYPE const speciesConcentration_i = logmath::exp( logPrimarySpeciesConcentrations[i] );
     aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
     mobileAggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
     dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
@@ -242,18 +242,16 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
 
     for( int j = 0; j < numSecondarySpecies; ++j )
     {
-      REAL_TYPE const secondarySpeciesConcentrations_j = exp( logSecondarySpeciesConcentrations[j] );
+      REAL_TYPE const secondarySpeciesConcentrations_j = logmath::exp( logSecondarySpeciesConcentrations[j] );
       aggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
       mobileAggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j * params.mobileSecondarySpeciesFlag( j );
       for( int k=0; k<numPrimarySpecies; ++k )
       {
-        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
-        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                   i+numSecondarySpecies ) *
+        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::ln10() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
 
-        dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                         i+numSecondarySpecies ) *
+        dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                             dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration *
                                                                                                             params.mobileSecondarySpeciesFlag( j );
       }

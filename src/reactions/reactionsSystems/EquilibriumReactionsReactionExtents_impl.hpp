@@ -98,7 +98,7 @@ EquilibriumReactions< REAL_TYPE,
       }
     }
     // compute the residual for this reaction
-    residual[a] = log( reverseProduct / ( forwardProduct * Keq ) );
+    residual[a] = logmath::log( reverseProduct / ( forwardProduct * Keq ) );
 
     // compute the jacobian
     for( IndexType b=0; b<numReactions; ++b )

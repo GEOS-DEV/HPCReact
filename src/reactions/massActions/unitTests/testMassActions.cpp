@@ -29,13 +29,13 @@ struct CalculateLogSecondarySpeciesConcentrationData
   double dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{0}};
   double const logPrimarySpeciesSolution[numPrimarySpecies] =
   {
-    log( 0.00043969547214915125 ),
-    log( 0.00037230096984514874 ),
-    log( 0.014716565308128551 ),
-    log( 0.0024913722747387217 ),
-    log( 1.8586090945989489 ),
-    log( 0.009881874292035079 ),
-    log( 1.0723078278653704 )
+    logmath::log( 0.00043969547214915125 ),
+    logmath::log( 0.00037230096984514874 ),
+    logmath::log( 0.014716565308128551 ),
+    logmath::log( 0.0024913722747387217 ),
+    logmath::log( 1.8586090945989489 ),
+    logmath::log( 0.009881874292035079 ),
+    logmath::log( 1.0723078278653704 )
   };
 };
 
@@ -84,7 +84,7 @@ void test_calculateLogSecondarySpeciesConcentration_helper()
 
   for( int j=0; j<numSecondarySpecies; ++j )
   {
-    EXPECT_NEAR( exp( data.logSecondarySpeciesConcentrations[j] ),
+    EXPECT_NEAR( logmath::exp( data.logSecondarySpeciesConcentrations[j] ),
                  expectedSecondarySpeciesConcentrations[j],
                  1.0e-8 );
   }
@@ -126,13 +126,13 @@ struct CalculateAggregatePrimaryConcentrationsWrtLogCHelperData
 {
   double const primarySpeciesSolution[numPrimarySpecies] =
   {
-    log(0.00043969547214915125),
-    log(0.00037230096984514874),
-    log(0.014716565308128551),
-    log(0.0024913722747387217),
-    log(1.8586090945989489),
-    log(0.009881874292035079),
-    log(1.0723078278653704)
+    logmath::log(0.00043969547214915125),
+    logmath::log(0.00037230096984514874),
+    logmath::log(0.014716565308128551),
+    logmath::log(0.0024913722747387217),
+    logmath::log(1.8586090945989489),
+    logmath::log(0.009881874292035079),
+    logmath::log(1.0723078278653704)
   };
 
   double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = {0};

@@ -81,12 +81,7 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
 
   };
 
-  computeReactionRatesTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea, // No use. Just to pass something here
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( carbonateSystemAllKinetic.kineticReactionsParameters(),
+  computeReactionRatesTest< double >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
                                             surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,
@@ -124,12 +119,7 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.0877659574468075e-03, -3.0877659574468075e-03, -2.9999999999999997e-02, 0, 0, 0, 0 }
   };
 
-  computeReactionRatesTest< double, false >( carbonateSystem.kineticReactionsParameters(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea,
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( carbonateSystem.kineticReactionsParameters(),
+  computeReactionRatesTest< double >( carbonateSystem.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
                                             surfaceArea,
                                             expectedReactionRates,
@@ -218,18 +208,12 @@ TEST( testKineticReactions, testTimeStep_carbonateSystemAllKinetic )
     1.072307827865370e+00 // Na+1
   };
 
-  timeStepTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                 10.0,
-                                 10000,
-                                 initialSpeciesConcentration,
-                                 expectedSpeciesConcentrations );
+  timeStepTest< double >( carbonateSystemAllKinetic.kineticReactionsParameters(),
+                          10.0,
+                          10000,
+                          initialSpeciesConcentration,
+                          expectedSpeciesConcentrations );
 
-  // ln(c) as the primary variable results in a singular system.
-  // timeStepTest< double, true >( simpleKineticTestRateParams,
-  //                               2.0,
-  //                               10,
-  //                               initialSpeciesConcentration,
-  //                               expectedSpeciesConcentrations );
 }
 
 int main( int argc, char * * argv )

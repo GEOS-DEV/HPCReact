@@ -44,12 +44,7 @@ TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionPa
   { { 0.05, 0.0, 0.0 },
     { 0.0, 0.03, 0.0 },
     { 0.0, 0.0, 0.02 } };
-  computeReactionRatesTest< double, false >( serialAllKineticParams.kineticReactionsParameters(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea, // No use. Just to pass something here
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( serialAllKineticParams.kineticReactionsParameters(),
+  computeReactionRatesTest< double >( serialAllKineticParams.kineticReactionsParameters(),
                                             initialSpeciesConcentration,
                                             surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,
