@@ -51,7 +51,7 @@ KineticReactions< REAL_TYPE,
                                                 ARRAY_2D & reactionRatesDerivatives )
 {
 
-  if constexpr( !CALCULATE_DERIVATIVES )
+  if constexpr ( !CALCULATE_DERIVATIVES )
   {
     HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
   }
@@ -88,7 +88,7 @@ KineticReactions< REAL_TYPE,
     reactionRates[r] = forwardRateConstant * logmath::exp( productConcForward )
                        - reverseRateConstant * logmath::exp( productConcReverse );
 
-    if constexpr( CALCULATE_DERIVATIVES )
+    if constexpr ( CALCULATE_DERIVATIVES )
     {
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
@@ -130,7 +130,7 @@ KineticReactions< REAL_TYPE,
                                                         ARRAY_1D & reactionRates,
                                                         ARRAY_2D & reactionRatesDerivatives )
 {
-  if constexpr( !CALCULATE_DERIVATIVES )
+  if constexpr ( !CALCULATE_DERIVATIVES )
   {
     HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
   }
@@ -141,7 +141,7 @@ KineticReactions< REAL_TYPE,
     // set reaction rate to zero
     reactionRates[r] = 0.0;
 
-    if constexpr( CALCULATE_DERIVATIVES )
+    if constexpr ( CALCULATE_DERIVATIVES )
     {
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
@@ -165,7 +165,7 @@ KineticReactions< REAL_TYPE,
     }
     quotient = logmath::exp( logQuotient );
 
-    if constexpr( CALCULATE_DERIVATIVES )
+    if constexpr ( CALCULATE_DERIVATIVES )
     {
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
@@ -199,7 +199,7 @@ KineticReactions< REAL_TYPE,
   RealType reactionRates[PARAMS_DATA::numReactions()] = { 0.0 };
   CArrayWrapper< double, PARAMS_DATA::numReactions(), PARAMS_DATA::numSpecies() > reactionRatesDerivatives;
 
-  if constexpr( !CALCULATE_DERIVATIVES )
+  if constexpr ( !CALCULATE_DERIVATIVES )
   {
     HPCREACT_UNUSED_VAR( speciesRatesDerivatives );
   }
@@ -209,7 +209,7 @@ KineticReactions< REAL_TYPE,
   for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
   {
     speciesRates[i] = 0.0;
-    if constexpr( CALCULATE_DERIVATIVES )
+    if constexpr ( CALCULATE_DERIVATIVES )
     {
       for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
       {
@@ -220,7 +220,7 @@ KineticReactions< REAL_TYPE,
     {
       RealType const s_ir = params.stoichiometricMatrix( r, i );
       speciesRates[i] += s_ir * reactionRates[r];
-      if constexpr( CALCULATE_DERIVATIVES )
+      if constexpr ( CALCULATE_DERIVATIVES )
       {
         for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
         {
@@ -242,12 +242,12 @@ HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
                   INDEX_TYPE >::timeStep( RealType const dt,
-                                                  RealType const & temperature,
-                                                  PARAMS_DATA const & params,
-                                                  ARRAY_1D_TO_CONST const & speciesConcentration_n,
-                                                  ARRAY_1D & speciesConcentration,
-                                                  ARRAY_1D & speciesRates,
-                                                  ARRAY_2D & speciesRatesDerivatives )
+                                          RealType const & temperature,
+                                          PARAMS_DATA const & params,
+                                          ARRAY_1D_TO_CONST const & speciesConcentration_n,
+                                          ARRAY_1D & speciesConcentration,
+                                          ARRAY_1D & speciesRates,
+                                          ARRAY_2D & speciesRatesDerivatives )
 {
 //  static constexpr int numReactions = PARAMS_DATA::numReactions();
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();

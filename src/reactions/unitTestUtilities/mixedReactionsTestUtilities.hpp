@@ -100,33 +100,33 @@ void timeStepTest( PARAMS_DATA const & params,
           }
 
           auto computeResidualAndJacobian = [&] ( REAL_TYPE const (&X)[numPrimarySpecies],
-                                                                       REAL_TYPE ( &r )[numPrimarySpecies],
-                                                                       REAL_TYPE ( &J )[numPrimarySpecies][numPrimarySpecies] )
+                                                  REAL_TYPE ( & r )[numPrimarySpecies],
+                                                  REAL_TYPE ( & J )[numPrimarySpecies][numPrimarySpecies] )
+      {
+        MixedReactionsType::updateMixedSystem( temperature,
+                                               params,
+                                               X,
+                                               surfaceArea,
+                                               logSecondarySpeciesConcentration,
+                                               aggregatePrimarySpeciesConcentration,
+                                               mobileAggregatePrimarySpeciesConcentration,
+                                               dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
+                                               dMobileAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
+                                               reactionRates,
+                                               dReactionRates_dlogPrimarySpeciesConcentration,
+                                               aggregateSpeciesRates,
+                                               dAggregateSpeciesRates_dlogPrimarySpeciesConcentration );
+
+
+        for( int i = 0; i < numPrimarySpecies; ++i )
+        {
+          r[i] = ( aggregatePrimarySpeciesConcentration[i] - aggregatePrimarySpeciesConcentration_n[i] ) - aggregateSpeciesRates[i] * dt;
+          for( int j = 0; j < numPrimarySpecies; ++j )
           {
-            MixedReactionsType::updateMixedSystem( temperature,
-                                                   params,
-                                                   X,
-                                                   surfaceArea,
-                                                   logSecondarySpeciesConcentration,
-                                                   aggregatePrimarySpeciesConcentration,
-                                                   mobileAggregatePrimarySpeciesConcentration,
-                                                   dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
-                                                   dMobileAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration,
-                                                   reactionRates,
-                                                   dReactionRates_dlogPrimarySpeciesConcentration,
-                                                   aggregateSpeciesRates,
-                                                   dAggregateSpeciesRates_dlogPrimarySpeciesConcentration );
-
-
-            for( int i = 0; i < numPrimarySpecies; ++i )
-            {
-              r[i] = ( aggregatePrimarySpeciesConcentration[i] - aggregatePrimarySpeciesConcentration_n[i] ) - aggregateSpeciesRates[i] * dt;
-              for( int j = 0; j < numPrimarySpecies; ++j )
-              {
-                J[i][j] = dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration[i][j] - dAggregateSpeciesRates_dlogPrimarySpeciesConcentration[i][j] * dt;
-              }
-            }
-          };
+            J[i][j] = dAggregatePrimarySpeciesConcentrations_dlogPrimarySpeciesConcentration[i][j] - dAggregateSpeciesRates_dlogPrimarySpeciesConcentration[i][j] * dt;
+          }
+        }
+      };
 
           nonlinearSolvers::newtonRaphson< numPrimarySpecies >( logPrimarySpeciesConcentration, computeResidualAndJacobian );
 

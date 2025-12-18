@@ -30,10 +30,10 @@ TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams
   { { 2.0, -0.5, 0.0, 0.0, 0.0 },
     { 0.0, 0.0, 0.5, 0.25, 0.0 } };
   computeReactionRatesTest< double >( bulkGeneric::simpleKineticTestRateParams.kineticReactionsParameters(),
-                                            initialSpeciesConcentration,
-                                            surfaceArea, // No use. Just to pass something here
-                                            expectedReactionRates,
-                                            expectedReactionRatesDerivatives );
+                                      initialSpeciesConcentration,
+                                      surfaceArea,       // No use. Just to pass something here
+                                      expectedReactionRates,
+                                      expectedReactionRatesDerivatives );
 }
 
 
@@ -49,9 +49,9 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams 
 
 
   computeSpeciesRatesTest< double >( bulkGeneric::simpleKineticTestRateParams.kineticReactionsParameters(),
-                                           initialSpeciesConcentration,
-                                           expectedSpeciesRates,
-                                           expectedSpeciesRatesDerivatives );
+                                     initialSpeciesConcentration,
+                                     expectedSpeciesRates,
+                                     expectedSpeciesRatesDerivatives );
 
 }
 
@@ -62,10 +62,10 @@ TEST( testKineticReactions, testTimeStep )
   double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01, 7.02014627734060e-01, 5.95970744531880e-01 };
 
   timeStepTest< double >( bulkGeneric::simpleKineticTestRateParams.kineticReactionsParameters(),
-                                 2.0,
-                                 10,
-                                 initialSpeciesConcentration,
-                                 expectedSpeciesConcentrations );
+                          2.0,
+                          10,
+                          initialSpeciesConcentration,
+                          expectedSpeciesConcentrations );
 
 }
 

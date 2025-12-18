@@ -51,11 +51,11 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
   };
 
   timeStepTest< double >( carbonateSystem,
-                                1.0,
-                                10,
-                                initialAggregateSpeciesConcentration,
-                                surfaceArea,
-                                expectedSpeciesConcentrations );
+                          1.0,
+                          10,
+                          initialAggregateSpeciesConcentration,
+                          surfaceArea,
+                          expectedSpeciesConcentrations );
 
 }
 

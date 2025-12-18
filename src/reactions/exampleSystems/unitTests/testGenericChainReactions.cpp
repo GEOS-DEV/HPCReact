@@ -45,10 +45,10 @@ TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionPa
     { 0.0, 0.03, 0.0 },
     { 0.0, 0.0, 0.02 } };
   computeReactionRatesTest< double >( serialAllKineticParams.kineticReactionsParameters(),
-                                            initialSpeciesConcentration,
-                                            surfaceArea, // No use. Just to pass something here
-                                            expectedReactionRates,
-                                            expectedReactionRatesDerivatives );
+                                      initialSpeciesConcentration,
+                                      surfaceArea,       // No use. Just to pass something here
+                                      expectedReactionRates,
+                                      expectedReactionRatesDerivatives );
 }
 
 int main( int argc, char * * argv )

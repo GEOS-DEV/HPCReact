@@ -91,14 +91,14 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
 
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    KineticReactionsType::computeReactionRates( temperature,
-                                                params,
-                                                dataCopy->speciesConcentration,
-                                                dataCopy->surfaceArea,
-                                                dataCopy->reactionRates,
-                                                dataCopy->reactionRatesDerivatives );
-  });
+      {
+        KineticReactionsType::computeReactionRates( temperature,
+                                                    params,
+                                                    dataCopy->speciesConcentration,
+                                                    dataCopy->surfaceArea,
+                                                    dataCopy->reactionRates,
+                                                    dataCopy->reactionRatesDerivatives );
+      } );
 
   for( int r=0; r<numReactions; ++r )
   {
@@ -161,13 +161,13 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
   }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    KineticReactionsType::computeSpeciesRates( temperature,
-                                               params,
-                                               dataCopy->speciesConcentration,
-                                               dataCopy->speciesRates,
-                                               dataCopy->speciesRatesDerivatives );
-  });
+      {
+        KineticReactionsType::computeSpeciesRates( temperature,
+                                                   params,
+                                                   dataCopy->speciesConcentration,
+                                                   dataCopy->speciesRates,
+                                                   dataCopy->speciesRatesDerivatives );
+      } );
 
 
   for( int r=0; r<numSpecies; ++r )
@@ -201,7 +201,7 @@ struct TimeStepTestData
   double time = 0.0;
 };
 
-template< typename REAL_TYPE, 
+template< typename REAL_TYPE,
           typename PARAMS_DATA >
 void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const dt,
@@ -225,34 +225,34 @@ void timeStepTest( PARAMS_DATA const & params,
   data.time = 0.0;
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature, dt, numSteps] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    double speciesConcentration_n[numSpecies];
-    double speciesRates[numSpecies] = { 0.0 };
-    CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
+      {
+        double speciesConcentration_n[numSpecies];
+        double speciesRates[numSpecies] = { 0.0 };
+        CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
 
-    for( int t = 0; t < numSteps; ++t )
-    {
-      printf("Time step %d \n ", t);
-      for( int i=0; i<numSpecies; ++i )
-      {
-        speciesConcentration_n[i] = dataCopy->speciesConcentration[i];
-      }
-      printf( "  before step: species concentrations: ");
-      for( int i=0; i<numSpecies; ++i )
-      {
-        printf( "%e ", logmath::exp( dataCopy->speciesConcentration[i] ) );
-      }
-      printf( "\n" );
-      KineticReactionsType::timeStep( dt,
-                                      temperature,
-                                      params,
-                                      speciesConcentration_n,
-                                      dataCopy->speciesConcentration,
-                                      speciesRates,
-                                      speciesRatesDerivatives );
-      dataCopy->time += dt;
-    }
-  });
+        for( int t = 0; t < numSteps; ++t )
+        {
+          printf( "Time step %d \n ", t );
+          for( int i=0; i<numSpecies; ++i )
+          {
+            speciesConcentration_n[i] = dataCopy->speciesConcentration[i];
+          }
+          printf( "  before step: species concentrations: " );
+          for( int i=0; i<numSpecies; ++i )
+          {
+            printf( "%e ", logmath::exp( dataCopy->speciesConcentration[i] ) );
+          }
+          printf( "\n" );
+          KineticReactionsType::timeStep( dt,
+                                          temperature,
+                                          params,
+                                          speciesConcentration_n,
+                                          dataCopy->speciesConcentration,
+                                          speciesRates,
+                                          speciesRatesDerivatives );
+          dataCopy->time += dt;
+        }
+      } );
 
 
   EXPECT_NEAR( data.time, dt*numSteps, 1.0e-8 );

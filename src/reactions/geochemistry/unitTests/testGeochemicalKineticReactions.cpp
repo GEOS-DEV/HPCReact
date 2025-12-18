@@ -82,10 +82,10 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
   };
 
   computeReactionRatesTest< double >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                            initialSpeciesConcentration,
-                                            surfaceArea, // No use. Just to pass something here
-                                            expectedReactionRates,
-                                            expectedReactionRatesDerivatives );
+                                      initialSpeciesConcentration,
+                                      surfaceArea,       // No use. Just to pass something here
+                                      expectedReactionRates,
+                                      expectedReactionRatesDerivatives );
 }
 
 TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
@@ -120,10 +120,10 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
   };
 
   computeReactionRatesTest< double >( carbonateSystem.kineticReactionsParameters(),
-                                            initialSpeciesConcentration,
-                                            surfaceArea,
-                                            expectedReactionRates,
-                                            expectedReactionRatesDerivatives );
+                                      initialSpeciesConcentration,
+                                      surfaceArea,
+                                      expectedReactionRates,
+                                      expectedReactionRatesDerivatives );
 }
 
 //******************************************************************************

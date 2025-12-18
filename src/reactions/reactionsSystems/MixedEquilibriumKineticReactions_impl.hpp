@@ -29,7 +29,7 @@ namespace reactionsSystems
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE>
+          typename INDEX_TYPE >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST_KINETIC,
@@ -56,7 +56,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                                                              ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
 {
-  if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
+  if constexpr ( PARAMS_DATA::numEquilibriumReactions() > 0 )
   {
     // 1. Compute new aggregate species from primary species
     massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
@@ -78,12 +78,12 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
       REAL_TYPE const speciesConcentration_i = logmath::exp( logPrimarySpeciesConcentrations[i] );
       aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
       mobileAggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
-      dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst<REAL_TYPE>() * speciesConcentration_i;
-      dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst<REAL_TYPE>() * speciesConcentration_i;
+      dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst< REAL_TYPE >() * speciesConcentration_i;
+      dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst< REAL_TYPE >() * speciesConcentration_i;
     }
   }
 
-  if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
+  if constexpr ( PARAMS_DATA::numKineticReactions() > 0 )
   {
     // 2. Compute the reaction rates for all kinetic reactions
     computeReactionRates( temperature,
@@ -111,7 +111,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE>
+          typename INDEX_TYPE >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST2,
@@ -168,11 +168,11 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   {
     for( IntType j = 0; j < numPrimarySpecies; ++j )
     {
-      dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = logmath::dWrtLogConst<REAL_TYPE>() * reactionRatesDerivatives( i, j + numSecondarySpecies );
+      dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = logmath::dWrtLogConst< REAL_TYPE >() * reactionRatesDerivatives( i, j + numSecondarySpecies );
 
       for( IntType k = 0; k < numSecondarySpecies; ++k )
       {
-        RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = logmath::dWrtLogConst<REAL_TYPE>() * params.stoichiometricMatrix( k, j + numSecondarySpecies );
+        RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = logmath::dWrtLogConst< REAL_TYPE >() * params.stoichiometricMatrix( k, j + numSecondarySpecies );
         dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) += reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
       }
     }
@@ -181,7 +181,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE>
+          typename INDEX_TYPE >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST2,
@@ -209,7 +209,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
   {
     aggregatesRates[i] = 0.0;
-    if constexpr( CALCULATE_DERIVATIVES )
+    if constexpr ( CALCULATE_DERIVATIVES )
     {
       for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
       {
@@ -220,7 +220,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     {
       RealType const s_ir = params.kineticReactionsParameters().stoichiometricMatrix( r, i+numSecondarySpecies );
       aggregatesRates[i] += s_ir * reactionRates[r];
-      if constexpr( CALCULATE_DERIVATIVES )
+      if constexpr ( CALCULATE_DERIVATIVES )
       {
         for( IntType j = 0; j < numPrimarySpecies; ++j )
         {

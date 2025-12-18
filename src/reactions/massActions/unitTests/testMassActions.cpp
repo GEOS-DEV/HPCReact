@@ -45,13 +45,13 @@ void test_calculateLogSecondarySpeciesConcentration_helper()
   static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
   static constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
 
-  CalculateLogSecondarySpeciesConcentrationData<numPrimarySpecies, numSecondarySpecies> data;
+  CalculateLogSecondarySpeciesConcentrationData< numPrimarySpecies, numSecondarySpecies > data;
 
   pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     calculateLogSecondarySpeciesConcentration< double,
-                                              int,
-                                              int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                               int,
+                                               int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
                                                       dataCopy->logPrimarySpeciesSolution,
                                                       dataCopy->logSecondarySpeciesConcentrations );
 
@@ -60,11 +60,10 @@ void test_calculateLogSecondarySpeciesConcentration_helper()
     calculateLogSecondarySpeciesConcentrationWrtLogC< double,
                                                       int,
                                                       int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                            dataCopy->logPrimarySpeciesSolution,
-                                                            dataCopy->logSecondarySpeciesConcentrations,
-                                                            dataCopy->dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
-  });
-
+                                                             dataCopy->logPrimarySpeciesSolution,
+                                                             dataCopy->logSecondarySpeciesConcentrations,
+                                                             dataCopy->dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+  } );
 
 
 
@@ -126,13 +125,13 @@ struct CalculateAggregatePrimaryConcentrationsWrtLogCHelperData
 {
   double const primarySpeciesSolution[numPrimarySpecies] =
   {
-    logmath::log(0.00043969547214915125),
-    logmath::log(0.00037230096984514874),
-    logmath::log(0.014716565308128551),
-    logmath::log(0.0024913722747387217),
-    logmath::log(1.8586090945989489),
-    logmath::log(0.009881874292035079),
-    logmath::log(1.0723078278653704)
+    logmath::log( 0.00043969547214915125 ),
+    logmath::log( 0.00037230096984514874 ),
+    logmath::log( 0.014716565308128551 ),
+    logmath::log( 0.0024913722747387217 ),
+    logmath::log( 1.8586090945989489 ),
+    logmath::log( 0.009881874292035079 ),
+    logmath::log( 1.0723078278653704 )
   };
 
   double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = {0};
@@ -144,7 +143,7 @@ void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
 {
   static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
 
-  CalculateAggregatePrimaryConcentrationsWrtLogCHelperData<numPrimarySpecies> data;
+  CalculateAggregatePrimaryConcentrationsWrtLogCHelperData< numPrimarySpecies > data;
 
   pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
   {
@@ -152,7 +151,7 @@ void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
                                                                         dataCopy->primarySpeciesSolution,
                                                                         dataCopy->aggregatePrimarySpeciesConcentration,
                                                                         dataCopy->dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
-  });
+  } );
 
   double const expectedAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
   {
