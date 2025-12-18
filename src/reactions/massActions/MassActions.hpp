@@ -147,14 +147,14 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
   {
     REAL_TYPE const speciesConcentration_i = logmath::exp( logPrimarySpeciesConcentrations[i] );
     aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
-    dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
+    dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst<REAL_TYPE>() * speciesConcentration_i;
     for( int j = 0; j < numSecondarySpecies; ++j )
     {
       REAL_TYPE const secondarySpeciesConcentrations_j = logmath::exp( logSecondarySpeciesConcentrations[j] );
       aggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
       for( int k=0; k<numPrimarySpecies; ++k )
       {
-        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::dWrtLogConst() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
+        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::dWrtLogConst<REAL_TYPE>() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
         dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
       }
@@ -237,8 +237,8 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
     REAL_TYPE const speciesConcentration_i = logmath::exp( logPrimarySpeciesConcentrations[i] );
     aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
     mobileAggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
-    dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
-    dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
+    dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst<REAL_TYPE>() * speciesConcentration_i;
+    dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst<REAL_TYPE>() * speciesConcentration_i;
 
     for( int j = 0; j < numSecondarySpecies; ++j )
     {
@@ -247,7 +247,7 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
       mobileAggregatePrimarySpeciesConcentrations[i] += params.stoichiometricMatrix( j, i+numSecondarySpecies ) * secondarySpeciesConcentrations_j * params.mobileSecondarySpeciesFlag( j );
       for( int k=0; k<numPrimarySpecies; ++k )
       {
-        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::dWrtLogConst() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
+        REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = logmath::dWrtLogConst<REAL_TYPE>() * params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
         dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
 

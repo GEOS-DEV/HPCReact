@@ -78,8 +78,8 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
       REAL_TYPE const speciesConcentration_i = logmath::exp( logPrimarySpeciesConcentrations[i] );
       aggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
       mobileAggregatePrimarySpeciesConcentrations[i] = speciesConcentration_i;
-      dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
-      dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = speciesConcentration_i;
+      dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst<REAL_TYPE>() * speciesConcentration_i;
+      dMobileAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations( i, i ) = logmath::dWrtLogConst<REAL_TYPE>() * speciesConcentration_i;
     }
   }
 
@@ -168,11 +168,11 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   {
     for( IntType j = 0; j < numPrimarySpecies; ++j )
     {
-      dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = reactionRatesDerivatives( i, j + numSecondarySpecies );
+      dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = logmath::dWrtLogConst<REAL_TYPE>() * reactionRatesDerivatives( i, j + numSecondarySpecies );
 
       for( IntType k = 0; k < numSecondarySpecies; ++k )
       {
-        RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = params.stoichiometricMatrix( k, j + numSecondarySpecies );
+        RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = logmath::dWrtLogConst<REAL_TYPE>() * params.stoichiometricMatrix( k, j + numSecondarySpecies );
         dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) += reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
       }
     }

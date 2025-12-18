@@ -35,7 +35,7 @@ struct LogExp
   T dWrtLogConst()
   {
     if constexpr ( Base == LogBase::e ) { return T(1.0); }
-    else                                { return T(ln10()); }
+    else                                { return T(ln10<T>()); }
   }
 
 
