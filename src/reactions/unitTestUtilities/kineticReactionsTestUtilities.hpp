@@ -240,7 +240,7 @@ void timeStepTest( PARAMS_DATA const & params,
           printf( "  before step: species concentrations: " );
           for( int i=0; i<numSpecies; ++i )
           {
-            printf( "%e ", logmath::exp( dataCopy->speciesConcentration[i] ) );
+            printf( "%e ", dataCopy->speciesConcentration[i] );
           }
           printf( "\n" );
           KineticReactionsType::timeStep( dt,
@@ -250,6 +250,12 @@ void timeStepTest( PARAMS_DATA const & params,
                                           dataCopy->speciesConcentration,
                                           speciesRates,
                                           speciesRatesDerivatives );
+          printf( "  after step: species concentrations: " );
+          for( int i=0; i<numSpecies; ++i )
+          {
+            printf( "%e ", dataCopy->speciesConcentration[i] );
+          }
+          printf( "\n" );                                          
           dataCopy->time += dt;
         }
       } );

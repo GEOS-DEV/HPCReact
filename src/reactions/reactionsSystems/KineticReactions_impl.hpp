@@ -257,7 +257,7 @@ KineticReactions< REAL_TYPE,
   REAL_TYPE residualNorm = 0.0;
   for( int k=0; k<20; ++k ) // newton loop
   {
-//    printf( "iteration %2d: \n", k );
+    printf( "iteration %2d: \n", k );
 
     computeSpeciesRates( temperature,
                          params,
@@ -265,14 +265,19 @@ KineticReactions< REAL_TYPE,
                          speciesRates,
                          speciesRatesDerivatives );
 
+    printf( "  species rates: " );
+    for( int i=0; i<numSpecies; ++i )
+    {
+      printf( "%e ", speciesRates[i] );
+    }
+    printf( "\n" );
+
     double residual[numSpecies] = { 0.0 };
     double deltaPrimarySpeciesConcentration[numSpecies] = { 0.0 };
 
     // form residual and Jacobian
     for( int i = 0; i < numSpecies; ++i )
     {
-
-
       RealType nonLogC;
       RealType nonLogC_n;
       nonLogC = logmath::exp( speciesConcentration[i] );

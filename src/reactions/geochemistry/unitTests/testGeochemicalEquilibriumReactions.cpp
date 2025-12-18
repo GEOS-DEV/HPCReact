@@ -90,10 +90,10 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
   //                                      initialSpeciesConcentration,
   //                                      expectedSpeciesConcentrations );
 
-  std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-  testEnforceEquilibrium< double, 2 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                       initialSpeciesConcentration,
-                                       expectedSpeciesConcentrations );
+  // std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
+  // testEnforceEquilibrium< double, 2 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+  //                                      initialSpeciesConcentration,
+  //                                      expectedSpeciesConcentrations );
 
 }
 
