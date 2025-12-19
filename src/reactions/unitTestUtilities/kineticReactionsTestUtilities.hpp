@@ -255,7 +255,7 @@ void timeStepTest( PARAMS_DATA const & params,
           {
             printf( "%e ", dataCopy->speciesConcentration[i] );
           }
-          printf( "\n" );                                          
+          printf( "\n" );
           dataCopy->time += dt;
         }
       } );

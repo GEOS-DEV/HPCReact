@@ -27,11 +27,11 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
 
   {
     std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-    double const expectedResiduals[] = { -37.534508668465 / logmath::dWrtLogConst<double>(), 
-                                         -72.989575795250 / logmath::dWrtLogConst<double>() };
+    double const expectedResiduals[] = { -37.534508668465 / logmath::dWrtLogConst< double >(),
+                                         -72.989575795250 / logmath::dWrtLogConst< double >() };
     double const expectedJacobian[2][2] =
-    { { 1.0e16 / logmath::dWrtLogConst<double>(), -2.0 / logmath::dWrtLogConst<double>() },
-      { -2.0 / logmath::dWrtLogConst<double>(), 4.0e16 / logmath::dWrtLogConst<double>() } };
+    { { 1.0e16 / logmath::dWrtLogConst< double >(), -2.0 / logmath::dWrtLogConst< double >() },
+      { -2.0 / logmath::dWrtLogConst< double >(), 4.0e16 / logmath::dWrtLogConst< double >() } };
 
     computeResidualAndJacobianTest< double, 2 >( bulkGeneric::simpleTestRateParams,
                                                  initialSpeciesConcentration,

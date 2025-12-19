@@ -188,7 +188,7 @@ void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
     for( int j=0; j<numPrimarySpecies; ++j )
     {
       EXPECT_NEAR( data.dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, j ),
-                   logmath::dWrtLogConst<double>() * expected_dAggregatePrimarySpeciesConcentration_dLogPrimarySpeciesConcentrations[i][j],
+                   logmath::dWrtLogConst< double >() * expected_dAggregatePrimarySpeciesConcentration_dLogPrimarySpeciesConcentrations[i][j],
                    1.0e-8 );
     }
   }

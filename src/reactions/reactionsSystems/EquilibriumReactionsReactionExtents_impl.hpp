@@ -103,7 +103,7 @@ EquilibriumReactions< REAL_TYPE,
     // compute the jacobian
     for( IndexType b=0; b<numReactions; ++b )
     {
-      jacobian( a, b ) = ( -dForwardProduct_dxi_divProduct[b] + dReverseProduct_dxi_divProduct[b] ) / logmath::dWrtLogConst<REAL_TYPE>();
+      jacobian( a, b ) = ( -dForwardProduct_dxi_divProduct[b] + dReverseProduct_dxi_divProduct[b] ) / logmath::dWrtLogConst< REAL_TYPE >();
     }
   }
 }

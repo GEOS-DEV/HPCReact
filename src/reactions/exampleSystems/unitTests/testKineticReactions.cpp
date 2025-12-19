@@ -59,7 +59,8 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams 
 // TEST( testKineticReactions, testTimeStep )
 // {
 //   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
-//   double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01, 7.02014627734060e-01, 5.95970744531880e-01 };
+//   double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01,
+// 7.02014627734060e-01, 5.95970744531880e-01 };
 
 //   timeStepTest< double >( bulkGeneric::simpleKineticTestRateParams.kineticReactionsParameters(),
 //                           2.0,
