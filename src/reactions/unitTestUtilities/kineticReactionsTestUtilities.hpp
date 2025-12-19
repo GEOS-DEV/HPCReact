@@ -99,6 +99,14 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
                                                     dataCopy->reactionRates,
                                                     dataCopy->reactionRatesDerivatives );
       } );
+      {
+        KineticReactionsType::computeReactionRates( temperature,
+                                                    params,
+                                                    dataCopy->speciesConcentration,
+                                                    dataCopy->surfaceArea,
+                                                    dataCopy->reactionRates,
+                                                    dataCopy->reactionRatesDerivatives );
+      } );
 
   for( int r=0; r<numReactions; ++r )
   {
