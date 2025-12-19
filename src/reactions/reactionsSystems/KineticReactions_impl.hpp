@@ -46,12 +46,12 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE
                   >::computeReactionRates_impl( RealType const &, //temperature,
                                                 PARAMS_DATA const & params,
-                                                ARRAY_1D_TO_CONST const & speciesConcentration,
+                                                ARRAY_1D_TO_CONST const & logSpeciesConcentration,
                                                 ARRAY_1D & reactionRates,
                                                 ARRAY_2D & reactionRatesDerivatives )
 {
 
-  if constexpr ( !CALCULATE_DERIVATIVES )
+  if constexpr( !CALCULATE_DERIVATIVES )
   {
     HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
   }
@@ -77,18 +77,18 @@ KineticReactions< REAL_TYPE,
 
       if( s_ri < 0.0 )
       {
-        productConcForward += (-s_ri) * speciesConcentration[i];
+        productConcForward += (-s_ri) * logSpeciesConcentration[i];
       }
       else if( s_ri > 0.0 )
       {
-        productConcReverse += s_ri * speciesConcentration[i];
+        productConcReverse += s_ri * logSpeciesConcentration[i];
       }
     }
 
     reactionRates[r] = forwardRateConstant * logmath::exp( productConcForward )
                        - reverseRateConstant * logmath::exp( productConcReverse );
 
-    if constexpr ( CALCULATE_DERIVATIVES )
+    if constexpr( CALCULATE_DERIVATIVES )
     {
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
@@ -125,12 +125,12 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE
                   >::computeReactionRatesQuotient_impl( RealType const &, //temperature,
                                                         PARAMS_DATA const & params,
-                                                        ARRAY_1D_TO_CONST const & speciesConcentration,
+                                                        ARRAY_1D_TO_CONST const & logSpeciesConcentration,
                                                         ARRAY_1D_SA const & surfaceArea,
                                                         ARRAY_1D & reactionRates,
                                                         ARRAY_2D & reactionRatesDerivatives )
 {
-  if constexpr ( !CALCULATE_DERIVATIVES )
+  if constexpr( !CALCULATE_DERIVATIVES )
   {
     HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
   }
@@ -141,7 +141,7 @@ KineticReactions< REAL_TYPE,
     // set reaction rate to zero
     reactionRates[r] = 0.0;
 
-    if constexpr ( CALCULATE_DERIVATIVES )
+    if constexpr( CALCULATE_DERIVATIVES )
     {
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
@@ -154,26 +154,28 @@ KineticReactions< REAL_TYPE,
     // temperature ) );
     RealType const equilibriumConstant = params.equilibriumConstant( r );
 
-    RealType quotient = 1.0;
 
     RealType logQuotient = 0.0;
     // build the products for the forward and reverse reaction rates
     for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
     {
       RealType const s_ri = params.stoichiometricMatrix( r, i );
-      logQuotient += s_ri * speciesConcentration[i];
+      logQuotient += s_ri * logSpeciesConcentration[i];
     }
-    quotient = logmath::exp( logQuotient );
+    RealType const quotient = logmath::exp( logQuotient );
 
-    if constexpr ( CALCULATE_DERIVATIVES )
+    RealType const CxA = rateConstant * surfaceArea[r];
+    RealType const QdivE = quotient / equilibriumConstant;
+    reactionRates[r] = CxA * ( 1.0 - QdivE );
+    if constexpr( CALCULATE_DERIVATIVES )
     {
+      RealType const dFactor = logmath::dWrtLogScale( -CxA * QdivE );
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
         RealType const s_ri = params.stoichiometricMatrix( r, i );
-        reactionRatesDerivatives( r, i ) = -rateConstant * surfaceArea[r] * s_ri * quotient / equilibriumConstant;
+        reactionRatesDerivatives( r, i ) = dFactor * s_ri;
       }
     } // end of if constexpr ( CALCULATE_DERIVATIVES )
-    reactionRates[r] = rateConstant * surfaceArea[r] * ( 1.0 - quotient / equilibriumConstant );
   }
 }
 
@@ -192,24 +194,24 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE
                   >::computeSpeciesRates_impl( RealType const & temperature,
                                                PARAMS_DATA const & params,
-                                               ARRAY_1D_TO_CONST const & speciesConcentration,
+                                               ARRAY_1D_TO_CONST const & logSpeciesConcentration,
                                                ARRAY_1D & speciesRates,
                                                ARRAY_2D & speciesRatesDerivatives )
 {
   RealType reactionRates[PARAMS_DATA::numReactions()] = { 0.0 };
   CArrayWrapper< double, PARAMS_DATA::numReactions(), PARAMS_DATA::numSpecies() > reactionRatesDerivatives;
 
-  if constexpr ( !CALCULATE_DERIVATIVES )
+  if constexpr( !CALCULATE_DERIVATIVES )
   {
     HPCREACT_UNUSED_VAR( speciesRatesDerivatives );
   }
 
-  computeReactionRates< PARAMS_DATA >( temperature, params, speciesConcentration, reactionRates, reactionRatesDerivatives );
+  computeReactionRates< PARAMS_DATA >( temperature, params, logSpeciesConcentration, reactionRates, reactionRatesDerivatives );
 
   for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
   {
     speciesRates[i] = 0.0;
-    if constexpr ( CALCULATE_DERIVATIVES )
+    if constexpr( CALCULATE_DERIVATIVES )
     {
       for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
       {
@@ -220,7 +222,7 @@ KineticReactions< REAL_TYPE,
     {
       RealType const s_ir = params.stoichiometricMatrix( r, i );
       speciesRates[i] += s_ir * reactionRates[r];
-      if constexpr ( CALCULATE_DERIVATIVES )
+      if constexpr( CALCULATE_DERIVATIVES )
       {
         for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
         {
@@ -244,8 +246,8 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE >::timeStep( RealType const dt,
                                           RealType const & temperature,
                                           PARAMS_DATA const & params,
-                                          ARRAY_1D_TO_CONST const & speciesConcentration_n,
-                                          ARRAY_1D & speciesConcentration,
+                                          ARRAY_1D_TO_CONST const & logSpeciesConcentration_n,
+                                          ARRAY_1D & logSpeciesConcentration,
                                           ARRAY_1D & speciesRates,
                                           ARRAY_2D & speciesRatesDerivatives )
 {
@@ -261,7 +263,7 @@ KineticReactions< REAL_TYPE,
 
     computeSpeciesRates( temperature,
                          params,
-                         speciesConcentration,
+                         logSpeciesConcentration,
                          speciesRates,
                          speciesRatesDerivatives );
 
@@ -273,15 +275,15 @@ KineticReactions< REAL_TYPE,
     printf( "\n" );
 
     double residual[numSpecies] = { 0.0 };
-    double deltaPrimarySpeciesConcentration[numSpecies] = { 0.0 };
+    double deltaPrimarylogSpeciesConcentration[numSpecies] = { 0.0 };
 
     // form residual and Jacobian
     for( int i = 0; i < numSpecies; ++i )
     {
       RealType nonLogC;
       RealType nonLogC_n;
-      nonLogC = logmath::exp( speciesConcentration[i] );
-      nonLogC_n = logmath::exp( speciesConcentration_n[i] );
+      nonLogC = logmath::exp( logSpeciesConcentration[i] );
+      nonLogC_n = logmath::exp( logSpeciesConcentration_n[i] );
       residual[i] = -(nonLogC - nonLogC_n - dt * speciesRates[i]);
 
 
@@ -305,11 +307,11 @@ KineticReactions< REAL_TYPE,
       break;
     }
 
-    solveNxN_pivoted< double, numSpecies >( speciesRatesDerivatives.data, residual, deltaPrimarySpeciesConcentration );
+    solveNxN_pivoted< double, numSpecies >( speciesRatesDerivatives.data, residual, deltaPrimarylogSpeciesConcentration );
 
     for( int i = 0; i < numSpecies; ++i )
     {
-      speciesConcentration[i] = speciesConcentration[i] + deltaPrimarySpeciesConcentration[i];
+      logSpeciesConcentration[i] = logSpeciesConcentration[i] + deltaPrimarylogSpeciesConcentration[i];
     }
   }
 }

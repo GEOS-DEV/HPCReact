@@ -136,6 +136,26 @@ struct LogExp
     else                                { return T(ln10<T>()); }
   }
 
+
+  /**
+   * @brief Adjusts a derivative value to account for logarithm base.
+   *
+   * @tparam T Floating-point type (typically `float` or `double`).
+   * @param[in,out] x The derivative value to adjust.
+   *
+   * @details
+   * This function multiplies the input `x` by the appropriate factor so that
+   * it represents a derivative with respect to `log_{10}(x)` instead of `ln(x)`.
+   * - If `Base == e`, `x` is unchanged.
+   * - If `Base == ten`, `x` is multiplied by \f$\ln(10)\f$.
+   */
+  template< typename T >
+  HPCREACT_HOST_DEVICE
+  static constexpr inline void dWrtLogScale( T & x )
+  {
+    if constexpr ( Base == LogBase::ten ) { x = x * ln10<T>(); }
+  }
+
   // ***** log function *********************************************************************************************
 
   /**

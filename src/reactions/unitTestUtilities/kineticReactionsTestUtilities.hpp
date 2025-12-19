@@ -90,7 +90,9 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   }
 
 
-  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  pmpl::genericKernelWrapper( 1,
+                              &data,
+                              [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
       {
         KineticReactionsType::computeReactionRates( temperature,
                                                     params,
@@ -99,15 +101,6 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
                                                     dataCopy->reactionRates,
                                                     dataCopy->reactionRatesDerivatives );
       } );
-      {
-        KineticReactionsType::computeReactionRates( temperature,
-                                                    params,
-                                                    dataCopy->speciesConcentration,
-                                                    dataCopy->surfaceArea,
-                                                    dataCopy->reactionRates,
-                                                    dataCopy->reactionRatesDerivatives );
-      } );
-
   for( int r=0; r<numReactions; ++r )
   {
     EXPECT_NEAR( data.reactionRates[r], expectedReactionRates[r], std::max( magScale, fabs( expectedReactionRates[r] ) ) * 1.0e-8 );

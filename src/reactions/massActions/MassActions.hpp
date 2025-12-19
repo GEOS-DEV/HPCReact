@@ -73,7 +73,7 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                 ARRAY_1D & logSecondarySpeciesConcentrations )
 {
-  if constexpr ( PARAMS_DATA::numSecondarySpecies() <= 0 )
+  if constexpr( PARAMS_DATA::numSecondarySpecies() <= 0 )
   {
     return;
   }
@@ -180,7 +180,7 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
 {
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
-  if constexpr ( numSecondarySpecies > 0 )
+  if constexpr( numSecondarySpecies > 0 )
   {
     REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
 

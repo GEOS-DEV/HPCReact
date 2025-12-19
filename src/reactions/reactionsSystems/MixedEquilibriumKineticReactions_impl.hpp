@@ -83,7 +83,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     }
   }
 
-  if constexpr ( PARAMS_DATA::numKineticReactions() > 0 )
+  if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
   {
     // 2. Compute the reaction rates for all kinetic reactions
     computeReactionRates( temperature,
@@ -209,7 +209,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
   {
     aggregatesRates[i] = 0.0;
-    if constexpr ( CALCULATE_DERIVATIVES )
+    if constexpr( CALCULATE_DERIVATIVES )
     {
       for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
       {
@@ -220,7 +220,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     {
       RealType const s_ir = params.kineticReactionsParameters().stoichiometricMatrix( r, i+numSecondarySpecies );
       aggregatesRates[i] += s_ir * reactionRates[r];
-      if constexpr ( CALCULATE_DERIVATIVES )
+      if constexpr( CALCULATE_DERIVATIVES )
       {
         for( IntType j = 0; j < numPrimarySpecies; ++j )
         {
