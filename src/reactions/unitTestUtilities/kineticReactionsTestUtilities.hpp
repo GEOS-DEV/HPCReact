@@ -113,7 +113,7 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
     for( int i = 0; i < numSpecies; ++i )
     {
 
-      data.reactionRatesDerivatives( r, i ) = data.reactionRatesDerivatives( r, i ) * logmath::exp( -data.speciesConcentration[i] );
+      data.reactionRatesDerivatives( r, i ) = data.reactionRatesDerivatives( r, i ) * logmath::exp( -data.speciesConcentration[i] ) / logmath::dWrtLogConst< double >();
       EXPECT_NEAR( data.reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], std::max( magScale, fabs( expectedReactionRatesDerivatives[r][i] ) ) * 1.0e-8 );
     }
   }
@@ -180,7 +180,7 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
   {
     for( int j = 0; j < numSpecies; ++j )
     {
-      data.speciesRatesDerivatives( i, j ) = data.speciesRatesDerivatives( i, j ) * logmath::exp( -data.speciesConcentration[j] );
+      data.speciesRatesDerivatives( i, j ) = data.speciesRatesDerivatives( i, j ) * logmath::exp( -data.speciesConcentration[j] ) / logmath::dWrtLogConst< double >();
       EXPECT_NEAR( data.speciesRatesDerivatives( i, j ), expectedSpeciesRatesDerivatives[i][j], 1.0e-8 );
     }
   }

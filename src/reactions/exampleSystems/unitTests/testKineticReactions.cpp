@@ -41,7 +41,8 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams 
 {
   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesRates[5] = { -2.0, 1.0, 0.75, -0.25, 0.5 };
-  double const expectedSpeciesRatesDerivatives[5][5] = { { -4.0, 1.0, 0.0, 0.0, 0.0 },
+  double const expectedSpeciesRatesDerivatives[5][5] =
+  { { -4.0, 1.0, 0.0, 0.0, 0.0 },
     {  2.0, -0.5, 0.0, 0.0, 0.0 },
     {  2.0, -0.5, -0.5, -0.25, 0.0 },
     {  0.0, 0.0, -0.5, -0.25, 0.0 },

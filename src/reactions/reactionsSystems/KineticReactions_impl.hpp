@@ -62,7 +62,7 @@ KineticReactions< REAL_TYPE,
     // set reaction rate to zero
     reactionRates[r] = 0.0;
     // get/calculate the forward and reverse rate constants for this reaction
-    RealType const forwardRateConstant = params.rateConstantForward( r ); //* logmath::exp( -params.m_activationEnergy[r] / ( constants::R *
+    RealType const forwardRateConstant = params.rateConstantForward( r ); // exp( -params.m_activationEnergy[r] / ( constants::R *
                                                                           // temperature ) );
     RealType const reverseRateConstant = params.rateConstantReverse( r );
 
@@ -90,16 +90,18 @@ KineticReactions< REAL_TYPE,
 
     if constexpr( CALCULATE_DERIVATIVES )
     {
+      RealType const dFactorForward = logmath::dWrtLogScale( forwardRateConstant * logmath::exp( productConcForward ) );
+      RealType const dFactorReverse = logmath::dWrtLogScale( -reverseRateConstant * logmath::exp( productConcReverse ) );
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
         RealType const s_ri = params.stoichiometricMatrix( r, i );
         if( s_ri < 0.0 )
         {
-          reactionRatesDerivatives( r, i ) = forwardRateConstant * logmath::exp( productConcForward ) * (-s_ri);
+          reactionRatesDerivatives( r, i ) = dFactorForward * (-s_ri);
         }
         else if( s_ri > 0.0 )
         {
-          reactionRatesDerivatives( r, i ) = -reverseRateConstant * logmath::exp( productConcReverse ) * s_ri;
+          reactionRatesDerivatives( r, i ) = dFactorReverse * s_ri;
         }
         else
         {
@@ -150,8 +152,8 @@ KineticReactions< REAL_TYPE,
     }
 
     // get/calculate the forward and reverse rate constants for this reaction
-    RealType const rateConstant = params.rateConstantForward( r ); //* logmath::exp( -params.m_activationEnergy[r] / ( constants::R *
-    // temperature ) );
+    RealType const rateConstant = params.rateConstantForward( r ); //* exp( -params.m_activationEnergy[r] / ( constants::R * temperature )
+                                                                   // );
     RealType const equilibriumConstant = params.equilibriumConstant( r );
 
 
@@ -257,7 +259,7 @@ KineticReactions< REAL_TYPE,
 
 
   REAL_TYPE residualNorm = 0.0;
-  for( int k=0; k<20; ++k ) // newton loop
+  for( int k=0; k<20; ++k )  // newton loop
   {
     printf( "iteration %2d: \n", k );
 

@@ -56,7 +56,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                                                              ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
 {
-  if constexpr ( PARAMS_DATA::numEquilibriumReactions() > 0 )
+  if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
   {
     // 1. Compute new aggregate species from primary species
     massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
@@ -168,7 +168,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   {
     for( IntType j = 0; j < numPrimarySpecies; ++j )
     {
-      dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = logmath::dWrtLogConst< REAL_TYPE >() * reactionRatesDerivatives( i, j + numSecondarySpecies );
+      dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = reactionRatesDerivatives( i, j + numSecondarySpecies );
 
       for( IntType k = 0; k < numSecondarySpecies; ++k )
       {

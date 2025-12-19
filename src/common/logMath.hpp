@@ -151,9 +151,10 @@ struct LogExp
    */
   template< typename T >
   HPCREACT_HOST_DEVICE
-  static constexpr inline void dWrtLogScale( T & x )
+  static constexpr inline T dWrtLogScale( T x )
   {
-    if constexpr ( Base == LogBase::ten ) { x = x * ln10<T>(); }
+    if constexpr ( Base == LogBase::ten ) { return x * ln10<T>(); }
+    else                                  { return x; }
   }
 
   // ***** log function *********************************************************************************************
