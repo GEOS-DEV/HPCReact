@@ -142,6 +142,7 @@ struct LogExp
    *
    * @tparam T Floating-point type (typically `float` or `double`).
    * @param[in,out] x The derivative value to adjust.
+   * @return The adjusted derivative value.
    *
    * @details
    * This function multiplies the input `x` by the appropriate factor so that
