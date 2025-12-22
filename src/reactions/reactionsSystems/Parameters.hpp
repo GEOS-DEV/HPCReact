@@ -157,7 +157,7 @@ struct MixedReactionsParameters
 
   HPCREACT_HOST_DEVICE static constexpr IndexType numSecondarySpecies() { return NUM_EQ_REACTIONS; }
 
-  HPCREACT_HOST_DEVICE 
+  HPCREACT_HOST_DEVICE
   constexpr
   EquilibriumReactionsParameters< RealType, IntType, IndexType, numSpecies(), numEquilibriumReactions() >
   equilibriumReactionsParameters() const
@@ -179,7 +179,7 @@ struct MixedReactionsParameters
     return { eqMatrix, eqConstants, mobileSpeciesFlags };
   }
 
-  HPCREACT_HOST_DEVICE 
+  HPCREACT_HOST_DEVICE
   constexpr
   KineticReactionsParameters< RealType, IntType, IndexType, numSpecies(), numKineticReactions() >
   kineticReactionsParameters() const
@@ -203,7 +203,7 @@ struct MixedReactionsParameters
     return { kineticMatrix, rateConstantForward, rateConstantReverse, equilibriumConstant, m_reactionRatesUpdateOption };
   }
 
-  HPCREACT_HOST_DEVICE 
+  HPCREACT_HOST_DEVICE
   void verifyParameterConsistency()
   {
     static constexpr int num_digits = 12;
@@ -239,10 +239,10 @@ struct MixedReactionsParameters
     }
   }
 
-  HPCREACT_HOST_DEVICE  IndexType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
-  HPCREACT_HOST_DEVICE  RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
-  HPCREACT_HOST_DEVICE  RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
-  HPCREACT_HOST_DEVICE  RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
+  HPCREACT_HOST_DEVICE IndexType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
+  HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
+  HPCREACT_HOST_DEVICE RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
+  HPCREACT_HOST_DEVICE RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
 
   CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
