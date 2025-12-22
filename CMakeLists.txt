@@ -8,9 +8,11 @@ set( HPCREACT_VERSION_PATCHLEVEL 0 )
 # check if this is build as a submodule or a separate project
 get_directory_property( parent_dir PARENT_DIRECTORY )
 if(parent_dir)
-    set( is_submodule ON )
+    set( is_submodule ON CACHE BOOL "" FORCE )
+    message( "HPCReact is a submodule")
 else()
-    set( is_submodule OFF )
+    set( is_submodule OFF CACHE BOOL "" FORCE )
+    message( "HPCReact is NOT a submodule")
 endif()
 
 if( NOT is_submodule )
