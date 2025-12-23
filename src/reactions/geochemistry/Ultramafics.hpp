@@ -25,7 +25,7 @@ namespace geochemistry
 namespace ultramafics
 {
 
-constexpr CArrayWrapper<double, 21, 25> stoichMatrix = 
+constexpr CArrayWrapper<signed char, 21, 25> stoichMatrix = 
 { //      OH-   CO2(aq)      CO3--      Mg2OH+++   Mg4(OH)++++   MgOH+   Mg2CO3++   MgCO3(aq)   MgHCO3+   Mg(H3SiO4)2      MgH2SiO4     MgH3SiO4+   H2SiO4--   H3SiO4-      H4(H2SiO4)----   H6(H2SiO4)--   Mg2SiO4   MgCO3   SiO2    Mg3Si2O5(OH)4     Mg(OH)2     H+      HCO3-      Mg++   SiO2(aq)  
     {    -1,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        0,        0   }, //  OH- + H+ = H2O          
     {     0,        -1,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,         1,       1,        0,        0   }, //  CO2(aq) + H2O = HCO3- + H+   
@@ -178,9 +178,9 @@ constexpr CArrayWrapper<int, 21> mobileSpeciesFlag =
   };
 }
 
-  using ultramaficSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 0 >;
-  using ultramaficSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 25, 21, 21 >;
-  using ultramaficSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 20, 21, 16 >;
+  using ultramaficSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, signed char, 25, 21, 0 >;
+  using ultramaficSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 25, 21, 21 >;
+  using ultramaficSystemType               = reactionsSystems::MixedReactionsParameters< double, int, signed char, 20, 21, 16 >;
 
   constexpr ultramaficSystemAllKineticType     ultramaficSystemAllKinetic( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
   constexpr ultramaficSystemAllEquilibriumType ultramaficSystemAllEquilibrium( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );

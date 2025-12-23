@@ -22,17 +22,17 @@ namespace hpcReact
 {
 #if defined(HPCREACT_USE_DEVICE)
   #if defined(HPCREACT_USE_CUDA)
-    #define deviceMalloc( PTR, BYTES ) cudaMalloc( PTR, BYTES );
-    #define deviceMallocManaged( PTR, BYTES ) cudaMallocManaged( PTR, BYTES );
-    #define deviceDeviceSynchronize() cudaDeviceSynchronize();
-    #define deviceMemCpy( DST, SRC, BYTES, KIND ) cudaMemcpy( DST, SRC, BYTES, KIND );
-    #define deviceFree( PTR ) cudaFree( PTR );
+#define deviceMalloc( PTR, BYTES ) cudaMalloc( PTR, BYTES );
+#define deviceMallocManaged( PTR, BYTES ) cudaMallocManaged( PTR, BYTES );
+#define deviceDeviceSynchronize() cudaDeviceSynchronize();
+#define deviceMemCpy( DST, SRC, BYTES, KIND ) cudaMemcpy( DST, SRC, BYTES, KIND );
+#define deviceFree( PTR ) cudaFree( PTR );
   #elif defined(HPCREACT_USE_HIP)
-    #define deviceMalloc( PTR, BYTES ) hipMalloc( PTR, BYTES );
-    #define deviceMallocManaged( PTR, BYTES ) hipMallocManaged( PTR, BYTES );
-    #define deviceDeviceSynchronize() hipDeviceSynchronize();
-    #define deviceMemCpy( DST, SRC, BYTES, KIND ) hipMemcpy( DST, SRC, BYTES, KIND );
-    #define deviceFree( PTR ) hipFree( PTR );
+#define deviceMalloc( PTR, BYTES ) hipMalloc( PTR, BYTES );
+#define deviceMallocManaged( PTR, BYTES ) hipMallocManaged( PTR, BYTES );
+#define deviceDeviceSynchronize() hipDeviceSynchronize();
+#define deviceMemCpy( DST, SRC, BYTES, KIND ) hipMemcpy( DST, SRC, BYTES, KIND );
+#define deviceFree( PTR ) hipFree( PTR );
   #endif
 #endif
 
@@ -130,12 +130,18 @@ void genericKernelWrapper( int const N, DATA_TYPE * const hostData, LAMBDA && fu
   genericKernel <<< 1, 1 >>> ( std::forward< LAMBDA >( func ), deviceData );
 
   cudaError_t e = cudaGetLastError();
-  if (e != cudaSuccess) { fprintf(stderr, "launch error: %s\n", cudaGetErrorString(e)); abort(); }
+  if( e != cudaSuccess )
+  {
+    fprintf( stderr, "launch error: %s\n", cudaGetErrorString( e )); abort();
+  }
 
   deviceDeviceSynchronize();
 
   e = cudaGetLastError();
-  if (e != cudaSuccess) { fprintf(stderr, "post-sync error: %s\n", cudaGetErrorString(e)); abort(); }
+  if( e != cudaSuccess )
+  {
+    fprintf( stderr, "post-sync error: %s\n", cudaGetErrorString( e )); abort();
+  }
 
   deviceMemCpy( hostData, deviceData, N * sizeof(DATA_TYPE), cudaMemcpyDeviceToHost );
   deviceFree( deviceData );

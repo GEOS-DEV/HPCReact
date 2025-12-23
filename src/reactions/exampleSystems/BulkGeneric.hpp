@@ -45,7 +45,7 @@ namespace bulkGeneric
 //   um1Constants };
 
 
-using simpleKineticTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 0 >;
+using simpleKineticTestType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 5, 2, 0 >;
 
 constexpr 
 simpleKineticTestType
@@ -68,7 +68,7 @@ simpleKineticTestRateParams =
   0
 };
 
-using simpleTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;
+using simpleTestType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 5, 2, 2 >;
 
 constexpr 
 simpleTestType
