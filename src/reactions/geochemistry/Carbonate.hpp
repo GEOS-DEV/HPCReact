@@ -24,7 +24,7 @@ namespace geochemistry
 namespace carbonate
 {
 
-constexpr CArrayWrapper<double, 10, 17> stoichMatrix = 
+constexpr CArrayWrapper<signed char, 10, 17> stoichMatrix = 
   { //   OH-    CO2  CO3-2  CaHCO3+   CaSO4  CaCl+  CaCl2  MgSO4   NaSO4- CaCO3  H+  HCO3-  Ca+2    SO4-2    Cl-    Mg+2  Na+
     {    -1,     0,     0,      0,     0,     0,     0,     0,     0,     0,    -1,     0,     0,     0,     0,     0,     0  }, //     OH- + H+ = H2O         
     {     0,    -1,     0,      0,     0,     0,     0,     0,     0,     0,     1,     1,     0,     0,     0,     0,     0  }, //    CO2 + H2O = H+ + HCO3-  
@@ -38,7 +38,7 @@ constexpr CArrayWrapper<double, 10, 17> stoichMatrix =
     {     0,     0,     0,      0,     0,     0,     0,     0,     0,    -1,    -1,     1,     1,     0,     0,     0,     0  }  //   CaCO3(s) + H+ = Ca+2 + HCO3- (kinetic)
   };
 
-constexpr CArrayWrapper<double, 10, 16> stoichMatrixNosolid = 
+constexpr CArrayWrapper<signed char, 10, 16> stoichMatrixNosolid = 
   { //   OH-    CO2  CO3-2  CaHCO3+   CaSO4  CaCl+  CaCl2  MgSO4   NaSO4-  H+  HCO3-  Ca+2    SO4-2    Cl-    Mg+2  Na+
     {    -1,     0,     0,      0,     0,     0,     0,     0,     0,     -1,     0,     0,     0,     0,     0,     0  }, //     OH- + H+ = H2O         
     {     0,    -1,     0,      0,     0,     0,     0,     0,     0,      1,     1,     0,     0,     0,     0,     0  }, //    CO2 + H2O = H+ + HCO3-  
@@ -109,9 +109,9 @@ constexpr CArrayWrapper<int, 10> mobileSpeciesFlag =
 
 }
 
-using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 10, 0 >;
-using carbonateSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 10, 10 >;
-using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 16, 10, 9 >;
+using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, signed char, 17, 10, 0 >;
+using carbonateSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 17, 10, 10 >;
+using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, signed char, 16, 10, 9 >;
 
 constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag, 0 );
 constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );

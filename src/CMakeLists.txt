@@ -73,7 +73,8 @@ add_subdirectory( reactions/massActions/unitTests )
 add_subdirectory( common/unitTests )
 add_subdirectory( docs )
 
-hpcReact_add_code_checks( PREFIX hpcReact
-                          UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
-                          EXCLUDES "blt/*" )
-
+if( NOT is_submodule )
+  hpcReact_add_code_checks( PREFIX hpcReact
+                            UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
+                            EXCLUDES "blt/*" )
+endif()
