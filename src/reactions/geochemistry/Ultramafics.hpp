@@ -50,7 +50,7 @@ constexpr CArrayWrapper<signed char, 21, 25> stoichMatrix =
     {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,          -1,        -2,       0,        1,        0   }  //  Mg(OH)2 + 2H+ = Mg++ + 2H2O 
   };
 
-constexpr CArrayWrapper<double, 21, 20> stoichMatrixNosolid = 
+constexpr CArrayWrapper<signed char, 21, 20> stoichMatrixNosolid = 
 { //      OH-   CO2(aq)      CO3--      Mg2OH+++   Mg4(OH)++++   MgOH+   Mg2CO3++   MgCO3(aq)   MgHCO3+   Mg(H3SiO4)2      MgH2SiO4     MgH3SiO4+   H2SiO4--   H3SiO4-      H4(H2SiO4)----   H6(H2SiO4)--   H+      HCO3-      Mg++   SiO2(aq)  
     {    -1,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       0,        0,        0   }, //  OH- + H+ = H2O          
     {     0,        -1,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,           1,       1,        0,        0   }, //  CO2(aq) + H2O = HCO3- + H+   
