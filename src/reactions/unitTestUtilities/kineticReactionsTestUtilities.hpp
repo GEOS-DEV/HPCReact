@@ -55,7 +55,6 @@ struct ComputeReactionRatesTestData
 };
 
 template< typename REAL_TYPE,
-          bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void computeReactionRatesTest( PARAMS_DATA const & params,
                                REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
@@ -65,8 +64,7 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
 {
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
-                                                                   int,
-                                                                   LOGE_CONCENTRATION >;
+                                                                   int >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
   static constexpr int numReactions = PARAMS_DATA::numReactions();
@@ -81,19 +79,9 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   }
 
 
-  if constexpr( LOGE_CONCENTRATION )
+  for( int i = 0; i < numSpecies; ++i )
   {
-    for( int i = 0; i < numSpecies; ++i )
-    {
-      data.speciesConcentration[i] = log( initialSpeciesConcentration[i] );
-    }
-  }
-  else
-  {
-    for( int i = 0; i < numSpecies; ++i )
-    {
-      data.speciesConcentration[i] = initialSpeciesConcentration[i];
-    }
+    data.speciesConcentration[i] = logmath::log( initialSpeciesConcentration[i] );
   }
 
   for( int r = 0; r < numReactions; ++r )
@@ -102,7 +90,9 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   }
 
 
-  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  pmpl::genericKernelWrapper( 1,
+                              &data,
+                              [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
       {
         KineticReactionsType::computeReactionRates( temperature,
                                                     params,
@@ -111,7 +101,6 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
                                                     dataCopy->reactionRates,
                                                     dataCopy->reactionRatesDerivatives );
       } );
-
   for( int r=0; r<numReactions; ++r )
   {
     EXPECT_NEAR( data.reactionRates[r], expectedReactionRates[r], std::max( magScale, fabs( expectedReactionRates[r] ) ) * 1.0e-8 );
@@ -123,10 +112,8 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   {
     for( int i = 0; i < numSpecies; ++i )
     {
-      if constexpr( LOGE_CONCENTRATION )
-      {
-        data.reactionRatesDerivatives( r, i ) = data.reactionRatesDerivatives( r, i ) * exp( -data.speciesConcentration[i] );
-      }
+
+      data.reactionRatesDerivatives( r, i ) = data.reactionRatesDerivatives( r, i ) * logmath::exp( -data.speciesConcentration[i] ) / logmath::dWrtLogConst< double >();
       EXPECT_NEAR( data.reactionRatesDerivatives( r, i ), expectedReactionRatesDerivatives[r][i], std::max( magScale, fabs( expectedReactionRatesDerivatives[r][i] ) ) * 1.0e-8 );
     }
   }
@@ -153,7 +140,6 @@ struct ComputeSpeciesRatesTestData
 };
 
 template< typename REAL_TYPE,
-          bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void computeSpeciesRatesTest( PARAMS_DATA const & params,
                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
@@ -163,27 +149,16 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
 
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
-                                                                   int,
-                                                                   LOGE_CONCENTRATION >;
+                                                                   int >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
   double const temperature = 298.15;
   ComputeSpeciesRatesTestData< numSpecies > data;
 
-  if constexpr( LOGE_CONCENTRATION )
+  for( int i = 0; i < numSpecies; ++i )
   {
-    for( int i = 0; i < numSpecies; ++i )
-    {
-      data.speciesConcentration[i] = log( initialSpeciesConcentration[i] );
-    }
-  }
-  else
-  {
-    for( int i = 0; i < numSpecies; ++i )
-    {
-      data.speciesConcentration[i] = initialSpeciesConcentration[i];
-    }
+    data.speciesConcentration[i] = logmath::log( initialSpeciesConcentration[i] );
   }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
@@ -205,10 +180,7 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
   {
     for( int j = 0; j < numSpecies; ++j )
     {
-      if constexpr( LOGE_CONCENTRATION )
-      {
-        data.speciesRatesDerivatives( i, j ) = data.speciesRatesDerivatives( i, j ) * exp( -data.speciesConcentration[j] );
-      }
+      data.speciesRatesDerivatives( i, j ) = data.speciesRatesDerivatives( i, j ) * logmath::exp( -data.speciesConcentration[j] ) / logmath::dWrtLogConst< double >();
       EXPECT_NEAR( data.speciesRatesDerivatives( i, j ), expectedSpeciesRatesDerivatives[i][j], 1.0e-8 );
     }
   }
@@ -231,7 +203,6 @@ struct TimeStepTestData
 };
 
 template< typename REAL_TYPE,
-          bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const dt,
@@ -241,28 +212,16 @@ void timeStepTest( PARAMS_DATA const & params,
 {
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
-                                                                   int,
-                                                                   LOGE_CONCENTRATION >;
+                                                                   int >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
   double const temperature = 298.15;
   TimeStepTestData< numSpecies > data;
 
-  if constexpr( LOGE_CONCENTRATION )
+  for( int i = 0; i < numSpecies; ++i )
   {
-    for( int i = 0; i < numSpecies; ++i )
-    {
-      data.speciesConcentration[i] = log( initialSpeciesConcentration[i] );
-    }
+    data.speciesConcentration[i] = logmath::log( initialSpeciesConcentration[i] );
   }
-  else
-  {
-    for( int i = 0; i < numSpecies; ++i )
-    {
-      data.speciesConcentration[i] = initialSpeciesConcentration[i];
-    }
-  }
-
 
   data.time = 0.0;
 
@@ -279,6 +238,12 @@ void timeStepTest( PARAMS_DATA const & params,
           {
             speciesConcentration_n[i] = dataCopy->speciesConcentration[i];
           }
+          printf( "  before step: species concentrations: " );
+          for( int i=0; i<numSpecies; ++i )
+          {
+            printf( "%e ", dataCopy->speciesConcentration[i] );
+          }
+          printf( "\n" );
           KineticReactionsType::timeStep( dt,
                                           temperature,
                                           params,
@@ -286,6 +251,12 @@ void timeStepTest( PARAMS_DATA const & params,
                                           dataCopy->speciesConcentration,
                                           speciesRates,
                                           speciesRatesDerivatives );
+          printf( "  after step: species concentrations: " );
+          for( int i=0; i<numSpecies; ++i )
+          {
+            printf( "%e ", dataCopy->speciesConcentration[i] );
+          }
+          printf( "\n" );
           dataCopy->time += dt;
         }
       } );
@@ -295,10 +266,7 @@ void timeStepTest( PARAMS_DATA const & params,
 
   for( int i = 0; i < numSpecies; ++i )
   {
-    if constexpr( LOGE_CONCENTRATION )
-    {
-      data.speciesConcentration[i] = exp( data.speciesConcentration[i] );
-    }
+    data.speciesConcentration[i] = logmath::exp( data.speciesConcentration[i] );
     EXPECT_NEAR( data.speciesConcentration[i], expectedSpeciesConcentrations[i], 1.0e-4 );
   }
 }

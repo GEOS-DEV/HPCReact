@@ -54,11 +54,11 @@ void testMoMasMediumEquilibriumHelper()
 
     double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
     {
-      log( initialPrimarySpeciesConcentration[0] ),
-      log( initialPrimarySpeciesConcentration[1] ),
-      log( initialPrimarySpeciesConcentration[2] ),
-      log( initialPrimarySpeciesConcentration[3] ),
-      log( initialPrimarySpeciesConcentration[4] )
+      logmath::log( initialPrimarySpeciesConcentration[0] ),
+      logmath::log( initialPrimarySpeciesConcentration[1] ),
+      logmath::log( initialPrimarySpeciesConcentration[2] ),
+      logmath::log( initialPrimarySpeciesConcentration[3] ),
+      logmath::log( initialPrimarySpeciesConcentration[4] )
     };
 
     EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
@@ -79,7 +79,7 @@ void testMoMasMediumEquilibriumHelper()
 
   for( int r=0; r<numPrimarySpecies; ++r )
   {
-    EXPECT_NEAR( exp( logPrimarySpeciesConcentration[r] ), expectedPrimarySpeciesConcentrations[r], 1.0e-8 * expectedPrimarySpeciesConcentrations[r] );
+    EXPECT_NEAR( logmath::exp( logPrimarySpeciesConcentration[r] ), expectedPrimarySpeciesConcentrations[r], 1.0e-8 * expectedPrimarySpeciesConcentrations[r] );
   }
 
 

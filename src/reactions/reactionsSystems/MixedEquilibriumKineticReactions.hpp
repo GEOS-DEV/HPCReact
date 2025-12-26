@@ -30,14 +30,12 @@ namespace reactionsSystems
  * @tparam REAL_TYPE The type of the real numbers used in the class.
  * @tparam INT_TYPE The type of the integer numbers used in the class.
  * @tparam INDEX_TYPE The type of the index used in the class.
- * @tparam LOGE_CONCENTRATION Whether to use logarithm of concentration for the calculations.
  * @details
  *   This class provides the ablity to compute kinetic reactions.
  */
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE,
-          bool LOGE_CONCENTRATION >
+          typename INDEX_TYPE >
 class MixedEquilibriumKineticReactions
 {
 public:
@@ -52,7 +50,7 @@ public:
   using IndexType = INDEX_TYPE;
 
   /// Type alias for the Kinetic reactions type used in the class.
-  using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, LOGE_CONCENTRATION >;
+  using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE >;
 
   /**
    * @brief Update a mixed chemical system by computing secondary species concentrations,
