@@ -29,6 +29,7 @@ namespace unitTest_utilities
 //******************************************************************************
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
+          typename ACTIVITY_MODEL,
           typename PARAMS_DATA >
 void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const dt,
@@ -53,10 +54,12 @@ void timeStepTest( PARAMS_DATA const & params,
         using MixedReactionsType = reactionsSystems::MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                                        int,
                                                                                        int,
+                                                                                        ACTIVITY_MODEL,
                                                                                        LOGE_CONCENTRATION >;
         using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                                  int,
-                                                                                 int >;
+                                                                                 int,
+                                                                                 ACTIVITY_MODEL >;
 
         // constexpr int numSpecies = PARAMS_DATA::numSpecies();
         static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();

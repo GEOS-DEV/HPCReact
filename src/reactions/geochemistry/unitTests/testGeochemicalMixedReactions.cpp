@@ -11,6 +11,8 @@
 
 #include "reactions/unitTestUtilities/mixedReactionsTestUtilities.hpp"
 #include "../GeochemicalSystems.hpp"
+#include "constitutive/activity/Bdot.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
 
 
 using namespace hpcReact;
@@ -50,7 +52,8 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
     1.070434904554991 // Na+1
   };
 
-  timeStepTest< double, true >( carbonateSystem,
+  using ActivityModelType = Bdot< double, int, SpeciatedIonicStrength< double, int, carbonateSystemType::numSpecies() > >;
+  timeStepTest< double, true, ActivityModelType >( carbonateSystem,
                                 1.0,
                                 10,
                                 initialAggregateSpeciesConcentration,

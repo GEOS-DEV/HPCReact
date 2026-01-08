@@ -22,11 +22,14 @@ using namespace hpcReact::unitTest_utilities;
 
 void testMoMasMediumEquilibriumHelper()
 {
-  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
-                                                                           int,
-                                                                           int >;
 
   static constexpr int numPrimarySpecies = hpcReact::MoMasBenchmark::mediumCaseParams.numPrimarySpecies();
+  static constexpr int numSpecies = hpcReact::MoMasBenchmark::mediumCaseParams.numSpecies();
+
+  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
+                                                                           int,
+                                                                           int,
+                                                                           Bdot< double, int, SpeciatedIonicStrength< double, int, numSpecies > >>;
 
 
 

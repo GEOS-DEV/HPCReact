@@ -45,7 +45,7 @@ namespace bulkGeneric
 //   um1Constants };
 
 
-using simpleKineticTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 0 >;
+using simpleKineticTestType = reactionsSystems::KineticReactionsParameters< double, int, int, 5, 2 >;
 
 constexpr 
 simpleKineticTestType
@@ -56,16 +56,15 @@ simpleKineticTestRateParams =
     { -2, 1,  1,  0, 0 },
     {  0, 0, -1, -1, 2 }
   },
-  // equilibrium constants
-  { 1.0, 1.0 },
   // forward rate constants
   { 1.0, 0.5 },
   // reverse rate constants
   { 1.0, 0.5 },
-  // flag of mobile secondary species
-  { 1, 1 },
+  // equilibrium constants
+  { 1.0, 1.0 },
   // Use the forward and reverse to calculate the kinetic reaction rates
   0
+
 };
 
 using simpleTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;

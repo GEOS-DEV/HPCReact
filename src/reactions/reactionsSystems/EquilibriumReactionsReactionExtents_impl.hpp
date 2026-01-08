@@ -24,7 +24,8 @@ constexpr bool debugPrinting = false;
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST,
@@ -34,7 +35,8 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
+                      INDEX_TYPE,
+                      ACTIVITY_MODEL >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
                                                                                PARAMS_DATA const & params,
                                                                                ARRAY_1D_TO_CONST const & speciesConcentration0,
                                                                                ARRAY_1D_TO_CONST2 const & xi,
@@ -112,7 +114,8 @@ EquilibriumReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST >
@@ -120,7 +123,8 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::enforceEquilibrium_Extents( REAL_TYPE const & temperature,
+                      INDEX_TYPE,
+                      ACTIVITY_MODEL >::enforceEquilibrium_Extents( REAL_TYPE const & temperature,
                                                                 PARAMS_DATA const & params,
                                                                 ARRAY_1D_TO_CONST const & speciesConcentration0,
                                                                 ARRAY_1D & speciesConcentration )

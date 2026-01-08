@@ -30,6 +30,7 @@ namespace reactionsSystems
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
@@ -43,6 +44,7 @@ HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
                                   INDEX_TYPE,
+                                  ACTIVITY_MODEL,
                                   LOGE_CONCENTRATION
                                   >::updateMixedSystem_impl( RealType const & temperature,
                                                              PARAMS_DATA const & params,
@@ -114,6 +116,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
@@ -125,6 +128,7 @@ HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
                                   INDEX_TYPE,
+                                  ACTIVITY_MODEL,
                                   LOGE_CONCENTRATION
                                   >::computeReactionRates_impl( RealType const & temperature,
                                                                 PARAMS_DATA const & params,
@@ -188,6 +192,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
@@ -200,6 +205,7 @@ HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
                                   INDEX_TYPE,
+                                  ACTIVITY_MODEL,
                                   LOGE_CONCENTRATION
                                   >::computeAggregateSpeciesRates_impl( PARAMS_DATA const & params,
                                                                         ARRAY_1D_TO_CONST const & speciesConcentration,

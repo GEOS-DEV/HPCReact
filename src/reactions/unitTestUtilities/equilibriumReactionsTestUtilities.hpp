@@ -13,6 +13,8 @@
 #include "reactions/reactionsSystems/EquilibriumReactions.hpp"
 #include "common/macros.hpp"
 #include "common/pmpl.hpp"
+#include "constitutive/activity/Bdot.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
 
 #include <gtest/gtest.h>
 
@@ -58,7 +60,8 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
 {
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                            int,
-                                                                           int >;
+                                                                           int,
+                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > > >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
   static constexpr int numReactions = PARAMS_DATA::numReactions();
@@ -128,7 +131,8 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
 {
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                            int,
-                                                                           int >;
+                                                                           int,
+                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > > >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 

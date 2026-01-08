@@ -16,7 +16,7 @@ namespace hpcReact
 {
 
 template< typename REAL_TYPE >
-class SpeciatedIonicStrength
+class StoichiometricIonicStrength
 {
 public:
 
@@ -27,13 +27,7 @@ calculate( ARRAY_1D_TO_CONST const & speciesConcentration,
            ARRAY_1D_TO_CONST const & speciesCharge,
            int const numSpecies )
 {
-  REAL_TYPE I = 0.0;
-  for( int i=0; i<numSpecies; ++i )
-  {
-    I += speciesConcentration[i] * speciesCharge[i] * speciesCharge[i];
-  }
-  I *= 0.5;
-  return I;
+  return 0.0;
 }
 
 };

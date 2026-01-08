@@ -35,7 +35,8 @@ namespace reactionsSystems
  */
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 class EquilibriumReactions
 {
 public:

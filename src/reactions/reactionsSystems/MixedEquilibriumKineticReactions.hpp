@@ -37,6 +37,7 @@ namespace reactionsSystems
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 class MixedEquilibriumKineticReactions
 {
@@ -52,7 +53,7 @@ public:
   using IndexType = INDEX_TYPE;
 
   /// Type alias for the Kinetic reactions type used in the class.
-  using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, LOGE_CONCENTRATION >;
+  using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, ACTIVITY_MODEL, LOGE_CONCENTRATION >;
 
   /**
    * @brief Update a mixed chemical system by computing secondary species concentrations,

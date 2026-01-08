@@ -140,18 +140,12 @@ struct MixedReactionsParameters
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
                                       CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag,
-                                      CArrayWrapper< RealType, NUM_SPECIES > const & speciesCharge,
-                                      CArrayWrapper< RealType, NUM_SPECIES > const & ionSizeParameter,
-                                      CArrayWrapper< RealType, NUM_SPECIES > const & bdotParameter,
                                       IntType const reactionRatesUpdateOption = 1 ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag ),
-    m_speciesCharge( speciesCharge ),
-    m_ionSizeParameter( ionSizeParameter ),
-    m_bdotParameter( bdotParameter ),
     m_reactionRatesUpdateOption( reactionRatesUpdateOption )
   {}
 
@@ -259,10 +253,6 @@ struct MixedReactionsParameters
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantForward;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
   CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
-
-  CArrayWrapper< RealType, NUM_SPECIES > m_speciesCharge;
-  CArrayWrapper< RealType, NUM_SPECIES > m_ionSizeParameter;
-  CArrayWrapper< RealType, NUM_SPECIES > m_bdotParameter;
 
   IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
 };

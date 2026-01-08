@@ -23,7 +23,8 @@ namespace reactionsSystems
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST,
@@ -34,7 +35,8 @@ inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
+                      INDEX_TYPE,
+                      ACTIVITY_MODEL >::computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
                                                                                               PARAMS_DATA const & params,
                                                                                               ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
                                                                                               ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
@@ -64,7 +66,8 @@ EquilibriumReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST >
@@ -72,7 +75,8 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::enforceEquilibrium_LogAggregate( REAL_TYPE const & temperature,
+                      INDEX_TYPE,
+                      ACTIVITY_MODEL >::enforceEquilibrium_LogAggregate( REAL_TYPE const & temperature,
                                                                      PARAMS_DATA const & params,
                                                                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
                                                                      ARRAY_1D & logPrimarySpeciesConcentration )
@@ -99,7 +103,8 @@ EquilibriumReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST >
@@ -107,7 +112,8 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::enforceEquilibrium_Aggregate( REAL_TYPE const & temperature,
+                      INDEX_TYPE,
+                      ACTIVITY_MODEL >::enforceEquilibrium_Aggregate( REAL_TYPE const & temperature,
                                                                   PARAMS_DATA const & params,
                                                                   ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
                                                                   ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,

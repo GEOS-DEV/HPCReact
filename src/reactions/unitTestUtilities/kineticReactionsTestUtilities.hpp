@@ -15,6 +15,8 @@
 #include "common/pmpl.hpp"
 #include "common/printers.hpp"
 #include "common/CArrayWrapper.hpp"
+#include "constitutive/activity/Bdot.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
 #include "reactions/reactionsSystems/KineticReactions.hpp"
 
 #include <gtest/gtest.h>
@@ -66,6 +68,7 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
                                                                    int,
+                                                                   Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >,
                                                                    LOGE_CONCENTRATION >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
@@ -164,6 +167,7 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
                                                                    int,
+                                                                   Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >,
                                                                    LOGE_CONCENTRATION >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
@@ -242,6 +246,7 @@ void timeStepTest( PARAMS_DATA const & params,
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
                                                                    int,
+                                                                   Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >,
                                                                    LOGE_CONCENTRATION >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();

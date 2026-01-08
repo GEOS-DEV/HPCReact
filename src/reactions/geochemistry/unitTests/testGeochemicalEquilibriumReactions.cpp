@@ -101,11 +101,14 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 {
 
-  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
-                                                                           int,
-                                                                           int >;
 
   static constexpr int numPrimarySpecies = hpcReact::geochemistry::carbonateSystemAllEquilibrium.numPrimarySpecies();
+  static constexpr int numSpecies = hpcReact::geochemistry::carbonateSystemAllEquilibrium.numSpecies();
+
+  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
+                                                                           int,
+                                                                           int,
+                                                                           Bdot< double, int, SpeciatedIonicStrength< double, int, numSpecies > >>;
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
