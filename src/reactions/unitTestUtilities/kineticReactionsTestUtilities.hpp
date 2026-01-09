@@ -15,8 +15,6 @@
 #include "common/pmpl.hpp"
 #include "common/printers.hpp"
 #include "common/CArrayWrapper.hpp"
-#include "constitutive/activity/Bdot.hpp"
-#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
 #include "reactions/reactionsSystems/KineticReactions.hpp"
 
 #include <gtest/gtest.h>
@@ -58,21 +56,23 @@ struct ComputeReactionRatesTestData
 
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
-          typename PARAMS_DATA >
-void computeReactionRatesTest( PARAMS_DATA const & params,
-                               REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
-                               REAL_TYPE const (&surfaceArea)[PARAMS_DATA::numReactions()],
-                               REAL_TYPE const (&expectedReactionRates)[PARAMS_DATA::numReactions()],
-                               REAL_TYPE const (&expectedReactionRatesDerivatives)[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] )
+          typename ACTIVITY_MODEL,
+          typename KINETIC_PARAMS_DATA >
+void computeReactionRatesTest( KINETIC_PARAMS_DATA const & params,
+                               typename ACTIVITY_MODEL::Params const & activityParams,
+                               REAL_TYPE const (&initialSpeciesConcentration)[KINETIC_PARAMS_DATA::numSpecies()],
+                               REAL_TYPE const (&surfaceArea)[KINETIC_PARAMS_DATA::numReactions()],
+                               REAL_TYPE const (&expectedReactionRates)[KINETIC_PARAMS_DATA::numReactions()],
+                               REAL_TYPE const (&expectedReactionRatesDerivatives)[KINETIC_PARAMS_DATA::numReactions()][KINETIC_PARAMS_DATA::numSpecies()] )
 {
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
                                                                    int,
-                                                                   Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >,
+                                                                   ACTIVITY_MODEL,
                                                                    LOGE_CONCENTRATION >;
 
-  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
-  static constexpr int numReactions = PARAMS_DATA::numReactions();
+  static constexpr int numSpecies = KINETIC_PARAMS_DATA::numSpecies();
+  static constexpr int numReactions = KINETIC_PARAMS_DATA::numReactions();
 
   double const temperature = 298.15;
   ComputeReactionRatesTestData< numReactions, numSpecies > data;
@@ -105,10 +105,11 @@ void computeReactionRatesTest( PARAMS_DATA const & params,
   }
 
 
-  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     KineticReactionsType::computeReactionRates( temperature,
                                                 params,
+                                                activityParams,
                                                 dataCopy->speciesConcentration,
                                                 dataCopy->surfaceArea,
                                                 dataCopy->reactionRates,
@@ -157,20 +158,22 @@ struct ComputeSpeciesRatesTestData
 
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
-          typename PARAMS_DATA >
-void computeSpeciesRatesTest( PARAMS_DATA const & params,
-                              REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
-                              REAL_TYPE const (&expectedSpeciesRates)[PARAMS_DATA::numSpecies()],
-                              REAL_TYPE const (&expectedSpeciesRatesDerivatives)[PARAMS_DATA::numSpecies()][PARAMS_DATA::numSpecies()] )
+          typename ACTIVITY_MODEL,
+          typename KINETIC_PARAMS_DATA >
+void computeSpeciesRatesTest( KINETIC_PARAMS_DATA const & params,
+                              typename ACTIVITY_MODEL::Params const & activityParams,
+                              REAL_TYPE const (&initialSpeciesConcentration)[KINETIC_PARAMS_DATA::numSpecies()],
+                              REAL_TYPE const (&expectedSpeciesRates)[KINETIC_PARAMS_DATA::numSpecies()],
+                              REAL_TYPE const (&expectedSpeciesRatesDerivatives)[KINETIC_PARAMS_DATA::numSpecies()][KINETIC_PARAMS_DATA::numSpecies()] )
 {
 
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
                                                                    int,
-                                                                   Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >,
+                                                                   ACTIVITY_MODEL,
                                                                    LOGE_CONCENTRATION >;
 
-  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numSpecies = KINETIC_PARAMS_DATA::numSpecies();
 
   double const temperature = 298.15;
   ComputeSpeciesRatesTestData< numSpecies > data;
@@ -190,10 +193,11 @@ void computeSpeciesRatesTest( PARAMS_DATA const & params,
     }
   }
 
-  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     KineticReactionsType::computeSpeciesRates( temperature,
                                                params,
+                                               activityParams,
                                                dataCopy->speciesConcentration,
                                                dataCopy->speciesRates,
                                                dataCopy->speciesRatesDerivatives );
@@ -236,20 +240,21 @@ struct TimeStepTestData
 
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
-          typename PARAMS_DATA >
-void timeStepTest( PARAMS_DATA const & params,
+          typename ACTIVITY_MODEL,
+          typename KINETIC_PARAMS_DATA >
+void timeStepTest( KINETIC_PARAMS_DATA const & params,
                    REAL_TYPE const dt,
                    int const numSteps,
-                   REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
-                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
+                   REAL_TYPE const (&initialSpeciesConcentration)[KINETIC_PARAMS_DATA::numSpecies()],
+                   REAL_TYPE const (&expectedSpeciesConcentrations)[KINETIC_PARAMS_DATA::numSpecies()] )
 {
   using KineticReactionsType = reactionsSystems::KineticReactions< REAL_TYPE,
                                                                    int,
                                                                    int,
-                                                                   Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >,
+                                                                   ACTIVITY_MODEL,
                                                                    LOGE_CONCENTRATION >;
 
-  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numSpecies = KINETIC_PARAMS_DATA::numSpecies();
   double const temperature = 298.15;
   TimeStepTestData< numSpecies > data;
 

@@ -12,6 +12,9 @@
 #pragma once
 
 #include "../reactionsSystems/Parameters.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
+#include "constitutive/activity/Bdot.hpp"
+#include "constitutive/activity/Identity.hpp"
 
 namespace hpcReact
 {
@@ -45,10 +48,10 @@ namespace bulkGeneric
 //   um1Constants };
 
 
-using simpleKineticTestType = reactionsSystems::KineticReactionsParameters< double, int, int, 5, 2 >;
+using simpleKineticParamsType = reactionsSystems::KineticReactionsParameters< double, int, int, 5, 2 >;
 
 constexpr 
-simpleKineticTestType
+simpleKineticParamsType
 simpleKineticTestRateParams = 
 { 
   // stoichiometric matrix
@@ -64,13 +67,30 @@ simpleKineticTestRateParams =
   { 1.0, 1.0 },
   // Use the forward and reverse to calculate the kinetic reaction rates
   0
-
 };
 
-using simpleTestType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;
+using simpleIonicStrengthType = SpeciatedIonicStrength< double, int, 5 >;
+
+using simpleActivityParamsType = Bdot< double, int, simpleIonicStrengthType >::Params;
+constexpr 
+simpleActivityParamsType
+simpleActivityTestParams =
+{
+  // species charge
+  {{ 2.0, -1.0, 1.0, 0.0, -1.0 }},
+  // ion size parameter
+  { 4.0, 3.5, 3.5, 3.5, 3.5 },
+  // bdot parameter
+  { 0.1, 0.1, 0.1, 0.0, 0.1 }
+};
+
+Identity< double, int, simpleIonicStrengthType >::Params simpleIdentityActivityTestParams = {};
+
+
+using simpleMixedParamsType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;
 
 constexpr 
-simpleTestType
+simpleMixedParamsType
 simpleTestRateParams = 
 { 
   // stoichiometric matrix

@@ -24,15 +24,21 @@ public:
   using RealType = REAL_TYPE;
   using IndexType = INDEX_TYPE;
 
+  struct Params
+  { 
+    HPCREACT_HOST_DEVICE static constexpr IndexType numSpecies() { return IONIC_STRENGTH_TYPE::Params::numSpecies(); }
+  };
+
   template< typename ARRAY_1D_TO_CONST,
-            typename ARRAY_1D >
+            typename ARRAY_1D,
+            typename PARAMS >
   static inline HPCREACT_HOST_DEVICE
   void
-  calculateActivities( IONIC_STRENGTH_TYPE::PARAMS const & params,
+  calculateActivities( PARAMS const & ,
                        ARRAY_1D_TO_CONST const & speciesConcentrations,
                        ARRAY_1D & activities )
   {
-    constexpr IndexType numSpecies = params.numSpecies();
+    constexpr IndexType numSpecies = PARAMS::numSpecies();
     for( IndexType i=0; i<numSpecies; ++i )
     {
       activities[i] = speciesConcentrations[i];
