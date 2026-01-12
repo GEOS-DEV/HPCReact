@@ -21,6 +21,9 @@ TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionPa
 {
   using namespace hpcReact::ChainGeneric;
 
+  using IonicStrengthType = ChainGeneric::serialAllKineticIonicStrengthType;
+  using ActivityType = Identity< double, int, IonicStrengthType >;
+
   double const initialSpeciesConcentration[] =
   {
     1.0, // C1
@@ -44,12 +47,18 @@ TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionPa
   { { 0.05, 0.0, 0.0 },
     { 0.0, 0.03, 0.0 },
     { 0.0, 0.0, 0.02 } };
-  computeReactionRatesTest< double, false >( serialAllKineticParams.kineticReactionsParameters(),
+  computeReactionRatesTest< double, 
+                            false,
+                            ActivityType >( serialAllKineticParams.kineticReactionsParameters(),
+                                             ChainGeneric::serialAllKineticIdentityActivityParams,
                                              initialSpeciesConcentration,
                                              surfaceArea, // No use. Just to pass something here
                                              expectedReactionRates,
                                              expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( serialAllKineticParams.kineticReactionsParameters(),
+  computeReactionRatesTest< double, 
+                            true,
+                            ActivityType >( serialAllKineticParams.kineticReactionsParameters(),
+                                            ChainGeneric::serialAllKineticIdentityActivityParams,
                                             initialSpeciesConcentration,
                                             surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,

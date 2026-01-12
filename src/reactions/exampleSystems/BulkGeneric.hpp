@@ -72,6 +72,7 @@ simpleKineticTestRateParams =
 using simpleIonicStrengthType = SpeciatedIonicStrength< double, int, 5 >;
 
 using simpleActivityParamsType = Bdot< double, int, simpleIonicStrengthType >::Params;
+
 constexpr 
 simpleActivityParamsType
 simpleActivityTestParams =

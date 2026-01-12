@@ -12,6 +12,9 @@
 #pragma once
 
 #include "../reactionsSystems/Parameters.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
+#include "constitutive/activity/Bdot.hpp"
+#include "constitutive/activity/Identity.hpp"
 
 namespace hpcReact
 {
@@ -62,6 +65,25 @@ namespace ChainGeneric
 
     0 // Use the forward and reverse to calculate the kinetic reaction rates
   };
+
+  using serialAllKineticIonicStrengthType = SpeciatedIonicStrength< double, int, 3 >;
+
+  using serialAllKineticActivityParamsType = Bdot< double, int, serialAllKineticIonicStrengthType >::Params;
+
+  constexpr 
+  serialAllKineticActivityParamsType
+  serialAllKineticActivityParams =
+  {
+    // species charge
+    {{ 0.0, 0.0, 0.0 }},
+    // ion size parameter
+    { 3.5, 3.5, 3.5 },
+    // bdot parameter
+    { 0.0, 0.0, 0.0 }
+  };
+
+  Identity< double, int, serialAllKineticIonicStrengthType >::Params serialAllKineticIdentityActivityParams = {};
+
 
 // *****UNCRUSTIFY-ON******
 } // namespace ChainGeneric

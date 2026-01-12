@@ -12,6 +12,9 @@
 #pragma once
 
 #include "../reactionsSystems/Parameters.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
+#include "constitutive/activity/Bdot.hpp"
+#include "constitutive/activity/Identity.hpp"
 
 namespace hpcReact
 {
@@ -107,15 +110,97 @@ constexpr CArrayWrapper<int, 10> mobileSpeciesFlag =
     1   // CaCO3 + H+ = Ca+2 + HCO3-
   };
 
+
+
+
+
+constexpr CArrayWrapper<double, 17> speciesCharge = 
+  { -1.0, // OH-
+     0.0, // CO2(aq)
+    -2.0, // CO3-2
+     1.0, // CaHCO3+
+     0.0, // CaSO4(aq)
+     1.0, // CaCl+
+     0.0, // CaCl2(aq)
+     0.0, // MgSO4(aq)
+    -1.0, // NaSO4-
+     0.0, // CaCO3(aq)
+     1.0, // H+
+    -1.0, // HCO3-
+     2.0, // Ca+2
+    -2.0, // SO4-2
+    -1.0, // Cl-
+     2.0, // Mg+2
+     1.0  // Na+
+    };
+
+  constexpr CArrayWrapper<double, 17> ionSize =
+  {
+    3.5,  // OH-      (from H2O = OH- + H+, -gamma 3.5 0.0)
+    0.0,  // CO2(aq)  (neutral, no -gamma; typically gamma ≈ 1)
+    5.4,  // CO3-2
+    5.4,  // CaHCO3+
+    0.0,  // CaSO4(aq) (neutral)
+    0.0,  // CaCl+    (no -gamma in phreeqc.dat)
+    0.0,  // CaCl2(aq) (neutral)
+    0.0,  // MgSO4(aq) (neutral)
+    0.0,  // NaSO4-   (no -gamma in phreeqc.dat)
+    0.0,  // CaCO3(aq) (neutral)
+    9.0,  // H+
+    5.4,  // HCO3-    (from CO3-2 + H+ = HCO3-, -gamma 5.4 0.0)
+    5.0,  // Ca+2
+    5.0,  // SO4-2
+    3.5,  // Cl-
+    5.5,  // Mg+2
+    4.0   // Na+ 
+  };
+
+  constexpr CArrayWrapper<double, 17> bdotParameters =
+  {
+      0.0,    // OH-
+      0.0,    // CO2(aq)
+      0.0,    // CO3-2
+      0.0,    // CaHCO3+
+      0.0,    // CaSO4(aq)
+      0.0,    // CaCl+
+      0.0,    // CaCl2(aq)
+      0.0,    // MgSO4(aq)
+      0.0,    // NaSO4-
+      0.0,    // CaCO3(aq)
+      0.0,    // H+
+      0.0,    // HCO3-
+    0.165,  // Ca+2
+   -0.040,  // SO4-2
+    0.015,  // Cl-
+    0.200,  // Mg+2
+    0.075   // Na+
+  }; 
+
+
 }
 
 using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 10, 0 >;
 using carbonateSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, int, 17, 10, 10 >;
 using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, int, 16, 10, 9 >;
 
+using carbonateIonicStrengthType = SpeciatedIonicStrength< double, int, 17 >;
+using carbonateActivityType = Bdot< double, int, carbonateIonicStrengthType >;
+using carbonateIdentityActivityType = Identity< double, int, carbonateIonicStrengthType >;
+
+
 constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag, 0 );
 constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
 constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
+constexpr carbonateActivityType::Params carbonateActivityParams = 
+{
+  {carbonate::speciesCharge},
+  carbonate::ionSize,
+  carbonate::bdotParameters
+};
+
+
+
+Identity< double, int, carbonateIonicStrengthType >::Params carbonateIdentityActivityParams = {};
 
 // *****UNCRUSTIFY-ON******
 } // namespace geochemistry

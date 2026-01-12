@@ -11,6 +11,7 @@
 #pragma once
 
 #include "DebyeHuckel.hpp"
+#include "common/CArrayWrapper.hpp"
 
 namespace hpcReact
 {
@@ -28,8 +29,8 @@ public:
 
 struct Params : public IONIC_STRENGTH_TYPE::Params
 {
-  RealType m_ionSizeParameter[IONIC_STRENGTH_TYPE::Params::numSpecies()];
-  RealType m_bdotParameter[IONIC_STRENGTH_TYPE::Params::numSpecies()];
+  CArrayWrapper<RealType, IONIC_STRENGTH_TYPE::Params::numSpecies()> m_ionSizeParameter;
+  CArrayWrapper<RealType, IONIC_STRENGTH_TYPE::Params::numSpecies()> m_bdotParameter;
 };
 
 
