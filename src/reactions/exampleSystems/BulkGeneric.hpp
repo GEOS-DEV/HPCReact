@@ -50,39 +50,52 @@ namespace bulkGeneric
 
 using simpleKineticParamsType = reactionsSystems::KineticReactionsParameters< double, int, int, 5, 2 >;
 
-constexpr 
-simpleKineticParamsType
-simpleKineticTestRateParams = 
-{ 
+constexpr CArrayWrapper< double, 2, 5 > simpleKineticStoichMatrix =
+{
   // stoichiometric matrix
   {
     { -2, 1,  1,  0, 0 },
     {  0, 0, -1, -1, 2 }
-  },
-  // forward rate constants
-  { 1.0, 0.5 },
-  // reverse rate constants
-  { 1.0, 0.5 },
-  // equilibrium constants
-  { 1.0, 1.0 },
-  // Use the forward and reverse to calculate the kinetic reaction rates
-  0
+  }
 };
+
+constexpr CArrayWrapper< double, 2 > simpleKineticForwardRates =
+{ 1.0, 0.5 };
+
+constexpr CArrayWrapper< double, 2 > simpleKineticReverseRates =
+{ 1.0, 0.5 };
+
+constexpr CArrayWrapper< double, 2 > simpleKineticEquilibriumConstants =
+{ 1.0, 1.0 };
+
+constexpr simpleKineticParamsType simpleKineticTestRateParams(
+  simpleKineticStoichMatrix,
+  simpleKineticForwardRates,
+  simpleKineticReverseRates,
+  simpleKineticEquilibriumConstants,
+  0 );
 
 using simpleIonicStrengthType = SpeciatedIonicStrength< double, int, 5 >;
 
 using simpleActivityParamsType = Bdot< double, int, simpleIonicStrengthType >::Params;
 
-constexpr 
-simpleActivityParamsType
-simpleActivityTestParams =
+constexpr CArrayWrapper< double, 5 > simpleSpeciesCharge =
+{ 2.0, -1.0, 1.0, 0.0, -1.0 };
+
+constexpr CArrayWrapper< double, 5 > simpleIonSize =
+{ 4.0, 3.5, 3.5, 3.5, 3.5 };
+
+constexpr CArrayWrapper< double, 5 > simpleBdotParameters =
+{ 0.1, 0.1, 0.1, 0.0, 0.1 };
+
+constexpr simpleActivityParamsType simpleActivityTestParams =
 {
   // species charge
-  {{ 2.0, -1.0, 1.0, 0.0, -1.0 }},
+  {{ simpleSpeciesCharge }},
   // ion size parameter
-  { 4.0, 3.5, 3.5, 3.5, 3.5 },
+  simpleIonSize,
   // bdot parameter
-  { 0.1, 0.1, 0.1, 0.0, 0.1 }
+  simpleBdotParameters
 };
 
 Identity< double, int, simpleIonicStrengthType >::Params simpleIdentityActivityTestParams = {};
@@ -90,26 +103,34 @@ Identity< double, int, simpleIonicStrengthType >::Params simpleIdentityActivityT
 
 using simpleMixedParamsType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;
 
-constexpr 
-simpleMixedParamsType
-simpleTestRateParams = 
-{ 
+constexpr CArrayWrapper< double, 2, 5 > simpleMixedStoichMatrix =
+{
   // stoichiometric matrix
   {
     { -2, 1,  1,  0, 0 },
     {  0, 0, -1, -1, 2 }
-  },
-  // equilibrium constants
-  { 1.0, 1.0 },
-  // forward rate constants
-  { 1.0, 0.5 },
-  // reverse rate constants
-  { 1.0, 0.5 },
-  // flag of mobile secondary species
-  { 1, 1 },
-  // Use the forward and reverse to calculate the kinetic reaction rates
-  0
+  }
 };
+
+constexpr CArrayWrapper< double, 2 > simpleMixedEquilibriumConstants =
+{ 1.0, 1.0 };
+
+constexpr CArrayWrapper< double, 2 > simpleMixedForwardRates =
+{ 1.0, 0.5 };
+
+constexpr CArrayWrapper< double, 2 > simpleMixedReverseRates =
+{ 1.0, 0.5 };
+
+constexpr CArrayWrapper< int, 2 > simpleMixedMobileSpeciesFlag =
+{ 1, 1 };
+
+constexpr simpleMixedParamsType simpleTestRateParams(
+  simpleMixedStoichMatrix,
+  simpleMixedEquilibriumConstants,
+  simpleMixedForwardRates,
+  simpleMixedReverseRates,
+  simpleMixedMobileSpeciesFlag,
+  0 );
 
 // *****UNCRUSTIFY-ON******
 } // namespace bulkGeneric
