@@ -35,20 +35,22 @@ struct Params
 };
 
 
-template< typename ARRAY_1D_TO_CONST >
+template< typename ARRAY_1D_TO_CONST,
+          typename ARRAY_1D >
 static inline HPCREACT_HOST_DEVICE 
 REAL_TYPE
 calculate( Params const & params,
-           ARRAY_1D_TO_CONST const & speciesConcentration )
+           ARRAY_1D_TO_CONST const & speciesConcentration,
+           ARRAY_1D & dIonicStrength_dConcentration )
 {
   REAL_TYPE I = 0.0;
   auto const &  numSpecies = params.numSpecies();
   auto const & speciesCharge = params.m_speciesCharge;
   for( int i=0; i<numSpecies; ++i )
   {
-    I += speciesConcentration[i] * speciesCharge[i] * speciesCharge[i];
+    dIonicStrength_dConcentration[i] = 0.5 * speciesCharge[i] * speciesCharge[i];
+    I += speciesConcentration[i] * dIonicStrength_dConcentration[i];
   }
-  I *= 0.5;
   return I;
 }
 

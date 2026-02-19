@@ -132,6 +132,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                   LOGE_CONCENTRATION
                                   >::computeReactionRates_impl( RealType const & temperature,
                                                                 PARAMS_DATA const & params,
+                                                                typename ACTIVITY_MODEL::Params const & activityParams,
                                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                                 ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
                                                                 ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
@@ -166,6 +167,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   kineticReactions::computeReactionRates( temperature,
                                           params.kineticReactionsParameters(),
+                                          activityParams,
                                           logSpeciesConcentration,
                                           surfaceArea,
                                           reactionRates,
@@ -182,8 +184,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
       {
         RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = params.stoichiometricMatrix( k, j + numSecondarySpecies );
 
-        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) +=
-          reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
+        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) += reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
       }
     }
   }

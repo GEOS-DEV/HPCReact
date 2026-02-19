@@ -48,6 +48,9 @@ EquilibriumReactions< REAL_TYPE,
 
   RealType aggregatePrimaryConcentrations[numPrimarySpecies] = {0.0};
   ARRAY_2D dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{{0.0}}};
+
+  
+
   massActions::calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
                                                                                                   logPrimarySpeciesConcentration,
                                                                                                   aggregatePrimaryConcentrations,

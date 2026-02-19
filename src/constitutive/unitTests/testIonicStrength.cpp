@@ -24,17 +24,19 @@ using IonicStrength = SpeciatedIonicStrength<double, int, 3>;
 constexpr IonicStrength::Params testParams
 {
   // Species charge
-  { 1.0, -1.0, 2.0 }
+  { -1.0, -1.0, 2.0 }
 };
 
 TEST( testBdot, testIonicStrength )
 {
   double speciesConcentration[ testParams.numSpecies() ] = { 0.1, 0.2, 0.3 };
-
+  double dIonicStrength_dConcentration[ testParams.numSpecies() ];
+  
   double I = IonicStrength::calculate( testParams,
-                                       speciesConcentration );
+                                       speciesConcentration,
+                                       dIonicStrength_dConcentration );
 
-  double expectedI = 0.5 * ( 0.1 * 1.0 * 1.0 + 0.2 * (-1.0) * (-1.0) + 0.3 * 2.0 * 2.0 );
+  double expectedI = 0.5 * ( 0.1 * (-1.0) * (-1.0) + 0.2 * (-1.0) * (-1.0) + 0.3 * 2.0 * 2.0 );
   EXPECT_DOUBLE_EQ( I, expectedI );
   
 }

@@ -36,15 +36,20 @@ struct Params : public IONIC_STRENGTH_TYPE::Params
 
 
 template< typename ARRAY_1D_TO_CONST,
-          typename ARRAY_1D >
+          typename ARRAY_1D,
+          typename ARRAY_2D >
 static inline HPCREACT_HOST_DEVICE 
 void
 calculateActivities( Params const & params,
                      ARRAY_1D_TO_CONST const & speciesConcentrations,
-                     ARRAY_1D & activities )
+                     ARRAY_1D & activities,
+                     ARRAY_2D & dActivities_dConcentrations )
 {
 
-  RealType const ionicStrength = IONIC_STRENGTH_TYPE::calculate( params, speciesConcentrations );
+  RealType dIonicStrength_dConcentration[ Params::numSpecies() ];
+  RealType const ionicStrength = IONIC_STRENGTH_TYPE::calculate( params, 
+                                                                 speciesConcentrations, 
+                                                                 dIonicStrength_dConcentration );
   RealType const sqrtI = sqrt(ionicStrength);
   RealType const rho_w = 997.0479; // kg/m3
   RealType const eps_r = 78.54;    // dimensionless
@@ -60,12 +65,22 @@ calculateActivities( Params const & params,
   const IndexType numSpecies = params.numSpecies();
   for( IndexType i=0; i<numSpecies; ++i )
   {
+    RealType dlog10_gamma_dI;
     RealType const DebyeHuckel_term = DebyeHuckel<RealType>::log10_gamma( sqrtI, 
                                                                  speciesCharge[i], 
                                                                  a[i], 
                                                                  A_gamma,
-                                                                 B_gamma );
-    activities[i] = DebyeHuckel_term + b[i] * ionicStrength;
+                                                                 B_gamma,
+                                                                 dlog10_gamma_dI );
+    RealType const log10gamma = DebyeHuckel_term + b[i] * ionicStrength;
+    RealType const gamma = pow(10.0, log10gamma);
+
+    activities[i] = speciesConcentrations[i] * gamma;
+    dActivities_dConcentrations[i][i] = gamma;
+    for( IndexType j=0; j<numSpecies; ++j )
+    {
+      dActivities_dConcentrations[i][j] += ( ( DebyeHuckel_term * 0.5 / ionicStrength ) + b[i] ) * dIonicStrength_dConcentration[j];
+    }
   }
 }
 

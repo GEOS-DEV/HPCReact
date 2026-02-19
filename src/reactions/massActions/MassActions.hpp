@@ -33,9 +33,9 @@ template< typename REAL_TYPE,
           typename FUNC >
 HPCREACT_HOST_DEVICE
 inline
-void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
-                                                ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                ARRAY_1D & logSecondarySpeciesConcentrations,
+void calculateLogSecondaryActivities( PARAMS_DATA const & params,
+                                                ARRAY_1D_TO_CONST const & logPrimaryActivities,
+                                                ARRAY_1D & logSecondaryActivities,
                                                 FUNC && derivativeFunc )
 {
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
@@ -43,16 +43,15 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
 
   for( INDEX_TYPE i = 0; i < numSecondarySpecies; ++i )
   {
-    logSecondarySpeciesConcentrations[i] = 0.0;
+    logSecondaryActivities[i] = 0.0;
   }
 
   for( int j=0; j<numSecondarySpecies; ++j )
   {
-    REAL_TYPE const gamma = 1;
-    logSecondarySpeciesConcentrations[j] = -log( params.equilibriumConstant( j ) ) - log( gamma );
+    logSecondaryActivities[j] = -log( params.equilibriumConstant( j ) );
     for( int k=0; k<numPrimarySpecies; ++k )
     {
-      logSecondarySpeciesConcentrations[j] += params.stoichiometricMatrix( j, k+numSecondarySpecies ) * ( logPrimarySpeciesConcentrations[k] + log( gamma ) );
+      logSecondaryActivities[j] += params.stoichiometricMatrix( j, k+numSecondarySpecies ) * ( logPrimaryActivities[k] );
       derivativeFunc( j, k, params.stoichiometricMatrix( j, k+numSecondarySpecies ) );
     }
   }
@@ -68,20 +67,20 @@ template< typename REAL_TYPE,
           typename ARRAY_1D >
 HPCREACT_HOST_DEVICE
 inline
-void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
-                                                ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                ARRAY_1D & logSecondarySpeciesConcentrations )
+void calculateLogSecondaryActivities( PARAMS_DATA const & params,
+                                                ARRAY_1D_TO_CONST const & logPrimaryActivities,
+                                                ARRAY_1D & logSecondaryActivities )
 {
   if constexpr( PARAMS_DATA::numSecondarySpecies() <= 0 )
   {
     return;
   }
 
-  massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE,
+  massActions_impl::calculateLogSecondaryActivities< REAL_TYPE,
                                                                INT_TYPE,
                                                                INDEX_TYPE >( params,
-                                                                             logPrimarySpeciesConcentrations,
-                                                                             logSecondarySpeciesConcentrations,
+                                                                             logPrimaryActivities,
+                                                                             logSecondaryActivities,
                                                                              [](INDEX_TYPE, INDEX_TYPE, REAL_TYPE ){} );
 }
 
@@ -95,17 +94,17 @@ template< typename REAL_TYPE,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE
 inline
-void calculateLogSecondarySpeciesConcentrationWrtLogC( PARAMS_DATA const & params,
-                                                       ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                       ARRAY_1D & logSecondarySpeciesConcentrations,
-                                                       ARRAY_2D & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations )
+void calculateLogSecondaryActivitiesWrtLogC( PARAMS_DATA const & params,
+                                             ARRAY_1D_TO_CONST const & logPrimaryActivities,
+                                             ARRAY_1D & logSecondaryActivities,
+                                             ARRAY_2D & dLogSecondaryActivities_dLogPrimaryActivities )
 {
-  massActions_impl::calculateLogSecondarySpeciesConcentration< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
-                                                                                                  logPrimarySpeciesConcentrations,
-                                                                                                  logSecondarySpeciesConcentrations,
+  massActions_impl::calculateLogSecondaryActivities< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
+                                                                                                  logPrimaryActivities,
+                                                                                                  logSecondaryActivities,
                                                                                                   [&]( const int j, const int k, REAL_TYPE const value )
   {
-    dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[j][k] = value;
+    dLogSecondaryActivities_dLogPrimaryActivities[j][k] = value;
   } );
 }
 
@@ -128,12 +127,11 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
   static constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
-
-  calculateLogSecondarySpeciesConcentration< REAL_TYPE,
-                                             INT_TYPE,
-                                             INDEX_TYPE >( params,
-                                                           logPrimarySpeciesConcentrations,
-                                                           logSecondarySpeciesConcentrations );
+  calculateLogSecondaryActivities< REAL_TYPE,
+                                   INT_TYPE,
+                                   INDEX_TYPE >( params,
+                                                 logPrimarySpeciesConcentrations,
+                                                 logSecondarySpeciesConcentrations );
   for( INDEX_TYPE i = 0; i < numPrimarySpecies; ++i )
   {
     for( INDEX_TYPE j = 0; j < numPrimarySpecies; ++j )
@@ -154,8 +152,7 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
       for( int k=0; k<numPrimarySpecies; ++k )
       {
         REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
-        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                   i+numSecondarySpecies ) *
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
       }
     }
@@ -173,6 +170,7 @@ HPCREACT_HOST_DEVICE
 inline
 void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
                                                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                                                     ARRAY_1D_TO_CONST const & logPrimaryActivities,
                                                      ARRAY_1D & aggregatePrimarySpeciesConcentrations,
                                                      ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
@@ -248,12 +246,10 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
       for( int k=0; k<numPrimarySpecies; ++k )
       {
         REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
-        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                   i+numSecondarySpecies ) *
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
 
-        dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                         i+numSecondarySpecies ) *
+        dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                             dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration *
                                                                                                             params.mobileSecondarySpeciesFlag( j );
       }

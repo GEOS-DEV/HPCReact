@@ -31,17 +31,23 @@ public:
 
   template< typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D,
+            typename ARRAY_2D,
             typename PARAMS >
   static inline HPCREACT_HOST_DEVICE
   void
   calculateActivities( PARAMS const & ,
                        ARRAY_1D_TO_CONST const & speciesConcentrations,
-                       ARRAY_1D & activities )
+                       ARRAY_1D & activities,
+                       ARRAY_2D & dActivities_dConcentrations )
   {
     constexpr IndexType numSpecies = PARAMS::numSpecies();
     for( IndexType i=0; i<numSpecies; ++i )
     {
       activities[i] = speciesConcentrations[i];
+      for( IndexType j=0; j<numSpecies; ++j )
+      {
+        dActivities_dConcentrations[i][j] = ( i == j ) ? 1.0 : 0.0;
+      }
     }
   }
 

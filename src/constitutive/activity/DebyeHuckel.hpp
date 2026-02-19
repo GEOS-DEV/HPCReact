@@ -128,15 +128,16 @@ public:
 
 
   static inline HPCREACT_HOST_DEVICE
-  RealType log10_gamma( RealType const I,
+  RealType log10_gamma( RealType const sqrtI,
                         RealType const zi,
                         RealType const ai,
-                        RealType const T_K )
+                        RealType const T_K,
+                        RealType & dlog10_gamma_dI )
   {
-    RealType const sqrtI   = sqrt(I);
     RealType const A       = A_gamma(T_K);
     RealType const B       = B_gamma(T_K);
     RealType const denom   = 1 + B * ai * sqrtI;
+    dlog10_gamma_dI = -0.5 * A * zi * zi / ( sqrtI * denom * denom );
     return -A * zi * zi * sqrtI / denom;
   }
 
@@ -146,9 +147,11 @@ public:
                         RealType const zi,
                         RealType const ai,
                         RealType const A,
-                        RealType const B )
+                        RealType const B,
+                        RealType & dlog10_gamma_dI )
   {
     RealType const denom   = 1 + B * ai * sqrtI;
+    dlog10_gamma_dI = -0.5 * A * zi * zi / ( sqrtI * denom * denom );
     return -A * zi * zi * sqrtI / denom;
   }
 

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "common/macros.hpp"
+#include "constitutive/activity/activity.hpp"
 
 #include <stdexcept>
 
@@ -54,7 +55,7 @@ public:
   using IndexType = INDEX_TYPE;
 
   /**
-   * @copydoc KineticReactions::computeReactionRates_impl()
+   * @copydoc KineticReactions::computeReactionRates()
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
@@ -66,14 +67,36 @@ public:
                         typename ACTIVITY_MODEL::Params const & activityParams,
                         ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates,
-                        ARRAY_2D & reactionRatesDerivatives )
+                        ARRAY_2D & dReactionRates_dConcentration )
   {
-    computeReactionRates_impl< PARAMS_DATA, true >( temperature,
+
+    RealType activities[ PARAMS_DATA::numSpecies() ];
+    RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    
+    calculateActivities( activityParams,
+                        speciesConcentration,
+                        activities,
+                        dActivities_dConcentration );
+
+    computeReactionRates< PARAMS_DATA, true >( temperature,
                                                     params,
-                                                    activityParams,
-                                                    speciesConcentration,
+                                                    activities,
                                                     reactionRates,
-                                                    reactionRatesDerivatives );
+                                                    dReactionRates_dActivities );
+
+    // chain rule to get dReactionRate_dConcentration
+    for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
+    {
+      for( IntType i=0; i<PARAMS_DATA::numSpecies(); ++i )
+      {
+        dReactionRates_dConcentration( r, i ) = 0.0;
+        for( IntType j=0; j<PARAMS_DATA::numSpecies(); ++j )
+        {
+          dReactionRates_dConcentration( r, i ) += dReactionRates_dActivities[r][j] * dActivities_dConcentration[j][i];
+        }
+      }
+    }
   }
 
   /**
@@ -96,13 +119,24 @@ public:
                         ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates )
   {
-    REAL_TYPE reactionRatesDerivatives[PARAMS_DATA::numReactions()][PARAMS_DATA::numSpecies()] = { {0.0} };
-    computeReactionRates_impl< PARAMS_DATA, false >( temperature,
+    
+
+    RealType activities[ PARAMS_DATA::numSpecies() ];
+    RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    
+    calculateActivities( activityParams,
+                        speciesConcentration,
+                        activities,
+                        dActivities_dConcentration );
+
+    computeReactionRates< PARAMS_DATA, false >( temperature,
                                                      params,
                                                      activityParams,
-                                                     speciesConcentration,
+                                                     activities,
                                                      reactionRates,
-                                                     reactionRatesDerivatives );
+                                                     dReactionRates_dActivities );
+    HPCREACT_UNUSED_VAR( dReactionRates_dActivities );
   }
 
   /**
@@ -117,7 +151,7 @@ public:
    * @param speciesConcentration The array of species concentrations.
    * @param surfaceArea The array of surface area.
    * @param reactionRates The array of reaction rates.
-   * @param reactionRatesDerivatives The array of reaction rates derivatives.
+   * @param dReactionRates_dConcentration The array of reaction rates derivatives.
    * @details
    *   This function computes the reaction rates for a given set of reactions,
    *   taking into account the surface area of the reactions. If
@@ -136,26 +170,51 @@ public:
                         ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D_SA const & surfaceArea,
                         ARRAY_1D & reactionRates,
-                        ARRAY_2D & reactionRatesDerivatives )
+                        ARRAY_2D & dReactionRates_dConcentration )
   {
+
+    RealType activities[ PARAMS_DATA::numSpecies() ];
+    RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ]{  };
+    RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ]{  };
+    
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         LOGE_CONCENTRATION >( activityParams,
+                                               speciesConcentration,
+                                               activities,
+                                               dActivities_dConcentration );
+
     if( params.reactionRatesUpdateOption() == 0 )
     {
-      computeReactionRates_impl< PARAMS_DATA, true >( temperature,
+      computeReactionRates< PARAMS_DATA, true >( temperature,
                                                       params,
-                                                      activityParams,
-                                                      speciesConcentration,
+                                                      activities,
                                                       reactionRates,
-                                                      reactionRatesDerivatives );
+                                                      dReactionRates_dActivities );
     }
     else if( params.reactionRatesUpdateOption() == 1 )
     {
       computeReactionRatesQuotient_impl< PARAMS_DATA, true >( temperature,
                                                               params,
-                                                              activityParams,
-                                                              speciesConcentration,
+                                                              activities,
                                                               surfaceArea,
                                                               reactionRates,
-                                                              reactionRatesDerivatives );
+                                                              dReactionRates_dActivities );
+    }
+
+    // chain rule to get dReactionRate_dConcentration
+    for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
+    {
+      for( IntType i=0; i<PARAMS_DATA::numSpecies(); ++i )
+      {
+        dReactionRates_dConcentration( r, i ) = 0.0;
+        for( IntType j=0; j<PARAMS_DATA::numSpecies(); ++j )
+        {
+          dReactionRates_dConcentration( r, i ) += dReactionRates_dActivities[r][j] * dActivities_dConcentration[j][i];
+        }
+      }
     }
   }
 
@@ -174,14 +233,39 @@ public:
                        typename ACTIVITY_MODEL::Params const & activityParams,
                        ARRAY_1D_TO_CONST const & speciesConcentration,
                        ARRAY_1D & speciesRates,
-                       ARRAY_2D & speciesRatesDerivatives )
+                       ARRAY_2D & dSpeciesRates_dConcentration )
   {
+
+    RealType activities[ PARAMS_DATA::numSpecies() ];
+    RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] {};
+    RealType dSpeciesRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] {};
+    
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         LOGE_CONCENTRATION >( activityParams,
+                                               speciesConcentration,
+                                               activities,
+                                               dActivities_dConcentration );
+
     computeSpeciesRates_impl< PARAMS_DATA, true >( temperature,
                                                    params,
-                                                   activityParams,
-                                                   speciesConcentration,
+                                                   activities,
                                                    speciesRates,
-                                                   speciesRatesDerivatives );
+                                                   dSpeciesRates_dActivities );
+    // chain rule to get dSpeciesRates_dConcentration
+    for( IntType i=0; i<PARAMS_DATA::numSpecies(); ++i )
+    {
+      for( IntType j=0; j<PARAMS_DATA::numSpecies(); ++j )
+      {
+        dSpeciesRates_dConcentration( i, j ) = 0.0;
+        for( IntType k=0; k<PARAMS_DATA::numSpecies(); ++k )
+        {
+          dSpeciesRates_dConcentration( i, j ) += dSpeciesRates_dActivities[i][k] * dActivities_dConcentration[k][j];
+        }
+      }
+    }
   }
 
   /**
@@ -204,13 +288,19 @@ public:
                        ARRAY_1D_TO_CONST const & speciesConcentration,
                        ARRAY_1D & speciesRates )
   {
-    char speciesRatesDerivatives;
+    RealType activities[ PARAMS_DATA::numSpecies() ];
+    RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    
+    calculateActivities( activityParams,
+                        speciesConcentration,
+                        activities,
+                        dActivities_dConcentration );
+
     computeSpeciesRates_impl< PARAMS_DATA, false >( temperature,
                                                     params,
-                                                    activityParams,
-                                                    speciesConcentration,
+                                                    activities,
                                                     speciesRates,
-                                                    speciesRatesDerivatives );
+                                                    void() );
   }
 
   /**
@@ -242,6 +332,17 @@ public:
 
 
 private:
+
+  // template< typename ARRAY_1D_TO_CONST,
+  //           typename ARRAY_1D,
+  //           typename ARRAY_2D >
+  // static HPCREACT_HOST_DEVICE void
+  // calculateActivities( typename ACTIVITY_MODEL::Params const & params,
+  //                      ARRAY_1D_TO_CONST const & speciesConcentration,
+  //                      ARRAY_1D & activities,
+  //                      ARRAY_2D & dActivities_dConcentration );
+
+  
 
   /**
    * @brief Compute the reaction rates for a given set of species concentrations.
@@ -280,12 +381,11 @@ private:
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
-  computeReactionRates_impl( RealType const & temperature,
+  computeReactionRates( RealType const & temperature,
                              PARAMS_DATA const & params,
-                             typename ACTIVITY_MODEL::Params const & activityParams,
-                             ARRAY_1D_TO_CONST const & speciesConcentration,
+                             ARRAY_1D_TO_CONST const & activities,
                              ARRAY_1D & reactionRates,
-                             ARRAY_2D & reactionRatesDerivatives );
+                             ARRAY_2D & dReactionRates_dActivities );
 
 /**
  * @brief
@@ -297,10 +397,10 @@ private:
  * @tparam ARRAY_2D
  * @param temperature
  * @param params
- * @param speciesConcentration
+ * @param activities
  * @param surfaceArea
  * @param reactionRates
- * @param reactionRatesDerivatives
+ * @param dReactionRates_dActivities
  * @return HPCREACT_HOST_DEVICE
  */
   template< typename PARAMS_DATA,
@@ -312,11 +412,10 @@ private:
   static HPCREACT_HOST_DEVICE void
   computeReactionRatesQuotient_impl( RealType const & temperature,
                                      PARAMS_DATA const & params,
-                                     typename ACTIVITY_MODEL::Params const & activityParams,
-                                     ARRAY_1D_TO_CONST const & speciesConcentration,
+                                     ARRAY_1D_TO_CONST const & activities,
                                      ARRAY_1D_SA const & surfaceArea,
                                      ARRAY_1D & reactionRates,
-                                     ARRAY_2D & reactionRatesDerivatives );
+                                     ARRAY_2D & dReactionRates_dActivities );
 
   /**
    * @brief Compute the kinetic species rates for a given set of kinetic reactions.
@@ -327,9 +426,9 @@ private:
    * @tparam ARRAY_2D The type of the array of species rates derivatives.
    * @param temperature The temperature of the system.
    * @param params The parameters data.
-   * @param speciesConcentration The array of species concentrations.
+   * @param activities The array of activities.
    * @param speciesRates The array of species rates.
-   * @param speciesRatesDerivatives The array of species rates derivatives.
+   * @param dReactionRates_dActivities The array of species rates derivatives.
    */
   template< typename PARAMS_DATA,
             bool CALCULATE_DERIVATIVES,
@@ -339,10 +438,9 @@ private:
   static HPCREACT_HOST_DEVICE void
   computeSpeciesRates_impl( RealType const & temperature,
                             PARAMS_DATA const & params,
-                            typename ACTIVITY_MODEL::Params const & activityParams,
-                            ARRAY_1D_TO_CONST const & speciesConcentration,
+                            ARRAY_1D_TO_CONST const & activities,
                             ARRAY_1D & speciesRates,
-                            ARRAY_2D & speciesRatesDerivatives );
+                            ARRAY_2D & dReactionRates_dActivities );
 
 };
 
