@@ -48,6 +48,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                   LOGE_CONCENTRATION
                                   >::updateMixedSystem_impl( RealType const & temperature,
                                                              PARAMS_DATA const & params,
+                                                             typename ACTIVITY_MODEL::Params const & activityParams,
                                                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                              ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                              ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
@@ -60,13 +61,68 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                                                              ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
 {
+  constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
+  constexpr IntType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+
   if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
   {
+    RealType logSpeciesConcentration[numSpecies] = { 0.0 };
+    RealType logSpeciesActivities[numSpecies] = { 0.0 };
+    RealType dLogSpeciesActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
+    RealType logPrimaryActivities[numPrimarySpecies] = { 0.0 };
+    RealType dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[numPrimarySpecies][numPrimarySpecies] = {{ 0.0 }};
+    RealType logSecondarySpeciesConcentrations_guess[numSecondarySpecies] = { 0.0 };
+    RealType dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
+
+    massActions::calculateLogSecondarySpeciesConcentrationWrtLogC< REAL_TYPE,
+                                                                   INT_TYPE,
+                                                                   INDEX_TYPE >( params.equilibriumReactionsParameters(),
+                                                                                 logPrimarySpeciesConcentrations,
+                                                                                 logSecondarySpeciesConcentrations_guess,
+                                                                                 dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+    for( IntType i = 0; i < numSecondarySpecies; ++i )
+    {
+      logSpeciesConcentration[i] = logSecondarySpeciesConcentrations_guess[i];
+    }
+    for( IntType i = 0; i < numPrimarySpecies; ++i )
+    {
+      logSpeciesConcentration[i + numSecondarySpecies] = logPrimarySpeciesConcentrations[i];
+    }
+
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         true >( activityParams,
+                                 logSpeciesConcentration,
+                                 logSpeciesActivities,
+                                 dLogSpeciesActivities_dLogSpeciesConcentrations );
+
+    for( IntType i = 0; i < numPrimarySpecies; ++i )
+    {
+      IntType const fullRow = i + numSecondarySpecies;
+      logPrimaryActivities[i] = logSpeciesActivities[fullRow];
+
+      for( IntType j = 0; j < numPrimarySpecies; ++j )
+      {
+        RealType value = dLogSpeciesActivities_dLogSpeciesConcentrations[fullRow][j + numSecondarySpecies];
+        for( IntType k = 0; k < numSecondarySpecies; ++k )
+        {
+          value += dLogSpeciesActivities_dLogSpeciesConcentrations[fullRow][k] *
+                   dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[k][j];
+        }
+        dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[i][j] = value;
+      }
+    }
+
     // 1. Compute new aggregate species from primary species
     massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
                                                                                INT_TYPE,
                                                                                INDEX_TYPE >( params.equilibriumReactionsParameters(),
                                                                                              logPrimarySpeciesConcentrations,
+                                                                                             logPrimaryActivities,
+                                                                                             dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
                                                                                              logSecondarySpeciesConcentrations,
                                                                                              aggregatePrimarySpeciesConcentrations,
                                                                                              mobileAggregatePrimarySpeciesConcentrations,
@@ -75,8 +131,6 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   }
   else
   {
-    constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
-
     for( int i = 0; i < numPrimarySpecies; ++i )
     {
       REAL_TYPE const speciesConcentration_i = exp( logPrimarySpeciesConcentrations[i] );
@@ -92,6 +146,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     // 2. Compute the reaction rates for all kinetic reactions
     computeReactionRates( temperature,
                           params,
+                          activityParams,
                           logPrimarySpeciesConcentrations,
                           logSecondarySpeciesConcentrations,
                           surfaceArea,
@@ -108,7 +163,10 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   }
   else
   {
-    GEOS_UNUSED_VAR( reactionRates, dReactionRates_dLogPrimarySpeciesConcentrations, aggregateSpeciesRates, dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
+    HPCREACT_UNUSED_VAR( reactionRates );
+    HPCREACT_UNUSED_VAR( dReactionRates_dLogPrimarySpeciesConcentrations );
+    HPCREACT_UNUSED_VAR( aggregateSpeciesRates );
+    HPCREACT_UNUSED_VAR( dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
   }
 
 }
@@ -179,12 +237,70 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     for( IntType j = 0; j < numPrimarySpecies; ++j )
     {
       dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = reactionRatesDerivatives( i, j + numSecondarySpecies );
+    }
+  }
 
-      for( IntType k = 0; k < numSecondarySpecies; ++k )
+  if constexpr( numSecondarySpecies > 0 )
+  {
+    RealType logSpeciesActivities[numSpecies] = { 0.0 };
+    RealType dLogSpeciesActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
+    RealType logPrimaryActivities[numPrimarySpecies] = { 0.0 };
+    RealType dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[numPrimarySpecies][numPrimarySpecies] = {{ 0.0 }};
+    RealType logSecondaryActivities[numSecondarySpecies] = { 0.0 };
+    RealType dLogSecondaryActivities_dLogPrimaryActivities[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
+    RealType dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
+
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         true >( activityParams,
+                                 logSpeciesConcentration,
+                                 logSpeciesActivities,
+                                 dLogSpeciesActivities_dLogSpeciesConcentrations );
+
+    for( IntType i = 0; i < numPrimarySpecies; ++i )
+    {
+      IntType const fullRow = i + numSecondarySpecies;
+      logPrimaryActivities[i] = logSpeciesActivities[fullRow];
+      for( IntType j = 0; j < numPrimarySpecies; ++j )
       {
-        RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = params.stoichiometricMatrix( k, j + numSecondarySpecies );
+        dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[i][j] =
+          dLogSpeciesActivities_dLogSpeciesConcentrations[fullRow][j + numSecondarySpecies];
+      }
+    }
 
-        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) += reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
+    massActions::calculateLogSecondaryActivitiesWrtLogC< REAL_TYPE,
+                                                         INT_TYPE,
+                                                         INDEX_TYPE >( params.equilibriumReactionsParameters(),
+                                                                       logPrimaryActivities,
+                                                                       logSecondaryActivities,
+                                                                       dLogSecondaryActivities_dLogPrimaryActivities );
+    HPCREACT_UNUSED_VAR( logSecondaryActivities );
+
+    for( IntType k = 0; k < numSecondarySpecies; ++k )
+    {
+      for( IntType j = 0; j < numPrimarySpecies; ++j )
+      {
+        dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[k][j] = 0.0;
+        for( IntType l = 0; l < numPrimarySpecies; ++l )
+        {
+          dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[k][j] +=
+            dLogSecondaryActivities_dLogPrimaryActivities[k][l] *
+            dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[l][j];
+        }
+      }
+    }
+
+    for( IntType i = 0; i < numKineticReactions; ++i )
+    {
+      for( IntType j = 0; j < numPrimarySpecies; ++j )
+      {
+        for( IntType k = 0; k < numSecondarySpecies; ++k )
+        {
+          dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) +=
+            reactionRatesDerivatives( i, k ) * dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[k][j];
+        }
       }
     }
   }

@@ -54,6 +54,7 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
 
   using ActivityModelType = Bdot< double, int, SpeciatedIonicStrength< double, int, carbonateSystemType::numSpecies() > >;
   timeStepTest< double, true, ActivityModelType >( carbonateSystem,
+                                carbonateNosolidActivityParams,
                                 1.0,
                                 10,
                                 initialAggregateSpeciesConcentration,

@@ -2,6 +2,7 @@
 set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
+     constitutive/activity/activity.hpp
      constitutive/activity/Bdot.hpp
      reactions/exampleSystems/BulkGeneric.hpp
      reactions/geochemistry/Carbonate.hpp
@@ -78,4 +79,3 @@ add_subdirectory( docs )
 hpcReact_add_code_checks( PREFIX hpcReact
                           UNCRUSTIFY_CFG_FILE ${PROJECT_SOURCE_DIR}/src/uncrustify.cfg
                           EXCLUDES "blt/*" )
-

@@ -33,6 +33,7 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
       { -2.0, 4.0e16 } };
 
     computeResidualAndJacobianTest< double, 2 >( bulkGeneric::simpleTestRateParams,
+                                                 bulkGeneric::simpleActivityTestParams,
                                                  initialSpeciesConcentration,
                                                  expectedResiduals,
                                                  expectedJacobian );
@@ -49,6 +50,7 @@ TEST( testEquilibriumReactions, testEnforceEquilibrium )
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
   testEnforceEquilibrium< double, 2 >( bulkGeneric::simpleTestRateParams.equilibriumReactionsParameters(),
+                                       bulkGeneric::simpleActivityTestParams,
                                        initialSpeciesConcentration,
                                        expectedSpeciesConcentrations );
 

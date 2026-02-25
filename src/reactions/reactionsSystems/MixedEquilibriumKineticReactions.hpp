@@ -94,6 +94,7 @@ public:
   static HPCREACT_HOST_DEVICE inline void
   updateMixedSystem( RealType const & temperature,
                      PARAMS_DATA const & params,
+                     typename ACTIVITY_MODEL::Params const & activityParams,
                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                      ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                      ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
@@ -106,14 +107,9 @@ public:
                      ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                      ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
   {
-    
-    RealType logPrimaryActivities[ PARAMS_DATA::numPrimarySpecies() ] = { 0.0 };
-    RealType logSecondaryActivities[ PARAMS_DATA::numSecondarySpecies() ] = { 0.0 };
-    RealType dLogPrimaryActivites_dLogPrimarySpeciesConcentrations[ PARAMS_DATA::numPrimarySpecies() ][ PARAMS_DATA::numPrimarySpecies() ] = { { 0.0 } };
-    RealType dLogSecondaryActivites_dLogPrimarySpeciesConcentrations[ PARAMS_DATA::numSecondarySpecies() ][ PARAMS_DATA::numPrimarySpecies() ] = { { 0.0 } };
-
     updateMixedSystem_impl( temperature,
                             params,
+                            activityParams,
                             logPrimarySpeciesConcentrations,
                             surfaceArea,
                             logSecondarySpeciesConcentrations,
@@ -153,6 +149,7 @@ public:
   static HPCREACT_HOST_DEVICE inline void
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
+                        typename ACTIVITY_MODEL::Params const & activityParams,
                         ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                         ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
                         ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
@@ -163,6 +160,7 @@ public:
 
     computeReactionRates_impl( temperature,
                                params,
+                               activityParams,
                                logPrimarySpeciesConcentrations,
                                logSecondarySpeciesConcentrations,
                                surfaceArea,
@@ -255,6 +253,7 @@ private:
   static HPCREACT_HOST_DEVICE void
   updateMixedSystem_impl( RealType const & temperature,
                           PARAMS_DATA const & params,
+                          typename ACTIVITY_MODEL::Params const & activityParams,
                           ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                           ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                           ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,

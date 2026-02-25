@@ -37,24 +37,84 @@ EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
                       ACTIVITY_MODEL >::computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
-                                                                                              PARAMS_DATA const & params,
-                                                                                              ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
-                                                                                              ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
-                                                                                              ARRAY_1D & residual,
-                                                                                              ARRAY_2D & jacobian )
+                                                                                                 PARAMS_DATA const & params,
+                                                                                                 typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                                                 ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
+                                                                                                 ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
+                                                                                                 ARRAY_1D & residual,
+                                                                                                 ARRAY_2D & jacobian )
 {
   HPCREACT_UNUSED_VAR( temperature );
+  static constexpr int numSpecies = PARAMS_DATA::numSpecies();
+  static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  static constexpr int numSecondarySpeciesStorage = numSecondarySpecies > 0 ? numSecondarySpecies : 1;
   static constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
 
   RealType aggregatePrimaryConcentrations[numPrimarySpecies] = {0.0};
+  RealType logPrimaryActivities[numPrimarySpecies] = {0.0};
+  RealType dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[numPrimarySpecies][numPrimarySpecies] = {{0.0}};
   ARRAY_2D dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations = {{{0.0}}};
 
-  
+  if constexpr( numPrimarySpecies > 0 )
+  {
+    RealType logSpeciesConcentration[numSpecies] = {0.0};
+    RealType logActivities[numSpecies] = {0.0};
+    RealType dLogActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0.0}};
+
+    RealType dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpeciesStorage][numPrimarySpecies] = {{0.0}};
+    if constexpr( numSecondarySpecies > 0 )
+    {
+      RealType logSecondarySpeciesConcentrations[numSecondarySpecies] = {0.0};
+      massActions::calculateLogSecondarySpeciesConcentrationWrtLogC< REAL_TYPE,
+                                                                     INT_TYPE,
+                                                                     INDEX_TYPE >( params,
+                                                                                   logPrimarySpeciesConcentration,
+                                                                                   logSecondarySpeciesConcentrations,
+                                                                                   dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+      for( IndexType i = 0; i < numSecondarySpecies; ++i )
+      {
+        logSpeciesConcentration[i] = logSecondarySpeciesConcentrations[i];
+      }
+    }
+
+    for( IndexType i = 0; i < numPrimarySpecies; ++i )
+    {
+      logSpeciesConcentration[i + numSecondarySpecies] = logPrimarySpeciesConcentration[i];
+    }
+
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         true >( activityParams,
+                                 logSpeciesConcentration,
+                                 logActivities,
+                                 dLogActivities_dLogSpeciesConcentrations );
+
+    for( IndexType i = 0; i < numPrimarySpecies; ++i )
+    {
+      IndexType const fullRow = i + numSecondarySpecies;
+      logPrimaryActivities[i] = logActivities[fullRow];
+
+      for( IndexType j = 0; j < numPrimarySpecies; ++j )
+      {
+        RealType value = dLogActivities_dLogSpeciesConcentrations[fullRow][j + numSecondarySpecies];
+        for( IndexType k = 0; k < numSecondarySpecies; ++k )
+        {
+          value += dLogActivities_dLogSpeciesConcentrations[fullRow][k] *
+                   dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[k][j];
+        }
+        dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[i][j] = value;
+      }
+    }
+  }
 
   massActions::calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
-                                                                                                  logPrimarySpeciesConcentration,
-                                                                                                  aggregatePrimaryConcentrations,
-                                                                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                                                    logPrimarySpeciesConcentration,
+                                                                                                    logPrimaryActivities,
+                                                                                                    dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                                    aggregatePrimaryConcentrations,
+                                                                                                    dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
 
 
   for( IndexType i=0; i<numPrimarySpecies; ++i )
@@ -80,9 +140,10 @@ EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
                       ACTIVITY_MODEL >::enforceEquilibrium_LogAggregate( REAL_TYPE const & temperature,
-                                                                     PARAMS_DATA const & params,
-                                                                     ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
-                                                                     ARRAY_1D & logPrimarySpeciesConcentration )
+                                                                         PARAMS_DATA const & params,
+                                                                         typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                         ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
+                                                                         ARRAY_1D & logPrimarySpeciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
   static constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
@@ -97,6 +158,7 @@ EquilibriumReactions< REAL_TYPE,
 
   enforceEquilibrium_Aggregate( temperature,
                                 params,
+                                activityParams,
                                 targetAggregatePrimarySpeciesConcentration,
                                 logPrimarySpeciesConcentration0,
                                 logPrimarySpeciesConcentration );
@@ -117,10 +179,11 @@ EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
                       ACTIVITY_MODEL >::enforceEquilibrium_Aggregate( REAL_TYPE const & temperature,
-                                                                  PARAMS_DATA const & params,
-                                                                  ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
-                                                                  ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
-                                                                  ARRAY_1D & logPrimarySpeciesConcentration )
+                                                                      PARAMS_DATA const & params,
+                                                                      typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                      ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
+                                                                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
+                                                                      ARRAY_1D & logPrimarySpeciesConcentration )
 {
   if constexpr( PARAMS_DATA::numSecondarySpecies() <= 0 )
   {
@@ -150,6 +213,7 @@ EquilibriumReactions< REAL_TYPE,
   {
     computeResidualAndJacobianAggregatePrimaryConcentrations( temperature,
                                                               params,
+                                                              activityParams,
                                                               targetAggregatePrimarySpeciesConcentration,
                                                               logPrimarySpeciesConcentration,
                                                               residual,

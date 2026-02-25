@@ -12,6 +12,7 @@
 
 #include "reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp"
 #include "../MoMasBenchmark.hpp"
+#include "constitutive/activity/Identity.hpp"
 
 using namespace hpcReact;
 using namespace hpcReact::MoMasBenchmark;
@@ -29,7 +30,7 @@ void testMoMasMediumEquilibriumHelper()
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
                                                                            int,
                                                                            int,
-                                                                           Bdot< double, int, SpeciatedIonicStrength< double, int, numSpecies > >>;
+                                                                           Identity< double, int, SpeciatedIonicStrength< double, int, numSpecies > >>;
 
 
 
@@ -37,6 +38,7 @@ void testMoMasMediumEquilibriumHelper()
 
   pmpl::genericKernelWrapper( numPrimarySpecies, logPrimarySpeciesConcentration, [] HPCREACT_DEVICE ( auto * const logPrimarySpeciesConcentrationCopy )
   {
+    Identity< double, int, SpeciatedIonicStrength< double, int, numSpecies > >::Params const activityParams = {};
     double const targetAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
     {
       1.0e-20, // X1
@@ -66,6 +68,7 @@ void testMoMasMediumEquilibriumHelper()
     
     EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
                                                             hpcReact::MoMasBenchmark::mediumCaseParams.equilibriumReactionsParameters(),
+                                                            activityParams,
                                                             targetAggregatePrimarySpeciesConcentration,
                                                             logInitialPrimarySpeciesConcentration,
                                                             logPrimarySpeciesConcentrationCopy );

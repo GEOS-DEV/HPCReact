@@ -82,6 +82,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 
   std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
   testEnforceEquilibrium< double, 0 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                       hpcReact::geochemistry::carbonateActivityParams,
                                        initialSpeciesConcentration,
                                        expectedSpeciesConcentrations );
 
@@ -92,6 +93,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
   testEnforceEquilibrium< double, 2 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                       hpcReact::geochemistry::carbonateActivityParams,
                                        initialSpeciesConcentration,
                                        expectedSpeciesConcentrations );
 
@@ -137,6 +139,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
   double logPrimarySpeciesConcentration[numPrimarySpecies];
   EquilibriumReactionsType::enforceEquilibrium_LogAggregate( 0,
                                                              hpcReact::geochemistry::carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                             hpcReact::geochemistry::carbonateActivityParams,
                                                              logInitialPrimarySpeciesConcentration,
                                                              logPrimarySpeciesConcentration );
 

@@ -74,10 +74,14 @@ public:
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     
-    calculateActivities( activityParams,
-                        speciesConcentration,
-                        activities,
-                        dActivities_dConcentration );
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         LOGE_CONCENTRATION >( activityParams,
+                                               speciesConcentration,
+                                               activities,
+                                               dActivities_dConcentration );
 
     computeReactionRates< PARAMS_DATA, true >( temperature,
                                                     params,
@@ -125,17 +129,20 @@ public:
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     
-    calculateActivities( activityParams,
-                        speciesConcentration,
-                        activities,
-                        dActivities_dConcentration );
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         LOGE_CONCENTRATION >( activityParams,
+                                               speciesConcentration,
+                                               activities,
+                                               dActivities_dConcentration );
 
     computeReactionRates< PARAMS_DATA, false >( temperature,
-                                                     params,
-                                                     activityParams,
-                                                     activities,
-                                                     reactionRates,
-                                                     dReactionRates_dActivities );
+                                                params,
+                                                activities,
+                                                reactionRates,
+                                                dReactionRates_dActivities );
     HPCREACT_UNUSED_VAR( dReactionRates_dActivities );
   }
 
@@ -291,10 +298,14 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     
-    calculateActivities( activityParams,
-                        speciesConcentration,
-                        activities,
-                        dActivities_dConcentration );
+    calculateActivities< RealType,
+                         IntType,
+                         IndexType,
+                         ACTIVITY_MODEL,
+                         LOGE_CONCENTRATION >( activityParams,
+                                               speciesConcentration,
+                                               activities,
+                                               dActivities_dConcentration );
 
     computeSpeciesRates_impl< PARAMS_DATA, false >( temperature,
                                                     params,

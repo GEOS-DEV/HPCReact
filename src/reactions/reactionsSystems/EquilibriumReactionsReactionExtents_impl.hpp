@@ -37,11 +37,12 @@ EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
                       ACTIVITY_MODEL >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
-                                                                               PARAMS_DATA const & params,
-                                                                               ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                                               ARRAY_1D_TO_CONST2 const & xi,
-                                                                               ARRAY_1D & residual,
-                                                                               ARRAY_2D & jacobian )
+                                                                                  PARAMS_DATA const & params,
+                                                                                  typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                                  ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                                  ARRAY_1D_TO_CONST2 const & xi,
+                                                                                  ARRAY_1D & residual,
+                                                                                  ARRAY_2D & jacobian )
 {
 
   HPCREACT_UNUSED_VAR( temperature );
@@ -59,6 +60,16 @@ EquilibriumReactions< REAL_TYPE,
     }
   }
 
+  RealType activities[numSpecies] = { 0.0 };
+  RealType dActivities_dConcentration[numSpecies][numSpecies] = {{ 0.0 }};
+  calculateActivities< RealType,
+                       IntType,
+                       IndexType,
+                       ACTIVITY_MODEL,
+                       false >( activityParams,
+                                speciesConcentration,
+                                activities,
+                                dActivities_dConcentration );
 
   // loop over reactions
   for( IndexType a=0; a<numReactions; ++a )
@@ -81,21 +92,31 @@ EquilibriumReactions< REAL_TYPE,
       if( s_ai < 0.0 )
       {
         // forward reaction
-        forwardProduct *= pow( speciesConcentration[i], -s_ai );
+        forwardProduct *= pow( activities[i], -s_ai );
         // derivative of forward product with respect to xi
         for( IndexType b=0; b<numReactions; ++b )
         {
-          dForwardProduct_dxi_divProduct[b] += -s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
+          RealType dActivity_i_dxi_b = 0.0;
+          for( IndexType j = 0; j < numSpecies; ++j )
+          {
+            dActivity_i_dxi_b += dActivities_dConcentration[i][j] * params.stoichiometricMatrix( b, j );
+          }
+          dForwardProduct_dxi_divProduct[b] += -s_ai / activities[i] * dActivity_i_dxi_b;
         }
       }
       else if( s_ai > 0.0 )
       {
         // reverse reaction
-        reverseProduct *= pow( speciesConcentration[i], s_ai );
+        reverseProduct *= pow( activities[i], s_ai );
         // derivative of reverse product with respect to xi
         for( IndexType b=0; b<numReactions; ++b )
         {
-          dReverseProduct_dxi_divProduct[b] += s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
+          RealType dActivity_i_dxi_b = 0.0;
+          for( IndexType j = 0; j < numSpecies; ++j )
+          {
+            dActivity_i_dxi_b += dActivities_dConcentration[i][j] * params.stoichiometricMatrix( b, j );
+          }
+          dReverseProduct_dxi_divProduct[b] += s_ai / activities[i] * dActivity_i_dxi_b;
         }
       }
     }
@@ -125,9 +146,10 @@ EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
                       ACTIVITY_MODEL >::enforceEquilibrium_Extents( REAL_TYPE const & temperature,
-                                                                PARAMS_DATA const & params,
-                                                                ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                                ARRAY_1D & speciesConcentration )
+                                                                    PARAMS_DATA const & params,
+                                                                    typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                    ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                    ARRAY_1D & speciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
@@ -142,6 +164,7 @@ EquilibriumReactions< REAL_TYPE,
   {
     computeResidualAndJacobianReactionExtents( temperature,
                                                params,
+                                               activityParams,
                                                speciesConcentration0,
                                                xi,
                                                residual,

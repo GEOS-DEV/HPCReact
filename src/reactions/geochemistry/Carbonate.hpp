@@ -186,11 +186,39 @@ using carbonateSystemType               = reactionsSystems::MixedReactionsParame
 using carbonateIonicStrengthType = SpeciatedIonicStrength< double, int, 17 >;
 using carbonateActivityType = Bdot< double, int, carbonateIonicStrengthType >;
 using carbonateIdentityActivityType = Identity< double, int, carbonateIonicStrengthType >;
+using carbonateNosolidIonicStrengthType = SpeciatedIonicStrength< double, int, 16 >;
+using carbonateNosolidActivityType = Bdot< double, int, carbonateNosolidIonicStrengthType >;
+using carbonateNosolidIdentityActivityType = Identity< double, int, carbonateNosolidIonicStrengthType >;
 
 
 constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag, 0 );
 constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
 constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
+
+constexpr CArrayWrapper< double, 16 > carbonateNosolidSpeciesCharge =
+{
+  carbonate::speciesCharge[0], carbonate::speciesCharge[1], carbonate::speciesCharge[2], carbonate::speciesCharge[3],
+  carbonate::speciesCharge[4], carbonate::speciesCharge[5], carbonate::speciesCharge[6], carbonate::speciesCharge[7],
+  carbonate::speciesCharge[8], carbonate::speciesCharge[10], carbonate::speciesCharge[11], carbonate::speciesCharge[12],
+  carbonate::speciesCharge[13], carbonate::speciesCharge[14], carbonate::speciesCharge[15], carbonate::speciesCharge[16]
+};
+
+constexpr CArrayWrapper< double, 16 > carbonateNosolidIonSize =
+{
+  carbonate::ionSize[0], carbonate::ionSize[1], carbonate::ionSize[2], carbonate::ionSize[3],
+  carbonate::ionSize[4], carbonate::ionSize[5], carbonate::ionSize[6], carbonate::ionSize[7],
+  carbonate::ionSize[8], carbonate::ionSize[10], carbonate::ionSize[11], carbonate::ionSize[12],
+  carbonate::ionSize[13], carbonate::ionSize[14], carbonate::ionSize[15], carbonate::ionSize[16]
+};
+
+constexpr CArrayWrapper< double, 16 > carbonateNosolidBdotParameters =
+{
+  carbonate::bdotParameters[0], carbonate::bdotParameters[1], carbonate::bdotParameters[2], carbonate::bdotParameters[3],
+  carbonate::bdotParameters[4], carbonate::bdotParameters[5], carbonate::bdotParameters[6], carbonate::bdotParameters[7],
+  carbonate::bdotParameters[8], carbonate::bdotParameters[10], carbonate::bdotParameters[11], carbonate::bdotParameters[12],
+  carbonate::bdotParameters[13], carbonate::bdotParameters[14], carbonate::bdotParameters[15], carbonate::bdotParameters[16]
+};
+
 constexpr carbonateActivityType::Params carbonateActivityParams = 
 {
   {carbonate::speciesCharge},
@@ -198,9 +226,17 @@ constexpr carbonateActivityType::Params carbonateActivityParams =
   carbonate::bdotParameters
 };
 
+constexpr carbonateNosolidActivityType::Params carbonateNosolidActivityParams =
+{
+  {carbonateNosolidSpeciesCharge},
+  carbonateNosolidIonSize,
+  carbonateNosolidBdotParameters
+};
+
 
 
 Identity< double, int, carbonateIonicStrengthType >::Params carbonateIdentityActivityParams = {};
+Identity< double, int, carbonateNosolidIonicStrengthType >::Params carbonateNosolidIdentityActivityParams = {};
 
 // *****UNCRUSTIFY-ON******
 } // namespace geochemistry

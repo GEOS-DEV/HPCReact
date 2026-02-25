@@ -54,6 +54,7 @@ template< typename REAL_TYPE,
           int RESIDUAL_FORM,
           typename PARAMS_DATA >
 void computeResidualAndJacobianTest( PARAMS_DATA const & params,
+                                     typename Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >::Params const & activityParams,
                                      REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
                                      REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions()],
                                      REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions()][PARAMS_DATA::numReactions()] )
@@ -74,12 +75,13 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
     data.speciesConcentration[i] = initialSpeciesConcentration[i];
   } 
 
-  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     double xi[numReactions] = { 0.0 };
 
     EquilibriumReactionsType::computeResidualAndJacobianReactionExtents( temperature,
                                                                          params,
+                                                                         activityParams,
                                                                          dataCopy->speciesConcentration,
                                                                          xi,
                                                                          dataCopy->residual,
@@ -126,6 +128,7 @@ template< typename REAL_TYPE,
           int RESIDUAL_FORM,
           typename PARAMS_DATA >
 void testEnforceEquilibrium( PARAMS_DATA const & params,
+                             typename Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >::Params const & activityParams,
                              REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
                              REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
@@ -144,10 +147,11 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
     data.speciesConcentration0[i] = initialSpeciesConcentration[i];
   }
 
-  pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
+  pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     EquilibriumReactionsType::enforceEquilibrium_Extents( temperature,
                                                           params,
+                                                          activityParams,
                                                           dataCopy->speciesConcentration0,
                                                           dataCopy->speciesConcentration );
   });

@@ -32,6 +32,7 @@ template< typename REAL_TYPE,
           typename ACTIVITY_MODEL,
           typename PARAMS_DATA >
 void timeStepTest( PARAMS_DATA const & params,
+                   typename ACTIVITY_MODEL::Params const & activityParams,
                    REAL_TYPE const dt,
                    int const numSteps,
                    REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numPrimarySpecies()],
@@ -90,6 +91,7 @@ void timeStepTest( PARAMS_DATA const & params,
 
         EquilibriumReactionsType::enforceEquilibrium_LogAggregate( temperature,
                                                                    params.equilibriumReactionsParameters(),
+                                                                   activityParams,
                                                                    logPrimarySpeciesConcentration,
                                                                    logPrimarySpeciesConcentration );
 
@@ -110,6 +112,7 @@ void timeStepTest( PARAMS_DATA const & params,
           {
             MixedReactionsType::updateMixedSystem( temperature,
                                                    params,
+                                                   activityParams,
                                                    logPrimarySpeciesConcentration,
                                                    surfaceArea,
                                                    logSecondarySpeciesConcentration,
