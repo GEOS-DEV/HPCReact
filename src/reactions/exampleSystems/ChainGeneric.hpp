@@ -60,7 +60,8 @@ namespace ChainGeneric
       1  // C3
     },
 
-    0 // Use the forward and reverse to calculate the kinetic reaction rates
+    0, // Use the forward and reverse to calculate the kinetic reaction rates
+    1.0  // Solvent density
   };
 
 // *****UNCRUSTIFY-ON******

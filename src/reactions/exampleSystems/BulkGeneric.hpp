@@ -65,7 +65,9 @@ simpleKineticTestRateParams =
   // flag of mobile secondary species
   { 1, 1 },
   // Use the forward and reverse to calculate the kinetic reaction rates
-  0
+  0,
+  // Solvent density
+  1.0
 };
 
 using simpleTestType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 5, 2, 2 >;
@@ -88,7 +90,9 @@ simpleTestRateParams =
   // flag of mobile secondary species
   { 1, 1 },
   // Use the forward and reverse to calculate the kinetic reaction rates
-  0
+  0,
+  // Solvent density
+  1.0
 };
 
 // *****UNCRUSTIFY-ON******
