@@ -79,7 +79,13 @@ namespace MoMasBenchmark
     1, // C5 = 4X2 + 3X3 + X4
     0, // CS1 = 3X2 + X3 + S
     0  // CS2 = -3X2 + X4 + 2S
-  }
+  },
+
+  // Reaction rates update option
+  1,
+
+  // Solvent density
+  1.0
 };
 
 constexpr mediumCaseType mediumCaseParams =
@@ -154,7 +160,13 @@ constexpr mediumCaseType mediumCaseParams =
     0, // CS1 = 3X2 + X3 + S
     0, // CS2 = -3X2 + X4 + 2S
     1  // Cc = -3X2 + X4 (kinetic)
-  }
+  },
+
+  // Reaction rates update option
+  1,
+
+  // Solvent density
+  1.0
 };
 
 // *****UNCRUSTIFY-ON******

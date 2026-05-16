@@ -136,13 +136,15 @@ struct MixedReactionsParameters
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
                                       CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag,
-                                      IntType const reactionRatesUpdateOption = 1 ):
+                                      IntType const reactionRatesUpdateOption = 1,
+                                      RealType const solventDensity = constants::waterDensity ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag ),
-    m_reactionRatesUpdateOption( reactionRatesUpdateOption )
+    m_reactionRatesUpdateOption( reactionRatesUpdateOption ),
+    m_solventDensity( solventDensity )
   {}
 
   HPCREACT_HOST_DEVICE static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -239,6 +241,8 @@ struct MixedReactionsParameters
     }
   }
 
+  HPCREACT_HOST_DEVICE constexpr RealType getSolventDensity() const { return m_solventDensity; }
+
   HPCREACT_HOST_DEVICE IndexType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
@@ -251,6 +255,7 @@ struct MixedReactionsParameters
   CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
 
   IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
+  RealType m_solventDensity; // Unit should be kg/m3
 };
 
 
