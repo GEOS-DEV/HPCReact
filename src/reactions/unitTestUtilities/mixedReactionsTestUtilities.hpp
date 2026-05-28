@@ -90,6 +90,11 @@ void timeStepTest( PARAMS_DATA const & params,
                                                                    logPrimarySpeciesConcentration,
                                                                    logPrimarySpeciesConcentration );
 
+        for (int i = 0; i < numPrimarySpecies; ++i )
+        {
+          std::cout << "Equilibrium natural log concentration of primary species (ln(mol/kg)) " << i << ": " << logPrimarySpeciesConcentration[i] <<" equilibrium concentrations (mol/kg): " << exp( logPrimarySpeciesConcentration[i] ) << std::endl;
+        }
+
         /// Time step loop
         double time = 0.0;
         for( int t = 0; t < numSteps; ++t )
