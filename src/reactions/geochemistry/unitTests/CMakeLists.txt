@@ -4,6 +4,7 @@ set( testSourceFiles
      testGeochemicalKineticReactions.cpp
      testGeochemicalMixedReactions.cpp
      testUltramaficReactions.cpp
+     testForgeReactions.cpp
      )
 
 set( dependencyList hpcReact gtest )

@@ -249,7 +249,7 @@ KineticReactions< REAL_TYPE,
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
         RealType const s_ri = params.stoichiometricMatrix( r, i );
-        logQuotient += s_ri * speciesConcentration[i];
+        logQuotient += s_ri * speciesConcentration[i]; // speciesConcentration should be activity here
       }
       quotient = exp( logQuotient );
 
