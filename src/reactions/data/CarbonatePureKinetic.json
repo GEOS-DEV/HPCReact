@@ -1,0 +1,26 @@
+{
+  "systemName": "Pure Kinetic System Example",
+  "namespace": "carbonatepurekinetic",
+  "secondarySpecies": [],
+  "primarySpecies": [
+    "H+",
+    "Ca+2",
+    "HCO3-",
+    "Mg+2",
+    "SiO2(aq)"
+  ],
+  "reactions": [
+    {
+      "equation": "CaCO3 + H+ = Ca+2 + HCO3-",
+      "equilibriumConstant": 5.16e1,
+      "forwardRate": 1.55e-6,
+      "reverseRate": 3.0e-8
+    },
+    {
+      "equation": "Mg2SiO4 + 4H+ = 2Mg+2 + SiO2(aq) + 2H2O",
+      "equilibriumConstant": 1.4e28,
+      "forwardRate": 2.29e-11,
+      "reverseRate": 1.65e-39
+    }
+  ]
+}

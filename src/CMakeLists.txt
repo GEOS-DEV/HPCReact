@@ -1,3 +1,76 @@
+# ============================================================================
+# Auto-generate reaction system headers from JSON definitions
+# ============================================================================
+set(REACTION_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/reactions/data")
+set(HPCREACT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
+set(REACTION_GEN_SCRIPT "${HPCREACT_ROOT}/scripts/generate_reaction_system.py")
+set(REACTION_VALIDATE_SCRIPT "${HPCREACT_ROOT}/scripts/validate_reaction_json.py")
+set(GEOCHEMISTRY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/reactions/geochemistry")
+
+# Find all JSON reaction definition files
+file(GLOB REACTION_JSON_FILES "${REACTION_DATA_DIR}/*.json")
+
+# Filter out example files (optional - remove this if you want to generate examples too)
+# Commented out to generate all JSON files including examples
+# list(FILTER REACTION_JSON_FILES EXCLUDE REGEX "example_.*\\.json$")
+
+set(GENERATED_REACTION_HEADERS)
+
+# Generate C++ header for each JSON file during CMake configuration
+foreach(JSON_FILE ${REACTION_JSON_FILES})
+    get_filename_component(BASENAME ${JSON_FILE} NAME_WE)
+
+    # Convert filename to CamelCase for class name
+    # e.g., my_system.json -> Mysystem.hpp
+    string(SUBSTRING ${BASENAME} 0 1 FIRST_CHAR)
+    string(TOUPPER ${FIRST_CHAR} FIRST_CHAR_UPPER)
+    string(REGEX REPLACE "^.(.*)" "${FIRST_CHAR_UPPER}\\1" CLASSNAME ${BASENAME})
+
+    set(HPP_FILE "${GEOCHEMISTRY_DIR}/${CLASSNAME}.hpp")
+
+    # Step 1: Validate JSON first
+    execute_process(
+        COMMAND python3 ${REACTION_VALIDATE_SCRIPT} ${JSON_FILE}
+        RESULT_VARIABLE VALIDATE_RESULT
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+
+    if(NOT VALIDATE_RESULT EQUAL 0)
+        message(WARNING "${BASENAME}.json validation failed - skipping generation")
+        continue()
+    endif()
+
+    # Step 2: Generate C++ header (only if validation passed)
+    message(STATUS "Generating reaction system: ${CLASSNAME}.hpp from ${BASENAME}.json")
+    execute_process(
+        COMMAND python3 ${REACTION_GEN_SCRIPT} ${JSON_FILE} -o ${HPP_FILE} --add-to-registry
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        RESULT_VARIABLE GEN_RESULT
+        OUTPUT_VARIABLE GEN_OUTPUT
+        ERROR_VARIABLE GEN_ERROR
+    )
+
+    if(NOT GEN_RESULT EQUAL 0)
+        message(WARNING "Failed to generate ${CLASSNAME}.hpp: ${GEN_ERROR}")
+    else()
+        message(STATUS "  -> Generated: ${HPP_FILE}")
+        list(APPEND GENERATED_REACTION_HEADERS ${HPP_FILE})
+    endif()
+endforeach()
+
+# Note: GeochemicalSystems.hpp is now updated incrementally via --add-to-registry flag above
+# If you need to regenerate it from scratch, manually run:
+#   python3 scripts/generate_reaction_system.py --generate-registry src/reactions
+set(REGISTRY_HEADER "${GEOCHEMISTRY_DIR}/GeochemicalSystems.hpp")
+if(EXISTS ${REGISTRY_HEADER})
+    list(APPEND GENERATED_REACTION_HEADERS ${REGISTRY_HEADER})
+endif()
+
+# No need for custom target since files are generated during configuration
+# The generated headers are already included in hpcReact_headers below
+
+# ============================================================================
 
 set( hpcReact_headers
      common/macros.hpp
@@ -19,6 +92,7 @@ set( hpcReact_headers
      reactions/unitTestUtilities/equilibriumReactionsTestUtilities.hpp
      reactions/unitTestUtilities/kineticReactionsTestUtilities.hpp
      reactions/unitTestUtilities/mixedReactionsTestUtilities.hpp
+     ${GENERATED_REACTION_HEADERS}
      )
 
 set( hpcReact_sources)
