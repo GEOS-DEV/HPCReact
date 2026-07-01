@@ -24,7 +24,7 @@ namespace forge
   // Stoichiometric matrix [24 reactions × 29 species]
   // Columns 1–19: secondary species (must be -1 on diagonal)
   // Columns 20–29: primary species
-  constexpr CArrayWrapper< double, 24, 29 > stoichMatrix = 
+  constexpr CArrayWrapper< signed char, 24, 29 > stoichMatrix = 
     {// CaCO₃  CaHCO₃⁺ CaSO₄ CaCl⁺ CaCl₂ MgHCO₃⁺ MgCO₃ MgCl⁺ CO₂(aq) HSO₄⁻ KHSO₄ HSiO₃⁻ NaHSilO₃ NaCl  KCl  KSO₄⁻ AlOH²⁺ Al(OH)₂ OH⁻  | H⁺  Ca²⁺  Mg²⁺   Na⁺    K⁺   Al³⁺   HCO₃⁻  SO₄²⁻  Cl⁻  SiO₂(aq)
      { -1,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -1,   1,    0,     0,    0,    0,     1,     0,     0,   0  }, // CaCO₃(aq) + H⁺ ⇌ Ca²⁺ + HCO₃⁻
      {  0,    -1,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,     0,   1,    0,     0,    0,    0,     1,     0,     0,   0  }, // CaHCO₃⁺ ⇌ Ca²⁺ + HCO₃⁻
@@ -168,7 +168,7 @@ constexpr CArrayWrapper< int, 24 > mobileSpeciesFlag =
 
 }
 
-using forgeSystemType = reactionsSystems::MixedReactionsParameters< double, int, int, 29, 24, 19 >;
+using forgeSystemType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 29, 24, 19 >;
 
 
 constexpr forgeSystemType forgeSystem( forge::stoichMatrix, forge::equilibriumConstants, forge::fwRateConstant, forge::reverseRateConstant, forge::mobileSpeciesFlag );

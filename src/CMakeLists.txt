@@ -5,6 +5,7 @@ set( hpcReact_headers
      reactions/exampleSystems/BulkGeneric.hpp
      reactions/geochemistry/Carbonate.hpp
      reactions/geochemistry/Forge.hpp
+     reactions/geochemistry/Mascagnite.hpp
      reactions/geochemistry/GeochemicalSystems.hpp
      reactions/geochemistry/Ultramafics.hpp
      reactions/massActions/MassActions.hpp

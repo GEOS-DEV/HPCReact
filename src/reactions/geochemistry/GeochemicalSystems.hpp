@@ -14,6 +14,7 @@
 #include "Carbonate.hpp"
 #include "Ultramafics.hpp"
 #include "Forge.hpp"
+#include "Mascagnite.hpp"
 
 #include <variant>
 
@@ -25,6 +26,7 @@ namespace geochemistry
 using systemTypes = std::variant< carbonateSystemType,
                                   carbonateSystemAllEquilibriumType,
                                   ultramaficSystemType,
+                                  mascagniteSystemType,
                                   forgeSystemType >;
 
 } // namespace geochemistry
