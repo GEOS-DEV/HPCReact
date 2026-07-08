@@ -250,9 +250,10 @@ KineticReactions< REAL_TYPE,
       {
         RealType const s_ri = params.stoichiometricMatrix( r, i );
         logQuotient += s_ri * speciesConcentration[i]; // speciesConcentration should be activity here
+        //std::cout<< "reaction " << r << ", species " << i << ": s_ri = " << s_ri << ", speciesConcentration[i] = " << speciesConcentration[i] << std::endl;
       }
       quotient = exp( logQuotient );
-
+      //std::cout<< "reaction " << r << ": logQuotient = " << logQuotient << ", quotient = " << quotient << std::endl;
       if constexpr( CALCULATE_DERIVATIVES )
       {
         for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
@@ -289,6 +290,7 @@ KineticReactions< REAL_TYPE,
       } // end of if constexpr ( CALCULATE_DERIVATIVES )
     } // end of else
     reactionRates[r] = rateConstant * surfaceArea[r] * ( 1.0 - quotient / equilibriumConstant );
+    //std::cout<< "reaction " << r << ": rateConstant = " << rateConstant << ", surfaceArea = " << surfaceArea[r] << ", quotient = " << quotient << ", equilibriumConstant = " << equilibriumConstant << ", reactionRates[r] = " << reactionRates[r] << std::endl;
   }
 }
 
