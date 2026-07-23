@@ -19,17 +19,17 @@ namespace ChainGeneric
 {
 // *****UNCRUSTIFY-OFF******
 
-  using serialAllKineticType = reactionsSystems::MixedReactionsParameters< double, int, int, 3, 3, 0 >;
+  using serialAllKineticType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 3, 3, 0 >;
 
   constexpr serialAllKineticType serialAllKineticParams =
   {
     // Stoichiometric matrix [3 rows × 3 columns]
     // Columns 0–3 are primary species: {C1, C2, C3 }
     {
-      // C1   C2   C3 
+      // C1   C2   C3
       {  -1,   1,   0 },  // C1 = C2
       {   0,  -1,   1 },  // C2 = C3
-      {   0,   0,  -1 },  // C3 = 
+      {   0,   0,  -1 },  // C3 =
     },
 
     // Equilibrium constants K
@@ -39,24 +39,24 @@ namespace ChainGeneric
       0  // C3
     },
 
-    // Forward rate constants 
-    { 
+    // Forward rate constants
+    {
       0.05, // C1 = C2
       0.03, // C2 = C3
       0.02, // C3
     },
 
-    // Reverse rate constants 
-    { 
+    // Reverse rate constants
+    {
       0.0, // C1 = C2
-      0.0, // C2 = C3 
+      0.0, // C2 = C3
       0.0  // C3
     },
 
     // Flag of mobile secondary species
-    { 
+    {
       1, // C1 = C2
-      1, // C2 = C3 
+      1, // C2 = C3
       1  // C3
     },
 

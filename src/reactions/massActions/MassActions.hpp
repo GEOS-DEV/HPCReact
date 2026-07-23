@@ -82,7 +82,7 @@ void calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                                INDEX_TYPE >( params,
                                                                              logPrimarySpeciesConcentrations,
                                                                              logSecondarySpeciesConcentrations,
-                                                                             [](INDEX_TYPE, INDEX_TYPE, REAL_TYPE ){} );
+                                                                             []( INDEX_TYPE, INDEX_TYPE, REAL_TYPE ){} );
 }
 
 
@@ -154,8 +154,7 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
       for( int k=0; k<numPrimarySpecies; ++k )
       {
         REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
-        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                   i+numSecondarySpecies ) *
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
       }
     }
@@ -248,12 +247,10 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
       for( int k=0; k<numPrimarySpecies; ++k )
       {
         REAL_TYPE const dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration = params.stoichiometricMatrix( j, k+numSecondarySpecies ) * secondarySpeciesConcentrations_j;
-        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                   i+numSecondarySpecies ) *
+        dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                       dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration;
 
-        dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j,
-                                                                                                                                         i+numSecondarySpecies ) *
+        dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations( i, k ) += params.stoichiometricMatrix( j, i+numSecondarySpecies ) *
                                                                                                             dSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentration *
                                                                                                             params.mobileSecondarySpeciesFlag( j );
       }

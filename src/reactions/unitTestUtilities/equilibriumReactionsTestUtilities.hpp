@@ -35,7 +35,7 @@ REAL_TYPE tolerance( REAL_TYPE const a, REAL_TYPE const b )
  * @tparam numSpecies Number of species.
  */
 template< int numReactions, int numSpecies >
-struct ComputeResidualAndJacobianTestData 
+struct ComputeResidualAndJacobianTestData
 {
   /// The reaction residuals
   double residual[numReactions] = { 0.0 };
@@ -65,23 +65,23 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
 
   double const temperature = 298.15;
 
-  ComputeResidualAndJacobianTestData<numReactions, numSpecies> data;
+  ComputeResidualAndJacobianTestData< numReactions, numSpecies > data;
   for( int i = 0; i < numSpecies; ++i )
   {
     data.speciesConcentration[i] = initialSpeciesConcentration[i];
-  } 
+  }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    double xi[numReactions] = { 0.0 };
+      {
+        double xi[numReactions] = { 0.0 };
 
-    EquilibriumReactionsType::computeResidualAndJacobianReactionExtents( temperature,
-                                                                         params,
-                                                                         dataCopy->speciesConcentration,
-                                                                         xi,
-                                                                         dataCopy->residual,
-                                                                         dataCopy->jacobian );
-  });
+        EquilibriumReactionsType::computeResidualAndJacobianReactionExtents( temperature,
+                                                                             params,
+                                                                             dataCopy->speciesConcentration,
+                                                                             xi,
+                                                                             dataCopy->residual,
+                                                                             dataCopy->jacobian );
+      } );
 
 //  printf( "R = { %8.4g, %8.4g }\n", residual[0], residual[1] );
   for( int r=0; r<numReactions; ++r )
@@ -114,7 +114,7 @@ struct TestEnforceEquilibriumData
 {
   /// The initial species concentrations
   double speciesConcentration0[numSpecies];
-  
+
   /// The final species concentrations
   double speciesConcentration[numSpecies];
 };
@@ -134,19 +134,19 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
 
   double const temperature = 298.15;
 
-  TestEnforceEquilibriumData<numSpecies> data;
+  TestEnforceEquilibriumData< numSpecies > data;
   for( int i = 0; i < numSpecies; ++i )
   {
     data.speciesConcentration0[i] = initialSpeciesConcentration[i];
   }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    EquilibriumReactionsType::enforceEquilibrium_Extents( temperature,
-                                                          params,
-                                                          dataCopy->speciesConcentration0,
-                                                          dataCopy->speciesConcentration );
-  });
+      {
+        EquilibriumReactionsType::enforceEquilibrium_Extents( temperature,
+                                                              params,
+                                                              dataCopy->speciesConcentration0,
+                                                              dataCopy->speciesConcentration );
+      } );
 
   for( int r=0; r<numSpecies; ++r )
   {

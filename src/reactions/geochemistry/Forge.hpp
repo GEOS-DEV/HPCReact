@@ -25,7 +25,7 @@ namespace forge
    // Stoichiometric matrix [24 reactions × 29 species]
    // Columns 1–19: secondary species (must be -1 on diagonal)
    // Columns 20–29: primary species
-constexpr CArrayWrapper< double, 24, 29 > stoichMatrix = 
+constexpr CArrayWrapper< signed char, 24, 29 > stoichMatrix =
 {// CaCO₃  CaHCO₃⁺ CaSO₄ CaCl⁺ CaCl₂ MgHCO₃⁺ MgCO₃ MgCl⁺ CO₂(aq) HSO₄⁻ KHSO₄ HSiO₃⁻ NaHSilO₃ NaCl  KCl  KSO₄⁻ AlOH²⁺ Al(OH)₂ OH⁻  | H⁺  Ca²⁺  Mg²⁺   Na⁺    K⁺   Al³⁺   HCO₃⁻  SO₄²⁻  Cl⁻  SiO₂(aq)
   { -1,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -1,   1,    0,     0,    0,    0,     1,     0,     0,   0  }, // CaCO₃(aq) + H⁺ ⇌ Ca²⁺ + HCO₃⁻
   {  0,    -1,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,     0,   1,    0,     0,    0,    0,     1,     0,     0,   0  }, // CaHCO₃⁺ ⇌ Ca²⁺ + HCO₃⁻
@@ -36,7 +36,7 @@ constexpr CArrayWrapper< double, 24, 29 > stoichMatrix =
   {  0,     0,     0,    0,    0,     0,    -1,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -1,   0,    1,     0,    0,    0,     1,     0,     0,   0  }, // MgCO₃(aq) + H⁺⇌ Mg²⁺ + HCO₃⁻
   {  0,     0,     0,    0,    0,     0,     0,   -1,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,     0,   0,    1,     0,    0,    0,     0,     0,     1,   0  }, // MgCl⁺ ⇌ Mg²⁺ + Cl⁻
   {  0,     0,     0,    0,    0,     0,     0,    0,    -1,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,     1,   0,    0,     0,    0,    0,     1,     0,     0,   0  }, // CO₂(aq) + H₂O ⇌ H⁺ + HCO₃⁻
-  {  0,     0,     0,    0,    0,     0,     0,    0,     0,    -1,     0,     0,     0,     0,   0,    0,    0,     0,      0,     1,   0,    0,     0,    0,    0,     0,     1,     0,   0  }, // HSO₄⁻ ⇌ H⁺ + SO₄²⁻ 
+  {  0,     0,     0,    0,    0,     0,     0,    0,     0,    -1,     0,     0,     0,     0,   0,    0,    0,     0,      0,     1,   0,    0,     0,    0,    0,     0,     1,     0,   0  }, // HSO₄⁻ ⇌ H⁺ + SO₄²⁻
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,    -1,     0,     0,     0,   0,    0,    0,     0,      0,     1,   0,    0,     0,    1,    0,     0,     1,     0,   0  }, // KHSO₄(aq) ⇌ H⁺ + K⁺ + SO₄²⁻
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,    -1,     0,     0,   0,    0,    0,     0,      0,     1,   0,    0,     0,    0,    0,     0,     0,     0,   1  }, // HSiO₃⁻ ⇌ H⁺ + SiO₂(aq)
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,    -1,     0,   0,    0,    0,     0,      0,     1,   0,    0,     1,    0,    0,     0,     0,     0,   1  }, // NaHSiO₃(aq) ⇌ H⁺ + Na⁺ + SiO₂(aq)
@@ -53,7 +53,7 @@ constexpr CArrayWrapper< double, 24, 29 > stoichMatrix =
   {  0,     0,     0,    0,    0,     0,     0,    0,     0,     0,     0,     0,     0,     0,   0,    0,    0,     0,      0,    -6,   0,    0,     0,    0,    2,     0,     0,     0,   2  }  // Al2Si2O5(OH)4(s) + 6H+ ⇌ 2Al3+ + 2 SiO2 + 5H2O
 };
 
-// Must convert these. They should not be the log.
+// Equilibrium constants for the 24-reaction FORGE system.
 constexpr CArrayWrapper< double, 24 > equilibriumConstants =
 {
    104351.8133, // CaCO₃(aq) + H⁺ ⇌ Ca²⁺ + HCO₃⁻
@@ -169,7 +169,7 @@ constexpr CArrayWrapper< int, 24 > mobileSpeciesFlag =
 
 }
 
-using forgeSystemType = reactionsSystems::MixedReactionsParameters< double, int, int, 29, 24, 19 >;
+using forgeSystemType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 29, 24, 19 >;
 
 
 constexpr forgeSystemType forgeSystem( forge::stoichMatrix, forge::equilibriumConstants, forge::fwRateConstant, forge::reverseRateConstant, forge::mobileSpeciesFlag );

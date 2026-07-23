@@ -19,8 +19,8 @@ namespace MoMasBenchmark
 {
 // *****UNCRUSTIFY-OFF******
 
-  using easyCaseType = reactionsSystems::MixedReactionsParameters< double, int, int, 12, 7, 7 >;
-  using mediumCaseType = reactionsSystems::MixedReactionsParameters< double, int, int, 14, 10, 9 >; 
+  using easyCaseType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 12, 7, 7 >;
+  using mediumCaseType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 14, 10, 9 >;
 
   constexpr easyCaseType easyCaseParams =
 {
@@ -49,8 +49,8 @@ namespace MoMasBenchmark
     1.0e1     // CS2 + 3X2 = + X4 + 2S
   },
 
-  // Forward rate constants 
-  { 
+  // Forward rate constants
+  {
     0.0,   // C1 = -X2
     0.0,   // C2 = X2 + X3
     0.0,   // C3 = -X2 + X4
@@ -60,8 +60,8 @@ namespace MoMasBenchmark
     0.0    // CS2 = -3X2 + X4 + 2S
   },
 
-  // Reverse rate constants 
-  { 
+  // Reverse rate constants
+  {
     0.0,   // C1 = -X2
     0.0,   // C2 = X2 + X3
     0.0,   // C3 = -X2 + X4
@@ -115,8 +115,8 @@ constexpr mediumCaseType mediumCaseParams =
     5         //  Cc + 3X2 = X4 (kinetic)
   },
 
-  // Forward rate constants 
-  { 
+  // Forward rate constants
+  {
     0.0,   // C1 = -X2
     0.0,   // C2 = X2 + X3
     0.0,   // C3 = -X2 + X4
@@ -129,8 +129,8 @@ constexpr mediumCaseType mediumCaseParams =
     10.0    // Cc = -3X2 + X4 (kinetic)
   },
 
-  // Reverse rate constants 
-  { 
+  // Reverse rate constants
+  {
     0.0,   // C1 = -X2
     0.0,   // C2 = X2 + X3
     0.0,   // C3 = -X2 + X4
