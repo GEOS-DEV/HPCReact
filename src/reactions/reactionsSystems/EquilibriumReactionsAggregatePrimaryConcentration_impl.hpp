@@ -37,12 +37,12 @@ EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
                       ACTIVITY_MODEL >::computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
-                                                                                                 PARAMS_DATA const & params,
-                                                                                                 typename ACTIVITY_MODEL::Params const & activityParams,
-                                                                                                 ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
-                                                                                                 ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
-                                                                                                 ARRAY_1D & residual,
-                                                                                                 ARRAY_2D & jacobian )
+                                                                                                  PARAMS_DATA const & params,
+                                                                                                  typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                                                  ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
+                                                                                                  ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
+                                                                                                  ARRAY_1D & residual,
+                                                                                                  ARRAY_2D & jacobian )
 {
   HPCREACT_UNUSED_VAR( temperature );
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
@@ -110,11 +110,11 @@ EquilibriumReactions< REAL_TYPE,
   }
 
   massActions::calculateAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
-                                                                                                    logPrimarySpeciesConcentration,
-                                                                                                    logPrimaryActivities,
-                                                                                                    dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
-                                                                                                    aggregatePrimaryConcentrations,
-                                                                                                    dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                                                  logPrimarySpeciesConcentration,
+                                                                                                  logPrimaryActivities,
+                                                                                                  dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                                  aggregatePrimaryConcentrations,
+                                                                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
 
 
   for( IndexType i=0; i<numPrimarySpecies; ++i )

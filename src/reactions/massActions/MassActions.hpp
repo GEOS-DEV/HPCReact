@@ -160,14 +160,14 @@ template< typename REAL_TYPE,
 HPCREACT_HOST_DEVICE
 inline
 void calculateTotalAndMobileAggregatePrimaryConcentrationsFromActivitiesWrtLogC( PARAMS_DATA const & params,
-                                                                                  ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
-                                                                                  ARRAY_1D_TO_CONST2 const & logPrimaryActivities,
-                                                                                  ARRAY_2D_TO_CONST const & dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
-                                                                                  ARRAY_1D_SECONDARY & logSecondaryActivities,
-                                                                                  ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
-                                                                                  ARRAY_1D_PRIMARY & mobileAggregatePrimarySpeciesConcentrations,
-                                                                                  ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
-                                                                                  ARRAY_2D & dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
+                                                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
+                                                                                 ARRAY_1D_TO_CONST2 const & logPrimaryActivities,
+                                                                                 ARRAY_2D_TO_CONST const & dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                 ARRAY_1D_SECONDARY & logSecondaryActivities,
+                                                                                 ARRAY_1D_PRIMARY & aggregatePrimarySpeciesConcentrations,
+                                                                                 ARRAY_1D_PRIMARY & mobileAggregatePrimarySpeciesConcentrations,
+                                                                                 ARRAY_2D & dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
+                                                                                 ARRAY_2D & dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations )
 {
   static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
@@ -290,9 +290,9 @@ void calculateLogSecondaryActivitiesWrtLogC( PARAMS_DATA const & params,
                                              ARRAY_2D & dLogSecondaryActivities_dLogPrimaryActivities )
 {
   massActions_impl::calculateLogSecondaryActivities< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
-                                                                                         logPrimaryActivities,
-                                                                                         logSecondaryActivities,
-                                                                                         [&]( const int j, const int k, REAL_TYPE const value )
+                                                                                        logPrimaryActivities,
+                                                                                        logSecondaryActivities,
+                                                                                        [&]( const int j, const int k, REAL_TYPE const value )
   {
     dLogSecondaryActivities_dLogPrimaryActivities[j][k] = value;
   } );
@@ -364,14 +364,14 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
   }
 
   massActions_impl::calculateAggregatePrimaryConcentrationsFromActivitiesWrtLogC< REAL_TYPE,
-                                                                                   INT_TYPE,
-                                                                                   INDEX_TYPE >( params,
-                                                                                                 logPrimarySpeciesConcentrations,
-                                                                                                 logPrimarySpeciesConcentrations,
-                                                                                                 dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
-                                                                                                 logSecondarySpeciesConcentrations,
-                                                                                                 aggregatePrimarySpeciesConcentrations,
-                                                                                                 dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                                  INT_TYPE,
+                                                                                  INDEX_TYPE >( params,
+                                                                                                logPrimarySpeciesConcentrations,
+                                                                                                logPrimarySpeciesConcentrations,
+                                                                                                dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                                logSecondarySpeciesConcentrations,
+                                                                                                aggregatePrimarySpeciesConcentrations,
+                                                                                                dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
 }
 
 template< typename REAL_TYPE,
@@ -438,14 +438,14 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
     REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
 
     massActions_impl::calculateAggregatePrimaryConcentrationsFromActivitiesWrtLogC< REAL_TYPE,
-                                                                                     INT_TYPE,
-                                                                                     INDEX_TYPE >( params,
-                                                                                                   logPrimarySpeciesConcentrations,
-                                                                                                   logPrimaryActivities,
-                                                                                                   dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
-                                                                                                   logSecondarySpeciesConcentrations,
-                                                                                                   aggregatePrimarySpeciesConcentrations,
-                                                                                                   dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                                    INT_TYPE,
+                                                                                    INDEX_TYPE >( params,
+                                                                                                  logPrimarySpeciesConcentrations,
+                                                                                                  logPrimaryActivities,
+                                                                                                  dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                                  logSecondarySpeciesConcentrations,
+                                                                                                  aggregatePrimarySpeciesConcentrations,
+                                                                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
   }
   else
   {
@@ -480,14 +480,14 @@ void calculateAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA const & params,
   {
     REAL_TYPE logSecondarySpeciesConcentrations[numSecondarySpecies] = { 0.0 };
     massActions_impl::calculateAggregatePrimaryConcentrationsFromActivitiesWrtLogC< REAL_TYPE,
-                                                                                     INT_TYPE,
-                                                                                     INDEX_TYPE >( params,
-                                                                                                   logPrimarySpeciesConcentrations,
-                                                                                                   logPrimaryActivities,
-                                                                                                   dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
-                                                                                                   logSecondarySpeciesConcentrations,
-                                                                                                   aggregatePrimarySpeciesConcentrations,
-                                                                                                   dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                                    INT_TYPE,
+                                                                                    INDEX_TYPE >( params,
+                                                                                                  logPrimarySpeciesConcentrations,
+                                                                                                  logPrimaryActivities,
+                                                                                                  dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                                  logSecondarySpeciesConcentrations,
+                                                                                                  aggregatePrimarySpeciesConcentrations,
+                                                                                                  dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
   }
   else
   {
@@ -526,16 +526,16 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
   }
 
   massActions_impl::calculateTotalAndMobileAggregatePrimaryConcentrationsFromActivitiesWrtLogC< REAL_TYPE,
-                                                                                                 INT_TYPE,
-                                                                                                 INDEX_TYPE >( params,
-                                                                                                               logPrimarySpeciesConcentrations,
-                                                                                                               logPrimarySpeciesConcentrations,
-                                                                                                               dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
-                                                                                                               logSecondarySpeciesConcentrations,
-                                                                                                               aggregatePrimarySpeciesConcentrations,
-                                                                                                               mobileAggregatePrimarySpeciesConcentrations,
-                                                                                                               dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
-                                                                                                               dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                                                INT_TYPE,
+                                                                                                INDEX_TYPE >( params,
+                                                                                                              logPrimarySpeciesConcentrations,
+                                                                                                              logPrimarySpeciesConcentrations,
+                                                                                                              dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                                              logSecondarySpeciesConcentrations,
+                                                                                                              aggregatePrimarySpeciesConcentrations,
+                                                                                                              mobileAggregatePrimarySpeciesConcentrations,
+                                                                                                              dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
+                                                                                                              dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
 }
 
 template< typename REAL_TYPE,
@@ -565,16 +565,16 @@ void calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC( PARAMS_DATA c
   if constexpr( numSecondarySpecies > 0 )
   {
     massActions_impl::calculateTotalAndMobileAggregatePrimaryConcentrationsFromActivitiesWrtLogC< REAL_TYPE,
-                                                                                                   INT_TYPE,
-                                                                                                   INDEX_TYPE >( params,
-                                                                                                                 logPrimarySpeciesConcentrations,
-                                                                                                                 logPrimaryActivities,
-                                                                                                                 dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
-                                                                                                                 logSecondarySpeciesConcentrations,
-                                                                                                                 aggregatePrimarySpeciesConcentrations,
-                                                                                                                 mobileAggregatePrimarySpeciesConcentrations,
-                                                                                                                 dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
-                                                                                                                 dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
+                                                                                                  INT_TYPE,
+                                                                                                  INDEX_TYPE >( params,
+                                                                                                                logPrimarySpeciesConcentrations,
+                                                                                                                logPrimaryActivities,
+                                                                                                                dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
+                                                                                                                logSecondarySpeciesConcentrations,
+                                                                                                                aggregatePrimarySpeciesConcentrations,
+                                                                                                                mobileAggregatePrimarySpeciesConcentrations,
+                                                                                                                dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations,
+                                                                                                                dMobileAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
   }
   else
   {

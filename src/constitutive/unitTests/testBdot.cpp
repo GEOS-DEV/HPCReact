@@ -21,8 +21,7 @@ using namespace hpcReact;
 
 
 
-
-constexpr SpeciatedIonicStrength<double, int, 3>::Params testParams
+constexpr SpeciatedIonicStrength< double, int, 3 >::Params testParams
 {
   // Species charge
   { 1.0, -1.0, 2.0 }
@@ -38,7 +37,7 @@ TEST( testBdot, testIonicStrength )
                                                                   dIonicStrength_dConcentration );
   double expectedI = 0.5 * ( 0.1 * 1.0 * 1.0 + 0.2 * (-1.0) * (-1.0) + 0.3 * 2.0 * 2.0 );
   EXPECT_DOUBLE_EQ( I, expectedI );
-  
+
 }
 
 

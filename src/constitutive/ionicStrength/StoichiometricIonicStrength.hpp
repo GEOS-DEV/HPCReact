@@ -20,15 +20,15 @@ class StoichiometricIonicStrength
 {
 public:
 
-template< typename ARRAY_1D_TO_CONST >
-static inline HPCREACT_HOST_DEVICE 
-REAL_TYPE
-calculate( ARRAY_1D_TO_CONST const & speciesConcentration,
-           ARRAY_1D_TO_CONST const & speciesCharge,
-           int const numSpecies )
-{
-  return 0.0;
-}
+  template< typename ARRAY_1D_TO_CONST >
+  static inline HPCREACT_HOST_DEVICE
+  REAL_TYPE
+  calculate( ARRAY_1D_TO_CONST const & speciesConcentration,
+             ARRAY_1D_TO_CONST const & speciesCharge,
+             int const numSpecies )
+  {
+    return 0.0;
+  }
 
 };
 

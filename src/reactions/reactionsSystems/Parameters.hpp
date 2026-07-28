@@ -117,9 +117,6 @@ struct KineticReactionsParameters
 
 
 
-
-
-
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,

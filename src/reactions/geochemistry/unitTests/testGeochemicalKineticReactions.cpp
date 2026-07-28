@@ -82,17 +82,17 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
   };
 
   using ActivityType = carbonateIdentityActivityType;
-  
 
-  computeReactionRatesTest< double, 
+
+  computeReactionRatesTest< double,
                             false,
                             ActivityType >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                             typename ActivityType::Params(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea, // No use. Just to pass something here
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, 
+                                            typename ActivityType::Params(),
+                                            initialSpeciesConcentration,
+                                            surfaceArea,  // No use. Just to pass something here
+                                            expectedReactionRates,
+                                            expectedReactionRatesDerivatives );
+  computeReactionRatesTest< double,
                             true,
                             ActivityType >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                             typename ActivityType::Params(),
@@ -135,18 +135,18 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
 
   using ActivityType = carbonateIdentityActivityType;
 
-  computeReactionRatesTest< double, 
-                            false, 
+  computeReactionRatesTest< double,
+                            false,
                             ActivityType >( carbonateSystem.kineticReactionsParameters(),
-                            typename ActivityType::Params(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea,
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, 
-                            true, 
+                                            typename ActivityType::Params(),
+                                            initialSpeciesConcentration,
+                                            surfaceArea,
+                                            expectedReactionRates,
+                                            expectedReactionRatesDerivatives );
+  computeReactionRatesTest< double,
+                            true,
                             ActivityType >( carbonateSystem.kineticReactionsParameters(),
-                            typename ActivityType::Params(),
+                                            typename ActivityType::Params(),
                                             initialSpeciesConcentration,
                                             surfaceArea,
                                             expectedReactionRates,
@@ -237,7 +237,7 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
 
 //   using ActivityType = carbonateIdentityActivityType;
 
-//   timeStepTest< double, 
+//   timeStepTest< double,
 //                 false,
 //                 ActivityType >( carbonateSystemAllKinetic.kineticReactionsParameters(),
 //                                 ActivityType::Params(),
@@ -246,12 +246,12 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
 //                                  initialSpeciesConcentration,
 //                                  expectedSpeciesConcentrations );
 
-  // ln(c) as the primary variable results in a singular system.
-  // timeStepTest< double, true >( simpleKineticTestRateParams,
-  //                               2.0,
-  //                               10,
-  //                               initialSpeciesConcentration,
-  //                               expectedSpeciesConcentrations );
+// ln(c) as the primary variable results in a singular system.
+// timeStepTest< double, true >( simpleKineticTestRateParams,
+//                               2.0,
+//                               10,
+//                               initialSpeciesConcentration,
+//                               expectedSpeciesConcentrations );
 //}
 
 int main( int argc, char * * argv )

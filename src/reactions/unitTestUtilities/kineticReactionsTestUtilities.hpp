@@ -106,15 +106,15 @@ void computeReactionRatesTest( KINETIC_PARAMS_DATA const & params,
 
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    KineticReactionsType::computeReactionRates( temperature,
-                                                params,
-                                                activityParams,
-                                                dataCopy->speciesConcentration,
-                                                dataCopy->surfaceArea,
-                                                dataCopy->reactionRates,
-                                                dataCopy->reactionRatesDerivatives );
-  });
+      {
+        KineticReactionsType::computeReactionRates( temperature,
+                                                    params,
+                                                    activityParams,
+                                                    dataCopy->speciesConcentration,
+                                                    dataCopy->surfaceArea,
+                                                    dataCopy->reactionRates,
+                                                    dataCopy->reactionRatesDerivatives );
+      } );
 
   for( int r=0; r<numReactions; ++r )
   {
@@ -194,14 +194,14 @@ void computeSpeciesRatesTest( KINETIC_PARAMS_DATA const & params,
   }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    KineticReactionsType::computeSpeciesRates( temperature,
-                                               params,
-                                               activityParams,
-                                               dataCopy->speciesConcentration,
-                                               dataCopy->speciesRates,
-                                               dataCopy->speciesRatesDerivatives );
-  });
+      {
+        KineticReactionsType::computeSpeciesRates( temperature,
+                                                   params,
+                                                   activityParams,
+                                                   dataCopy->speciesConcentration,
+                                                   dataCopy->speciesRates,
+                                                   dataCopy->speciesRatesDerivatives );
+      } );
 
 
   for( int r=0; r<numSpecies; ++r )

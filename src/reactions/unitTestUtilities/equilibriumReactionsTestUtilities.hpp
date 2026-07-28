@@ -62,7 +62,7 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                            int,
                                                                            int,
-                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > > >;
+                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies () > > >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
   static constexpr int numReactions = PARAMS_DATA::numReactions();
@@ -76,17 +76,17 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
   }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    double xi[numReactions] = { 0.0 };
+      {
+        double xi[numReactions] = { 0.0 };
 
-    EquilibriumReactionsType::computeResidualAndJacobianReactionExtents( temperature,
-                                                                         params,
-                                                                         activityParams,
-                                                                         dataCopy->speciesConcentration,
-                                                                         xi,
-                                                                         dataCopy->residual,
-                                                                         dataCopy->jacobian );
-  });
+        EquilibriumReactionsType::computeResidualAndJacobianReactionExtents( temperature,
+                                                                             params,
+                                                                             activityParams,
+                                                                             dataCopy->speciesConcentration,
+                                                                             xi,
+                                                                             dataCopy->residual,
+                                                                             dataCopy->jacobian );
+      } );
 
 //  printf( "R = { %8.4g, %8.4g }\n", residual[0], residual[1] );
   for( int r=0; r<numReactions; ++r )
@@ -135,7 +135,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                            int,
                                                                            int,
-                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > > >;
+                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies () > > >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 
@@ -148,13 +148,13 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
   }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    EquilibriumReactionsType::enforceEquilibrium_Extents( temperature,
-                                                          params,
-                                                          activityParams,
-                                                          dataCopy->speciesConcentration0,
-                                                          dataCopy->speciesConcentration );
-  });
+      {
+        EquilibriumReactionsType::enforceEquilibrium_Extents( temperature,
+                                                              params,
+                                                              activityParams,
+                                                              dataCopy->speciesConcentration0,
+                                                              dataCopy->speciesConcentration );
+      } );
 
   for( int r=0; r<numSpecies; ++r )
   {

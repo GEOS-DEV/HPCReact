@@ -73,7 +73,7 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
-    
+
     calculateActivities< RealType,
                          IntType,
                          IndexType,
@@ -84,10 +84,10 @@ public:
                                                dActivities_dConcentration );
 
     computeReactionRates< PARAMS_DATA, true >( temperature,
-                                                    params,
-                                                    activities,
-                                                    reactionRates,
-                                                    dReactionRates_dActivities );
+                                               params,
+                                               activities,
+                                               reactionRates,
+                                               dReactionRates_dActivities );
 
     // chain rule to get dReactionRate_dConcentration
     for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
@@ -123,12 +123,12 @@ public:
                         ARRAY_1D_TO_CONST const & speciesConcentration,
                         ARRAY_1D & reactionRates )
   {
-    
+
 
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
-    
+
     calculateActivities< RealType,
                          IntType,
                          IndexType,
@@ -183,7 +183,7 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ]{  };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ]{  };
-    
+
     calculateActivities< RealType,
                          IntType,
                          IndexType,
@@ -196,10 +196,10 @@ public:
     if( params.reactionRatesUpdateOption() == 0 )
     {
       computeReactionRates< PARAMS_DATA, true >( temperature,
-                                                      params,
-                                                      activities,
-                                                      reactionRates,
-                                                      dReactionRates_dActivities );
+                                                 params,
+                                                 activities,
+                                                 reactionRates,
+                                                 dReactionRates_dActivities );
     }
     else if( params.reactionRatesUpdateOption() == 1 )
     {
@@ -246,7 +246,7 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] {};
     RealType dSpeciesRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] {};
-    
+
     calculateActivities< RealType,
                          IntType,
                          IndexType,
@@ -297,7 +297,7 @@ public:
   {
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
-    
+
     calculateActivities< RealType,
                          IntType,
                          IndexType,
@@ -353,7 +353,7 @@ private:
   //                      ARRAY_1D & activities,
   //                      ARRAY_2D & dActivities_dConcentration );
 
-  
+
 
   /**
    * @brief Compute the reaction rates for a given set of species concentrations.
@@ -393,10 +393,10 @@ private:
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeReactionRates( RealType const & temperature,
-                             PARAMS_DATA const & params,
-                             ARRAY_1D_TO_CONST const & activities,
-                             ARRAY_1D & reactionRates,
-                             ARRAY_2D & dReactionRates_dActivities );
+                        PARAMS_DATA const & params,
+                        ARRAY_1D_TO_CONST const & activities,
+                        ARRAY_1D & reactionRates,
+                        ARRAY_2D & dReactionRates_dActivities );
 
 /**
  * @brief

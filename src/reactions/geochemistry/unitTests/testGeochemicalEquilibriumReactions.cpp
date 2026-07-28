@@ -110,7 +110,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
                                                                            int,
                                                                            int,
-                                                                           Bdot< double, int, SpeciatedIonicStrength< double, int, numSpecies > >>;
+                                                                           Bdot< double, int, SpeciatedIonicStrength< double, int, numSpecies > > >;
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {

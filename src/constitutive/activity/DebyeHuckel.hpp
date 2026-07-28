@@ -76,10 +76,10 @@ public:
    * @return A^γ in units consistent with molal ionic strength, for use
    *         in ln(γ) expressions.
    */
-  static inline HPCREACT_HOST_DEVICE 
+  static inline HPCREACT_HOST_DEVICE
   RealType A_gamma( RealType const T_K,
-                        RealType const rho_w,
-                        RealType const eps_r )
+                    RealType const rho_w,
+                    RealType const eps_r )
   {
     RealType const num = ::pow( eChg, 3.0 ) * ::sqrt( 2.0 * pi * NA * rho_w );
     RealType const den = ::pow( 4.0 * pi * e0 * eps_r * kB * T_K, 1.5 );
@@ -118,8 +118,8 @@ public:
    */
   static inline HPCREACT_HOST_DEVICE
   RealType B_gamma( RealType const T_K,
-                  RealType const rho_w,
-                  RealType const eps_r )
+                    RealType const rho_w,
+                    RealType const eps_r )
   {
     RealType const num = 2.0 * NA * rho_w * eChg * eChg;
     RealType const den = e0 * eps_r * kB * T_K;
@@ -134,8 +134,8 @@ public:
                         RealType const T_K,
                         RealType & dlog10_gamma_dI )
   {
-    RealType const A       = A_gamma(T_K);
-    RealType const B       = B_gamma(T_K);
+    RealType const A       = A_gamma( T_K );
+    RealType const B       = B_gamma( T_K );
     RealType const denom   = 1 + B * ai * sqrtI;
     dlog10_gamma_dI = -0.5 * A * zi * zi / ( sqrtI * denom * denom );
     return -A * zi * zi * sqrtI / denom;

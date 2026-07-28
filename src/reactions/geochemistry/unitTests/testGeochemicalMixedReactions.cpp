@@ -52,14 +52,14 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
     1.070434904554991 // Na+1
   };
 
-  using ActivityModelType = Bdot< double, int, SpeciatedIonicStrength< double, int, carbonateSystemType::numSpecies() > >;
+  using ActivityModelType = Bdot< double, int, SpeciatedIonicStrength< double, int, carbonateSystemType::numSpecies () > >;
   timeStepTest< double, true, ActivityModelType >( carbonateSystem,
-                                carbonateNosolidActivityParams,
-                                1.0,
-                                10,
-                                initialAggregateSpeciesConcentration,
-                                surfaceArea,
-                                expectedSpeciesConcentrations );
+                                                   carbonateNosolidActivityParams,
+                                                   1.0,
+                                                   10,
+                                                   initialAggregateSpeciesConcentration,
+                                                   surfaceArea,
+                                                   expectedSpeciesConcentrations );
 
 }
 

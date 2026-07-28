@@ -30,7 +30,7 @@ void testMoMasMediumEquilibriumHelper()
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
                                                                            int,
                                                                            int,
-                                                                           Identity< double, int, SpeciatedIonicStrength< double, int, numSpecies > >>;
+                                                                           Identity< double, int, SpeciatedIonicStrength< double, int, numSpecies > > >;
 
 
 

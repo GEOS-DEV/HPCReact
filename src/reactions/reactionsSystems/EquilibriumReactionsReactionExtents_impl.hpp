@@ -37,12 +37,12 @@ EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
                       INDEX_TYPE,
                       ACTIVITY_MODEL >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
-                                                                                  PARAMS_DATA const & params,
-                                                                                  typename ACTIVITY_MODEL::Params const & activityParams,
-                                                                                  ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                                                  ARRAY_1D_TO_CONST2 const & xi,
-                                                                                  ARRAY_1D & residual,
-                                                                                  ARRAY_2D & jacobian )
+                                                                                   PARAMS_DATA const & params,
+                                                                                   typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                                   ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                                   ARRAY_1D_TO_CONST2 const & xi,
+                                                                                   ARRAY_1D & residual,
+                                                                                   ARRAY_2D & jacobian )
 {
 
   HPCREACT_UNUSED_VAR( temperature );

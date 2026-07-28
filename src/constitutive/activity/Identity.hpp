@@ -25,7 +25,7 @@ public:
   using IndexType = INDEX_TYPE;
 
   struct Params
-  { 
+  {
     HPCREACT_HOST_DEVICE static constexpr IndexType numSpecies() { return IONIC_STRENGTH_TYPE::Params::numSpecies(); }
   };
 
@@ -35,7 +35,7 @@ public:
             typename PARAMS >
   static inline HPCREACT_HOST_DEVICE
   void
-  calculateActivities( PARAMS const & ,
+  calculateActivities( PARAMS const &,
                        ARRAY_1D_TO_CONST const & speciesConcentrations,
                        ARRAY_1D & activities,
                        ARRAY_2D & dActivities_dConcentrations )

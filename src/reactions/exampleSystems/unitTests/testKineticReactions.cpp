@@ -39,7 +39,7 @@ TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams
     { { 2.0, -0.5, 0.0, 0.0, 0.0 },
       { 0.0, 0.0, 0.5, 0.25, 0.0 } };
 
-    computeReactionRatesTest< double, 
+    computeReactionRatesTest< double,
                               false,
                               ActivityType >( bulkGeneric::simpleKineticTestRateParams,
                                               bulkGeneric::simpleIdentityActivityTestParams,
@@ -47,7 +47,7 @@ TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams
                                               surfaceArea, // No use. Just to pass something here
                                               expectedReactionRates,
                                               expectedReactionRatesDerivatives );
-    computeReactionRatesTest< double, 
+    computeReactionRatesTest< double,
                               true,
                               ActivityType >( bulkGeneric::simpleKineticTestRateParams,
                                               bulkGeneric::simpleIdentityActivityTestParams,
@@ -63,7 +63,7 @@ TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams
     { { 2.0, -0.5, 0.0, 0.0, 0.0 },
       { 0.0, 0.0, 0.5, 0.25, 0.0 } };
 
-    computeReactionRatesTest< double, 
+    computeReactionRatesTest< double,
                               false,
                               ActivityType >( bulkGeneric::simpleKineticTestRateParams,
                                               bulkGeneric::simpleActivityTestParams,
@@ -71,7 +71,7 @@ TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams
                                               surfaceArea, // No use. Just to pass something here
                                               expectedReactionRates,
                                               expectedReactionRatesDerivatives );
-    computeReactionRatesTest< double, 
+    computeReactionRatesTest< double,
                               true,
                               ActivityType >( bulkGeneric::simpleKineticTestRateParams,
                                               bulkGeneric::simpleActivityTestParams,
@@ -98,16 +98,16 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams 
     {  0.0, 0.0, -0.5, -0.25, 0.0 },
     {  0.0, 0.0, 1.0, 0.5, 0.0 } };
 
-  computeSpeciesRatesTest< double, 
+  computeSpeciesRatesTest< double,
                            false,
                            ActivityType >( bulkGeneric::simpleKineticTestRateParams,
-                                            bulkGeneric::simpleIdentityActivityTestParams,
-                                            initialSpeciesConcentration,
-                                            expectedSpeciesRates,
-                                            expectedSpeciesRatesDerivatives );
+                                           bulkGeneric::simpleIdentityActivityTestParams,
+                                           initialSpeciesConcentration,
+                                           expectedSpeciesRates,
+                                           expectedSpeciesRatesDerivatives );
 
-  computeSpeciesRatesTest< double, 
-                           true, 
+  computeSpeciesRatesTest< double,
+                           true,
                            ActivityType >( bulkGeneric::simpleKineticTestRateParams,
                                            bulkGeneric::simpleIdentityActivityTestParams,
                                            initialSpeciesConcentration,
@@ -120,7 +120,8 @@ TEST( testKineticReactions, computeSpeciesRatesTest_simpleKineticTestRateParams 
 // TEST( testKineticReactions, testTimeStep )
 // {
 //   double const initialSpeciesConcentration[5] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
-//   double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01, 7.02014627734060e-01, 5.95970744531880e-01 };
+//   double const expectedSpeciesConcentrations[5] = { 3.92138293924124e-01, 3.03930853037938e-01, 5.05945480771998e-01,
+// 7.02014627734060e-01, 5.95970744531880e-01 };
 
 //   timeStepTest< double, false >( bulkGeneric::simpleKineticTestRateParams,
 //                                  2.0,
