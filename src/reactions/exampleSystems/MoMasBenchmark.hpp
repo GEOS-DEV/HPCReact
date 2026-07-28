@@ -19,10 +19,10 @@ namespace MoMasBenchmark
 {
 // *****UNCRUSTIFY-OFF******
 
-  using easyCaseType = reactionsSystems::MixedReactionsParameters< double, int, int, 12, 7, 7 >;
-  using mediumCaseType = reactionsSystems::MixedReactionsParameters< double, int, int, 14, 10, 9 >; 
+  using easyCaseType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 12, 7, 7 >;
+  using mediumCaseType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 14, 10, 9 >; 
 
-  constexpr CArrayWrapper< double, 7, 12 > easyCaseStoichMatrix =
+  constexpr CArrayWrapper< signed char, 7, 12 > easyCaseStoichMatrix =
   {
     // Stoichiometric matrix [7 rows × 12 columns]
     // Columns 0–6 are secondary species (must be -1 on the diagonal)
@@ -90,7 +90,7 @@ namespace MoMasBenchmark
     easyCaseReverseRates,
     easyCaseMobileSpeciesFlag );
 
-  constexpr CArrayWrapper< double, 10, 14 > mediumCaseStoichMatrix =
+  constexpr CArrayWrapper< signed char, 10, 14 > mediumCaseStoichMatrix =
   {
     // Stoichiometric matrix [10 rows × 14 columns]
     // Columns 0–8 are secondary species (must be -1 on the diagonal)

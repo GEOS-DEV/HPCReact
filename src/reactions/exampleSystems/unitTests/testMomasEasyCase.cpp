@@ -71,7 +71,7 @@ void testMoMasAllEquilibriumHelper()
                                                             targetAggregatePrimarySpeciesConcentration,
                                                             logInitialPrimarySpeciesConcentration,
                                                             logPrimarySpeciesConcentrationCopy );
-  });
+  } );
 
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
   {

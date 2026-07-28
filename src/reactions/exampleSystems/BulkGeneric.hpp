@@ -48,9 +48,9 @@ namespace bulkGeneric
 //   um1Constants };
 
 
-using simpleKineticParamsType = reactionsSystems::KineticReactionsParameters< double, int, int, 5, 2 >;
+using simpleKineticParamsType = reactionsSystems::KineticReactionsParameters< double, int, signed char, 5, 2 >;
 
-constexpr CArrayWrapper< double, 2, 5 > simpleKineticStoichMatrix =
+constexpr CArrayWrapper< signed char, 2, 5 > simpleKineticStoichMatrix =
 {
   // stoichiometric matrix
   {
@@ -101,9 +101,9 @@ constexpr simpleActivityParamsType simpleActivityTestParams =
 Identity< double, int, simpleIonicStrengthType >::Params simpleIdentityActivityTestParams = {};
 
 
-using simpleMixedParamsType = reactionsSystems::MixedReactionsParameters< double, int, int, 5, 2, 2 >;
+using simpleMixedParamsType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 5, 2, 2 >;
 
-constexpr CArrayWrapper< double, 2, 5 > simpleMixedStoichMatrix =
+constexpr CArrayWrapper< signed char, 2, 5 > simpleMixedStoichMatrix =
 {
   // stoichiometric matrix
   {

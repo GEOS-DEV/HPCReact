@@ -22,9 +22,9 @@ namespace ChainGeneric
 {
 // *****UNCRUSTIFY-OFF******
 
-  using serialAllKineticType = reactionsSystems::MixedReactionsParameters< double, int, int, 3, 3, 0 >;
+  using serialAllKineticType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 3, 3, 0 >;
 
-  constexpr CArrayWrapper< double, 3, 3 > serialAllKineticStoichMatrix =
+  constexpr CArrayWrapper< signed char, 3, 3 > serialAllKineticStoichMatrix =
   {
     // Stoichiometric matrix [3 rows × 3 columns]
     // Columns 0–3 are primary species: {C1, C2, C3 }

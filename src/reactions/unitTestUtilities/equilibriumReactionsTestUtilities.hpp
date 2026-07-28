@@ -37,7 +37,7 @@ REAL_TYPE tolerance( REAL_TYPE const a, REAL_TYPE const b )
  * @tparam numSpecies Number of species.
  */
 template< int numReactions, int numSpecies >
-struct ComputeResidualAndJacobianTestData 
+struct ComputeResidualAndJacobianTestData
 {
   /// The reaction residuals
   double residual[numReactions] = { 0.0 };
@@ -69,11 +69,11 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
 
   double const temperature = 298.15;
 
-  ComputeResidualAndJacobianTestData<numReactions, numSpecies> data;
+  ComputeResidualAndJacobianTestData< numReactions, numSpecies > data;
   for( int i = 0; i < numSpecies; ++i )
   {
     data.speciesConcentration[i] = initialSpeciesConcentration[i];
-  } 
+  }
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
@@ -119,7 +119,7 @@ struct TestEnforceEquilibriumData
 {
   /// The initial species concentrations
   double speciesConcentration0[numSpecies];
-  
+
   /// The final species concentrations
   double speciesConcentration[numSpecies];
 };
@@ -141,7 +141,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
 
   double const temperature = 298.15;
 
-  TestEnforceEquilibriumData<numSpecies> data;
+  TestEnforceEquilibriumData< numSpecies > data;
   for( int i = 0; i < numSpecies; ++i )
   {
     data.speciesConcentration0[i] = initialSpeciesConcentration[i];

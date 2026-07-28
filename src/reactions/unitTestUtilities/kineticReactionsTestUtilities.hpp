@@ -277,28 +277,28 @@ void timeStepTest( KINETIC_PARAMS_DATA const & params,
   data.time = 0.0;
 
   pmpl::genericKernelWrapper( 1, &data, [params, temperature, dt, numSteps] HPCREACT_DEVICE ( auto * const dataCopy )
-  {
-    double speciesConcentration_n[numSpecies];
-    double speciesRates[numSpecies] = { 0.0 };
-    CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
-
-    for( int t = 0; t < numSteps; ++t )
-    {
-      printf("Time step %d \n ", t);
-      for( int i=0; i<numSpecies; ++i )
       {
-        speciesConcentration_n[i] = dataCopy->speciesConcentration[i];
-      }
-      KineticReactionsType::timeStep( dt,
-                                      temperature,
-                                      params,
-                                      speciesConcentration_n,
-                                      dataCopy->speciesConcentration,
-                                      speciesRates,
-                                      speciesRatesDerivatives );
-      dataCopy->time += dt;
-    }
-  });
+        double speciesConcentration_n[numSpecies];
+        double speciesRates[numSpecies] = { 0.0 };
+        CArrayWrapper< double, numSpecies, numSpecies > speciesRatesDerivatives;
+
+        for( int t = 0; t < numSteps; ++t )
+        {
+          printf( "Time step %d \n ", t );
+          for( int i=0; i<numSpecies; ++i )
+          {
+            speciesConcentration_n[i] = dataCopy->speciesConcentration[i];
+          }
+          KineticReactionsType::timeStep( dt,
+                                          temperature,
+                                          params,
+                                          speciesConcentration_n,
+                                          dataCopy->speciesConcentration,
+                                          speciesRates,
+                                          speciesRatesDerivatives );
+          dataCopy->time += dt;
+        }
+      } );
 
 
   EXPECT_NEAR( data.time, dt*numSteps, 1.0e-8 );
