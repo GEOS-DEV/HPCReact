@@ -88,7 +88,7 @@ void testMoMasAllEquilibriumHelper()
   }
 
 }
-TEST( testEquilibriumReactions, testMoMasAllEquilibrium )
+TEST( testEquilibriumReactions, testMoMasAllEquilibrium_Identity )
 {
   testMoMasAllEquilibriumHelper();
 }

@@ -34,7 +34,7 @@ using namespace hpcReact::unitTest_utilities;
 
 
 //******************************************************************************
-TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
+TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium_Bdot )
 {
   using namespace hpcReact::geochemistry;
 
@@ -100,7 +100,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
 }
 
 
-TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
+TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2_Bdot )
 {
 
 

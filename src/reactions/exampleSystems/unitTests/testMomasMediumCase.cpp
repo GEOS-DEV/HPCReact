@@ -91,7 +91,7 @@ void testMoMasMediumEquilibriumHelper()
 
 }
 
-TEST( testEquilibriumReactions, testMoMasMediumEquilibrium )
+TEST( testEquilibriumReactions, testMoMasMediumEquilibrium_Identity )
 {
   testMoMasMediumEquilibriumHelper();
 }

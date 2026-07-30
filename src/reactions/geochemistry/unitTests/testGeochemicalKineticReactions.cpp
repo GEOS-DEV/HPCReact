@@ -20,7 +20,7 @@ using namespace hpcReact::geochemistry;
 using namespace hpcReact::unitTest_utilities;
 
 
-TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
+TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic_Identity )
 {
   double const initialSpeciesConcentration[17] =
   {
@@ -89,7 +89,7 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
                             ActivityType >( carbonateSystemAllKinetic.kineticReactionsParameters(),
                                             typename ActivityType::Params(),
                                             initialSpeciesConcentration,
-                                            surfaceArea,  // No use. Just to pass something here
+                                            surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
   computeReactionRatesTest< double,
@@ -102,7 +102,7 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
                                             expectedReactionRatesDerivatives );
 }
 
-TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
+TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem_Identity )
 {
   double const initialSpeciesConcentration[16] =
   {

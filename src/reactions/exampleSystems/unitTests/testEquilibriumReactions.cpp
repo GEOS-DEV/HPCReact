@@ -20,7 +20,7 @@ using namespace hpcReact;
 using namespace hpcReact::unitTest_utilities;
 
 //******************************************************************************
-TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
+TEST( testEquilibriumReactions, computeResidualAndJacobianTest_Bdot )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
 
@@ -42,7 +42,7 @@ TEST( testEquilibriumReactions, computeResidualAndJacobianTest )
 }
 
 //******************************************************************************
-TEST( testEquilibriumReactions, testEnforceEquilibrium )
+TEST( testEquilibriumReactions, testEnforceEquilibrium_Bdot )
 {
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const expectedSpeciesConcentrations[5] = { 3.92138294e-01, 3.03930853e-01, 5.05945481e-01, 7.02014628e-01, 5.95970745e-01 };

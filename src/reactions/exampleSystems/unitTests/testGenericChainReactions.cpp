@@ -17,7 +17,7 @@ using namespace hpcReact;
 using namespace hpcReact::unitTest_utilities;
 
 //******************************************************************************
-TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionParams )
+TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionParams_Identity )
 {
   using namespace hpcReact::ChainGeneric;
 
@@ -52,7 +52,7 @@ TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionPa
                             ActivityType >( serialAllKineticParams.kineticReactionsParameters(),
                                             ChainGeneric::serialAllKineticIdentityActivityParams,
                                             initialSpeciesConcentration,
-                                            surfaceArea,  // No use. Just to pass something here
+                                            surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
   computeReactionRatesTest< double,
