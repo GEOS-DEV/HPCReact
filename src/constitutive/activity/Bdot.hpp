@@ -56,13 +56,13 @@ public:
                                                                    dIonicStrength_dConcentration );
     RealType const sqrtI = sqrt( ionicStrength );
     RealType const rho_w = 997.0479; // kg/m3
-    RealType const eps_r = 78.54;  // dimensionless
+    RealType const eps_r = 78.54; // dimensionless
     RealType const T_K = 298.15;
     RealType const A_gamma = DebyeHuckel< RealType >::A_gamma( T_K, rho_w, eps_r );
     // A_gamma is returned in its natural-log form, while the log10_gamma equation below is
     // evaluated in log10. Convert it to the log10 scale.
     RealType const A_gamma_log10 = A_gamma * DebyeHuckel< RealType >::invln10;
-    
+
     // B_gamma*sqrt(I) is an inverse Debye length in 1/m, while m_ionSizeParameter is specified
     // in Angstrom in the parameter files (e.g. Carbonate.hpp). Scale B_gamma so that the
     // B*a*sqrt(I) group is dimensionless.
