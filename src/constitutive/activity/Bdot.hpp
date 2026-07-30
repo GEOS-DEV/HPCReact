@@ -88,9 +88,17 @@ public:
 
       activities[i] = speciesConcentrations[i] * gamma;
       dActivities_dConcentrations[i][i] = gamma;
+
+      // d(activity_i)/d(concentration_j) = gamma_i * delta_ij
+      //                                    + c_i * gamma_i * ln(10) * dlog10(gamma_i)/dI * dI/dc_j.
+      // dlog10_gamma_dI is singular at I = 0, where the ionic strength term is dropped.
+      RealType const dActivity_dIonicStrength =
+        ionicStrength > 0.0 ?
+        speciesConcentrations[i] * gamma * DebyeHuckel< RealType >::ln10 * ( dlog10_gamma_dI + b[i] ) :
+        0.0;
       for( IndexType j=0; j<numSpecies; ++j )
       {
-        dActivities_dConcentrations[i][j] += ( ( DebyeHuckel_term * 0.5 / ionicStrength ) + b[i] ) * dIonicStrength_dConcentration[j];
+        dActivities_dConcentrations[i][j] += dActivity_dIonicStrength * dIonicStrength_dConcentration[j];
       }
     }
   }
