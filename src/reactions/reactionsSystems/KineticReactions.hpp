@@ -245,7 +245,7 @@ public:
 
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] {};
-    RealType dSpeciesRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] {};
+    RealType dSpeciesRates_dActivities[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] {};
 
     calculateActivities< RealType,
                          IntType,

@@ -72,7 +72,8 @@ namespace ChainGeneric
     serialAllKineticMobileSpeciesFlag,
     0 );
 
-  using serialAllKineticIonicStrengthType = SpeciatedIonicStrength< double, int, 3 >;
+  // species count taken from the system type so it cannot drift from it
+  using serialAllKineticIonicStrengthType = SpeciatedIonicStrength< double, int, serialAllKineticType::numSpecies() >;
 
   using serialAllKineticActivityParamsType = Bdot< double, int, serialAllKineticIonicStrengthType >::Params;
 

@@ -133,7 +133,7 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.0877659574468075e-03, -3.0877659574468075e-03, -2.9999999999999997e-02, 0, 0, 0, 0 }
   };
 
-  using ActivityType = carbonateIdentityActivityType;
+  using ActivityType = carbonateNosolidIdentityActivityType;
 
   computeReactionRatesTest< double,
                             false,

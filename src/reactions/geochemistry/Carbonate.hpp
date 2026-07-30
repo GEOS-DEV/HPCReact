@@ -184,10 +184,12 @@ using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParame
 using carbonateSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 17, 10, 10 >;
 using carbonateSystemType               = reactionsSystems::MixedReactionsParameters< double, int, signed char, 16, 10, 9 >;
 
-using carbonateIonicStrengthType = SpeciatedIonicStrength< double, int, 17 >;
+// The species count of an activity model must match that of the system it is applied to, so it is
+// taken from the system type rather than repeated as a literal.
+using carbonateIonicStrengthType = SpeciatedIonicStrength< double, int, carbonateSystemAllKineticType::numSpecies() >;
 using carbonateActivityType = Bdot< double, int, carbonateIonicStrengthType >;
 using carbonateIdentityActivityType = Identity< double, int, carbonateIonicStrengthType >;
-using carbonateNosolidIonicStrengthType = SpeciatedIonicStrength< double, int, 16 >;
+using carbonateNosolidIonicStrengthType = SpeciatedIonicStrength< double, int, carbonateSystemType::numSpecies() >;
 using carbonateNosolidActivityType = Bdot< double, int, carbonateNosolidIonicStrengthType >;
 using carbonateNosolidIdentityActivityType = Identity< double, int, carbonateNosolidIonicStrengthType >;
 

@@ -75,7 +75,8 @@ constexpr simpleKineticParamsType simpleKineticTestRateParams(
   simpleKineticEquilibriumConstants,
   0 );
 
-using simpleIonicStrengthType = SpeciatedIonicStrength< double, int, 5 >;
+// species count taken from the system type so it cannot drift from it
+using simpleIonicStrengthType = SpeciatedIonicStrength< double, int, simpleKineticParamsType::numSpecies() >;
 
 using simpleActivityParamsType = Bdot< double, int, simpleIonicStrengthType >::Params;
 
