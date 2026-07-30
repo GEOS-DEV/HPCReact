@@ -106,14 +106,14 @@ void timeStepTest( PARAMS_DATA const & params,
             aggregatePrimarySpeciesConcentration_n[i] = aggregatePrimarySpeciesConcentration[i];
           }
 
-          auto computeResidualAndJacobian = [&] ( REAL_TYPE const (&logPrimarySpeciesConcentration)[numPrimarySpecies],
+          auto computeResidualAndJacobian = [&] ( REAL_TYPE const (&logPrimarySpeciesConcentrationNewton)[numPrimarySpecies],
                                                   REAL_TYPE ( & r )[numPrimarySpecies],
                                                   REAL_TYPE ( & J )[numPrimarySpecies][numPrimarySpecies] )
       {
         MixedReactionsType::updateMixedSystem( temperature,
                                                params,
                                                activityParams,
-                                               logPrimarySpeciesConcentration,
+                                               logPrimarySpeciesConcentrationNewton,
                                                surfaceArea,
                                                logSecondarySpeciesConcentration,
                                                aggregatePrimarySpeciesConcentration,
