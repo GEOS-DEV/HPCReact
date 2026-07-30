@@ -82,6 +82,7 @@ using simpleActivityParamsType = Bdot< double, int, simpleIonicStrengthType >::P
 constexpr CArrayWrapper< double, 5 > simpleSpeciesCharge =
 { 2.0, -1.0, 1.0, 0.0, -1.0 };
 
+// ion size parameter in ANGSTROM
 constexpr CArrayWrapper< double, 5 > simpleIonSize =
 { 4.0, 3.5, 3.5, 3.5, 3.5 };
 

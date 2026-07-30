@@ -12,6 +12,7 @@
 
 #include "DebyeHuckel.hpp"
 #include "common/CArrayWrapper.hpp"
+#include "common/constants.hpp"
 
 namespace hpcReact
 {
@@ -29,7 +30,10 @@ public:
 
   struct Params : public IONIC_STRENGTH_TYPE::Params
   {
+    /// Ion size parameter in ANGSTROM (as tabulated by phreeqc.dat).
     CArrayWrapper< RealType, IONIC_STRENGTH_TYPE::Params::numSpecies() > m_ionSizeParameter;
+
+    /// B-dot parameter in kg/mol, so that b*I is dimensionless.
     CArrayWrapper< RealType, IONIC_STRENGTH_TYPE::Params::numSpecies() > m_bdotParameter;
   };
 
@@ -55,7 +59,10 @@ public:
     RealType const eps_r = 78.54;  // dimensionless
     RealType const T_K = 298.15;
     RealType const A_gamma = DebyeHuckel< RealType >::A_gamma( T_K, rho_w, eps_r );
-    RealType const B_gamma = DebyeHuckel< RealType >::B_gamma( T_K, rho_w, eps_r );
+    // B_gamma*sqrt(I) is an inverse Debye length in 1/m, while m_ionSizeParameter is specified
+    // in Angstrom in the parameter files (e.g. Carbonate.hpp). Scale B_gamma so that the
+    // B*a*sqrt(I) group is dimensionless.
+    RealType const B_gamma = DebyeHuckel< RealType >::B_gamma( T_K, rho_w, eps_r ) * constants::metersPerAngstrom;
     auto const & speciesCharge = params.m_speciesCharge;
     auto const & a = params.m_ionSizeParameter;
     auto const & b = params.m_bdotParameter;

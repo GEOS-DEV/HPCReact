@@ -79,6 +79,7 @@ namespace ChainGeneric
   constexpr CArrayWrapper< double, 3 > serialAllKineticSpeciesCharge =
   { 0.0, 0.0, 0.0 };
 
+  // ion size parameter in ANGSTROM
   constexpr CArrayWrapper< double, 3 > serialAllKineticIonSize =
   { 3.5, 3.5, 3.5 };
 

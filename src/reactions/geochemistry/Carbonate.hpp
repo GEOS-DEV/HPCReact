@@ -134,6 +134,7 @@ constexpr CArrayWrapper<double, 17> speciesCharge =
      1.0  // Na+
     };
 
+  // ion size parameter in ANGSTROM
   constexpr CArrayWrapper<double, 17> ionSize =
   {
     3.5,  // OH-      (from H2O = OH- + H+, -gamma 3.5 0.0)
@@ -203,6 +204,7 @@ constexpr CArrayWrapper< double, 16 > carbonateNosolidSpeciesCharge =
   carbonate::speciesCharge[13], carbonate::speciesCharge[14], carbonate::speciesCharge[15], carbonate::speciesCharge[16]
 };
 
+// ion size parameter in ANGSTROM
 constexpr CArrayWrapper< double, 16 > carbonateNosolidIonSize =
 {
   carbonate::ionSize[0], carbonate::ionSize[1], carbonate::ionSize[2], carbonate::ionSize[3],
