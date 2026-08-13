@@ -1,0 +1,56 @@
+{
+  "systemName": "Example Carbonate System",
+  "namespace": "carbonatemixed",
+  "secondarySpecies": [
+    "OH-",
+    "CO2",
+    "CO3-2",
+    "CaHCO3+",
+    "CaCl+"
+  ],
+  "primarySpecies": [
+    "H+",
+    "HCO3-",
+    "Ca+2",
+    "Cl-"
+  ],
+  "reactions": [
+    {
+      "equation": "OH- + H+ = H2O",
+      "equilibriumConstant": 9.89e13,
+      "forwardRate": 1.4e11,
+      "reverseRate": 1.43e-3
+    },
+    {
+      "equation": "CO2 + H2O = H+ + HCO3-",
+      "equilibriumConstant": 4.42e-7,
+      "forwardRate": 0.039,
+      "reverseRate": 8.92e4
+    },
+    {
+      "equation": "CO3-2 + H+ = HCO3-",
+      "equilibriumConstant": 2.21e10,
+      "forwardRate": 1.0e10,
+      "reverseRate": 4.67e-1
+    },
+    {
+      "equation": "CaHCO3+ = Ca+2 + HCO3-",
+      "equilibriumConstant": 6.0e-2,
+      "forwardRate": 1.5e6,
+      "reverseRate": 1.85e7
+    },
+    {
+      "equation": "CaCl+ = Ca+2 + Cl-",
+      "equilibriumConstant": 2.0e-1,
+      "forwardRate": 1.0e8,
+      "reverseRate": 2.14e7
+    },
+    {
+      "equation": "CaCO3 + H+ = Ca+2 + HCO3-",
+      "equilibriumConstant": 5.16e1,
+      "forwardRate": 1.55e-6,
+      "reverseRate": 3.0e-8,
+      "isEquilibrium": false
+    }
+  ]
+}
