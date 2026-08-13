@@ -39,15 +39,26 @@ public:
 
 
 
+  /**
+   * @brief Compute ln(gamma) for every species, and its derivatives wrt linear concentration.
+   * @param params activity model parameters
+   * @param speciesConcentrations linear concentrations c_i
+   * @param logActivityCoefficients [out] ln(gamma_i)
+   * @param dLogActivityCoefficients_dConcentrations [out] d ln(gamma_i) / d c_j
+   *
+   * The caller composes the activity as a = c * gamma. Returning gamma rather than the activity
+   * keeps gamma available to callers that need to invert it (e.g. converting a secondary species'
+   * activity back to a concentration for the mole balance).
+   */
   template< typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static inline HPCREACT_HOST_DEVICE
   void
-  calculateActivities( Params const & params,
-                       ARRAY_1D_TO_CONST const & speciesConcentrations,
-                       ARRAY_1D & activities,
-                       ARRAY_2D & dActivities_dConcentrations )
+  calculateLogActivityCoefficients( Params const & params,
+                                    ARRAY_1D_TO_CONST const & speciesConcentrations,
+                                    ARRAY_1D & logActivityCoefficients,
+                                    ARRAY_2D & dLogActivityCoefficients_dConcentrations )
   {
 
     RealType dIonicStrength_dConcentration[ Params::numSpecies() ];
@@ -61,7 +72,7 @@ public:
     RealType const A_gamma = DebyeHuckel< RealType >::A_gamma( T_K, rho_w, eps_r );
     // A_gamma is returned in its natural-log form, while the log10_gamma equation below is
     // evaluated in log10. Convert it to the log10 scale.
-    RealType const A_gamma_log10 = A_gamma * DebyeHuckel< RealType >::invln10;
+    RealType const A_gamma_log10 = A_gamma * constants::invln10;
 
     // B_gamma*sqrt(I) is an inverse Debye length in 1/m, while m_ionSizeParameter is specified
     // in Angstrom in the parameter files (e.g. Carbonate.hpp). Scale B_gamma so that the
@@ -70,8 +81,6 @@ public:
     auto const & speciesCharge = params.m_speciesCharge;
     auto const & a = params.m_ionSizeParameter;
     auto const & b = params.m_bdotParameter;
-
-
 
     const IndexType numSpecies = params.numSpecies();
     for( IndexType i=0; i<numSpecies; ++i )
@@ -83,36 +92,20 @@ public:
                                                                               A_gamma_log10,
                                                                               B_gamma,
                                                                               dlog10_gamma_dI );
-      RealType const log10gamma = DebyeHuckel_term + b[i] * ionicStrength;
-      RealType const gamma = pow( 10.0, log10gamma );
+      logActivityCoefficients[i] = ( DebyeHuckel_term + b[i] * ionicStrength ) * constants::ln10;
 
-      activities[i] = speciesConcentrations[i] * gamma;
-      dActivities_dConcentrations[i][i] = gamma;
-
-      // d(activity_i)/d(concentration_j) = gamma_i * delta_ij
-      //                                    + c_i * gamma_i * ln(10) * dlog10(gamma_i)/dI * dI/dc_j.
+      // d ln(gamma_i)/dc_j = ln(10) * dlog10(gamma_i)/dI * dI/dc_j.
       // dlog10_gamma_dI is singular at I = 0, where the ionic strength term is dropped.
-      RealType const dActivity_dIonicStrength =
+      RealType const dLogGamma_dIonicStrength =
         ionicStrength > 0.0 ?
-        speciesConcentrations[i] * gamma * DebyeHuckel< RealType >::ln10 * ( dlog10_gamma_dI + b[i] ) :
+        constants::ln10 * ( dlog10_gamma_dI + b[i] ) :
         0.0;
       for( IndexType j=0; j<numSpecies; ++j )
       {
-        dActivities_dConcentrations[i][j] += dActivity_dIonicStrength * dIonicStrength_dConcentration[j];
+        dLogActivityCoefficients_dConcentrations[i][j] = dLogGamma_dIonicStrength * dIonicStrength_dConcentration[j];
       }
     }
   }
-
-private:
-  // -------------------------------------------------------------
-  // Physical constants (CODATA 2018-ish), SI units
-  // -------------------------------------------------------------
-  static constexpr double pi   = 3.14159265358979323846;
-  static constexpr double e0   = 8.8541878128e-12; // vacuum permittivity [F/m]
-  static constexpr double eChg = 1.602176634e-19; // elementary charge [C]
-  static constexpr double kB   = 1.380649e-23; // Boltzmann constant [J/K]
-  static constexpr double NA   = 6.02214076e23; // Avogadro [1/mol]
-  static constexpr double ln10 = 2.3025850929940459;
 
 };
 

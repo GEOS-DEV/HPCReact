@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/constants.hpp"
 #include "common/macros.hpp"
 
 #include <cmath>
@@ -37,12 +38,6 @@ public:
 
   /// Avogadro constant N_A [1/mol].
   static constexpr RealType NA        = 6.022140760000000e+23;
-
-  /// Natural logarithm of 10, ln(10).
-  static constexpr RealType ln10      = 2.302585092994046e+00;
-
-  /// Inverse of ln(10).
-  static constexpr RealType invln10  = 4.342944819032518e-01;
 
 
   // -------------------------------------------------------------

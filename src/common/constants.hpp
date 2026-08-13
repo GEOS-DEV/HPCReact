@@ -22,5 +22,8 @@ constexpr double NA = 6.02214076e23; // 1/mol
 
 constexpr double metersPerAngstrom = 1.0e-10; // m/Angstrom
 
+constexpr double ln10 = 2.302585092994046e+00;
+constexpr double invln10 = 4.342944819032518e-01;
+
 } // namespace constants
 } // namespace hpcReact
