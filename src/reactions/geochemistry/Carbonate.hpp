@@ -178,6 +178,53 @@ constexpr CArrayWrapper<double, 17> speciesCharge =
   }; 
 
 
+// EQ3/6 B-dot parameters (data0.com.V8.R6), for validation against EQ3NR. The WATEQ form reduces
+// to EQ3/6 B-dot when all species share one b. EQ3/6 applies b to charged species only.
+// CO2(aq) will not match: EQ3/6 gives it a Drummond salting-out term rather than gamma = 1.
+constexpr CArrayWrapper<double, 17> ionSizeEQ36 =
+  {
+    3.5,  // OH-
+    3.0,  // CO2(aq)
+    4.5,  // CO3-2
+    4.0,  // CaHCO3+
+    3.0,  // CaSO4(aq)
+    4.0,  // CaCl+
+    3.0,  // CaCl2(aq)
+    3.0,  // MgSO4(aq)
+    4.0,  // NaSO4-
+    3.0,  // CaCO3(aq)
+    9.0,  // H+
+    4.0,  // HCO3-
+    6.0,  // Ca+2
+    4.0,  // SO4-2
+    3.0,  // Cl-
+    8.0,  // Mg+2
+    4.0   // Na+
+  };
+
+constexpr double bdotEQ36_25C = 0.0410;
+
+constexpr CArrayWrapper<double, 17> bdotParametersEQ36 =
+  {
+    bdotEQ36_25C,  // OH-
+    0.0,           // CO2(aq)
+    bdotEQ36_25C,  // CO3-2
+    bdotEQ36_25C,  // CaHCO3+
+    0.0,           // CaSO4(aq)
+    bdotEQ36_25C,  // CaCl+
+    0.0,           // CaCl2(aq)
+    0.0,           // MgSO4(aq)
+    bdotEQ36_25C,  // NaSO4-
+    0.0,           // CaCO3(aq)
+    bdotEQ36_25C,  // H+
+    bdotEQ36_25C,  // HCO3-
+    bdotEQ36_25C,  // Ca+2
+    bdotEQ36_25C,  // SO4-2
+    bdotEQ36_25C,  // Cl-
+    bdotEQ36_25C,  // Mg+2
+    bdotEQ36_25C   // Na+
+  };
+
 }
 
 using carbonateSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, signed char, 17, 10, 0 >;
@@ -235,6 +282,36 @@ constexpr carbonateNosolidActivityType::Params carbonateNosolidActivityParams =
   {carbonateNosolidSpeciesCharge},
   carbonateNosolidIonSize,
   carbonateNosolidBdotParameters
+};
+
+constexpr CArrayWrapper< double, 16 > carbonateNosolidIonSizeEQ36 =
+{
+  carbonate::ionSizeEQ36[0], carbonate::ionSizeEQ36[1], carbonate::ionSizeEQ36[2], carbonate::ionSizeEQ36[3],
+  carbonate::ionSizeEQ36[4], carbonate::ionSizeEQ36[5], carbonate::ionSizeEQ36[6], carbonate::ionSizeEQ36[7],
+  carbonate::ionSizeEQ36[8], carbonate::ionSizeEQ36[10], carbonate::ionSizeEQ36[11], carbonate::ionSizeEQ36[12],
+  carbonate::ionSizeEQ36[13], carbonate::ionSizeEQ36[14], carbonate::ionSizeEQ36[15], carbonate::ionSizeEQ36[16]
+};
+
+constexpr CArrayWrapper< double, 16 > carbonateNosolidBdotParametersEQ36 =
+{
+  carbonate::bdotParametersEQ36[0], carbonate::bdotParametersEQ36[1], carbonate::bdotParametersEQ36[2], carbonate::bdotParametersEQ36[3],
+  carbonate::bdotParametersEQ36[4], carbonate::bdotParametersEQ36[5], carbonate::bdotParametersEQ36[6], carbonate::bdotParametersEQ36[7],
+  carbonate::bdotParametersEQ36[8], carbonate::bdotParametersEQ36[10], carbonate::bdotParametersEQ36[11], carbonate::bdotParametersEQ36[12],
+  carbonate::bdotParametersEQ36[13], carbonate::bdotParametersEQ36[14], carbonate::bdotParametersEQ36[15], carbonate::bdotParametersEQ36[16]
+};
+
+constexpr carbonateActivityType::Params carbonateActivityParamsEQ36 =
+{
+  {carbonate::speciesCharge},
+  carbonate::ionSizeEQ36,
+  carbonate::bdotParametersEQ36
+};
+
+constexpr carbonateNosolidActivityType::Params carbonateNosolidActivityParamsEQ36 =
+{
+  {carbonateNosolidSpeciesCharge},
+  carbonateNosolidIonSizeEQ36,
+  carbonateNosolidBdotParametersEQ36
 };
 
 
