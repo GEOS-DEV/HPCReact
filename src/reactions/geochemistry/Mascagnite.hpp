@@ -47,14 +47,14 @@ constexpr CArrayWrapper<double, 3> forwardRates =
   { 
     1.0e10,  //  NH4+ = NH3(aq) + H+ 
     1.0e10,  //  HSO4- = H+ + SO4--
-    0.3      //  (NH4)2SO4(s) = 2NH4+ + SO4--
+    0.003      //  (NH4)2SO4(s) = 2NH4+ + SO4--
   };
 
 constexpr CArrayWrapper<double, 3> reverseRates = 
   { 
     1.0e10,      //  NH4+ = NH3(aq) + H+ 
     1.0e10,      //  HSO4- = H+ + SO4--
-    0.1475   //  (NH4)2SO4(s) = 2NH4+ + SO4--
+    0.001475   //  (NH4)2SO4(s) = 2NH4+ + SO4--
   };
 
 constexpr CArrayWrapper<int, 3> mobileSpeciesFlag = 
