@@ -16,6 +16,7 @@
 #include "common/CArrayWrapper.hpp"
 #include "common/macros.hpp"
 
+#include <math.h>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -230,7 +231,7 @@ struct MixedReactionsParameters
       else // numSpecified == 3
       {
         RealType const absDiff = fabs( K - ( kf / kr ) );
-        RealType const effectiveMagnitude = max( fabs( K ), fabs( kf/kr ));
+        RealType const effectiveMagnitude = fmax( fabs( K ), fabs( kf/kr ));
         RealType const tolerance = effectiveMagnitude * pow( 10, -num_digits );
         if( absDiff > tolerance ) // Tolerance for floating point precision
         {
