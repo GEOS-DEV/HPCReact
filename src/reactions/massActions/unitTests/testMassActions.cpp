@@ -259,7 +259,7 @@ TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_mixedSyste
 /**
  * @brief With the Identity model the solve must reproduce the reference solution.
  */
-TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_identityActivityModel )
+void test_calculateLogSecondarySpeciesConcentration_identityActivityModel_helper()
 {
   static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
   static constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
@@ -307,6 +307,11 @@ TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_identityAc
                  1.0e-8 );
     EXPECT_NEAR( data.logActivityCoefficients[j], 0.0, 1.0e-15 );
   }
+}
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_identityActivityModel )
+{
+  test_calculateLogSecondarySpeciesConcentration_identityActivityModel_helper();
 }
 
 

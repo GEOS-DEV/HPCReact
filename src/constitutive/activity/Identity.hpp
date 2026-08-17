@@ -24,10 +24,8 @@ public:
   using RealType = REAL_TYPE;
   using IndexType = INDEX_TYPE;
 
-  struct Params
-  {
-    HPCREACT_HOST_DEVICE static constexpr IndexType numSpecies() { return IONIC_STRENGTH_TYPE::Params::numSpecies(); }
-  };
+  struct Params : public IONIC_STRENGTH_TYPE::Params
+  {};
 
   /**
    * @brief Ideal solution: gamma = 1 for every species, so ln(gamma) = 0 and all derivatives vanish.
