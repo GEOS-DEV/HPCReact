@@ -13,6 +13,7 @@
 #include "reactions/geochemistry/GeochemicalSystems.hpp"
 #include "common/pmpl.hpp"
 #include "common/printers.hpp"
+#include <math.h>
 
 
 #include <gtest/gtest.h>
@@ -23,7 +24,7 @@ using namespace hpcReact::geochemistry;
 
 
 template< int numPrimarySpecies, int numSecondarySpecies >
-struct CalculateLogSecondarySpeciesConcentrationData
+struct CalculateLogSecondarySpeciesConcentrationNoActivityUpdateData
 {
   double logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
   double dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{0}};
@@ -40,29 +41,35 @@ struct CalculateLogSecondarySpeciesConcentrationData
 };
 
 
-void test_calculateLogSecondarySpeciesConcentration_helper()
+void test_calculateLogSecondarySpeciesConcentrationNoActivityUpdate_helper()
 {
   static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
   static constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
 
-  CalculateLogSecondarySpeciesConcentrationData< numPrimarySpecies, numSecondarySpecies > data;
+  CalculateLogSecondarySpeciesConcentrationNoActivityUpdateData< numPrimarySpecies, numSecondarySpecies > data;
 
-  pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
+  // What the Identity model would return: gamma = 1, so the secondary activities and
+  // concentrations coincide.
+  double const identityLogSecondaryActivityCoefficients[numSecondarySpecies] = { 0.0 };
+
+  pmpl::genericKernelWrapper( 1, &data, [identityLogSecondaryActivityCoefficients] HPCREACT_DEVICE ( auto * const dataCopy )
   {
-    calculateLogSecondarySpeciesConcentration< double,
-                                               int,
-                                               int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                      dataCopy->logPrimarySpeciesSolution,
-                                                      dataCopy->logSecondarySpeciesConcentrations );
+    calculateLogSecondarySpeciesConcentrationNoActivityUpdate< double,
+                                                               int,
+                                                               int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                                      dataCopy->logPrimarySpeciesSolution,
+                                                                      identityLogSecondaryActivityCoefficients,
+                                                                      dataCopy->logSecondarySpeciesConcentrations );
 
 
 
-    calculateLogSecondarySpeciesConcentrationWrtLogC< double,
-                                                      int,
-                                                      int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                             dataCopy->logPrimarySpeciesSolution,
-                                                             dataCopy->logSecondarySpeciesConcentrations,
-                                                             dataCopy->dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+    calculateLogSecondarySpeciesConcentrationWrtLogCNoActivityUpdate< double,
+                                                                      int,
+                                                                      int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                                             dataCopy->logPrimarySpeciesSolution,
+                                                                             identityLogSecondaryActivityCoefficients,
+                                                                             dataCopy->logSecondarySpeciesConcentrations,
+                                                                             dataCopy->dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
   } );
 
 
@@ -114,16 +121,23 @@ void test_calculateLogSecondarySpeciesConcentration_helper()
   }
 }
 
-TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration )
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentrationNoActivityUpdate )
 {
-  test_calculateLogSecondarySpeciesConcentration_helper();
+  test_calculateLogSecondarySpeciesConcentrationNoActivityUpdate_helper();
 }
 
 
-template< int numPrimarySpecies >
-struct CalculateAggregatePrimaryConcentrationsWrtLogCHelperData
+template< int numPrimarySpecies, int numSecondarySpecies, int numSpecies >
+struct CalculateLogSecondarySpeciesConcentrationData
 {
-  double const primarySpeciesSolution[numPrimarySpecies] =
+  double logSecondarySpeciesConcentrations[numSecondarySpecies] = {0};
+  double logActivityCoefficients[numSpecies] = {0};
+  double logActivities[numSpecies] = {0};
+  double dLogActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
+  double dLogActivityCoefficients_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
+  bool converged = false;
+
+  double const logPrimarySpeciesSolution[numPrimarySpecies] =
   {
     log( 0.00043969547214915125 ),
     log( 0.00037230096984514874 ),
@@ -133,25 +147,341 @@ struct CalculateAggregatePrimaryConcentrationsWrtLogCHelperData
     log( 0.009881874292035079 ),
     log( 1.0723078278653704 )
   };
+};
 
+/**
+ * @brief Verify the coupled secondary concentration and activity coefficient solve is
+ *   self-consistent.
+ * @param massActionTolerance tolerance on the equilibrium residual.
+ *
+ * Ionic strength couples the secondary concentrations and the activity coefficients, so a Newton
+ * iteration updates both together. The checks below are on the returned state itself, which is why
+ * one helper serves any activity model:
+ *   - mass action holds on the activities, to massActionTolerance
+ *   - a = C*gamma for the secondary species, to 1e-12
+ *   - a = C*gamma for the primary species, to 1e-12
+ */
+template< typename ACTIVITY_MODEL, typename EQ_PARAMS, typename ACTIVITY_PARAMS >
+void test_calculateLogSecondarySpeciesConcentration_helper( EQ_PARAMS const eqParams,
+                                                            ACTIVITY_PARAMS const activityParams,
+                                                            double const massActionTolerance )
+{
+  static constexpr int numPrimarySpecies   = EQ_PARAMS::numPrimarySpecies();
+  static constexpr int numSecondarySpecies = EQ_PARAMS::numSecondarySpecies();
+  static constexpr int numSpecies          = EQ_PARAMS::numSpecies();
+
+  CalculateLogSecondarySpeciesConcentrationData< numPrimarySpecies, numSecondarySpecies, numSpecies > data;
+
+  pmpl::genericKernelWrapper( 1, &data, [eqParams, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
+  {
+    dataCopy->converged =
+      calculateLogSecondarySpeciesConcentration< double,
+                                                 int,
+                                                 int,
+                                                 ACTIVITY_MODEL,
+                                                 true >( eqParams,
+                                                         activityParams,
+                                                         dataCopy->logPrimarySpeciesSolution,
+                                                         dataCopy->logSecondarySpeciesConcentrations,
+                                                         dataCopy->logActivityCoefficients,
+                                                         dataCopy->logActivities,
+                                                         dataCopy->dLogActivities_dLogSpeciesConcentrations,
+                                                         dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations );
+  } );
+
+  EXPECT_TRUE( data.converged );
+
+  // The equilibrium constraint must hold at the returned state:
+  //   log(a_j) + log(K_j) - sum_k nu_jk log(a_k) = 0
+  for( int j = 0; j < numSecondarySpecies; ++j )
+  {
+    double residual = data.logActivities[j] + log( eqParams.equilibriumConstant( j ) );
+    for( int k = 0; k < numPrimarySpecies; ++k )
+    {
+      residual -= eqParams.stoichiometricMatrix( j, k + numSecondarySpecies ) *
+                  data.logActivities[k + numSecondarySpecies];
+    }
+    EXPECT_NEAR( residual, 0.0, massActionTolerance ) << "mass action violated, secondary species " << j;
+  }
+
+  // Concentrations, activity coefficients and activities must be mutually consistent.
+  for( int j = 0; j < numSecondarySpecies; ++j )
+  {
+    EXPECT_NEAR( data.logActivities[j],
+                 data.logSecondarySpeciesConcentrations[j] + data.logActivityCoefficients[j],
+                 1.0e-12 ) << "a != c*gamma, secondary species " << j;
+  }
+
+  // The primary concentrations were held fixed, so their activities follow from them directly.
+  for( int k = 0; k < numPrimarySpecies; ++k )
+  {
+    EXPECT_NEAR( data.logActivities[k + numSecondarySpecies],
+                 data.logPrimarySpeciesSolution[k] + data.logActivityCoefficients[k + numSecondarySpecies],
+                 1.0e-12 ) << "a != c*gamma, primary species " << k;
+  }
+}
+
+// Two systems, each with the Identity and B-dot activity models: carbonateSystemAllEquilibrium
+// (all reactions at equilibrium) and carbonateSystem (mixed equilibrium and kinetic).
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_allEquilibrium_identity )
+{
+  test_calculateLogSecondarySpeciesConcentration_helper< carbonateIdentityActivityType >(
+    carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+    carbonateIdentityActivityParams,
+    1.0e-12 );
+}
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_allEquilibrium_bdot )
+{
+  test_calculateLogSecondarySpeciesConcentration_helper< carbonateActivityType >(
+    carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+    carbonateActivityParamsEQ36,
+    1.0e-9 );
+}
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_mixedSystem_identity )
+{
+  test_calculateLogSecondarySpeciesConcentration_helper< carbonateNosolidIdentityActivityType >(
+    carbonateSystem.equilibriumReactionsParameters(),
+    carbonateNosolidIdentityActivityParams,
+    1.0e-12 );
+}
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_mixedSystem_bdot )
+{
+  test_calculateLogSecondarySpeciesConcentration_helper< carbonateNosolidActivityType >(
+    carbonateSystem.equilibriumReactionsParameters(),
+    carbonateNosolidActivityParams,
+    1.0e-9 );
+}
+
+/**
+ * @brief With the Identity model the solve must reproduce the reference solution.
+ */
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentration_identityActivityModel )
+{
+  static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  static constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
+  static constexpr int numSpecies = carbonateSystemAllEquilibrium.numSpecies();
+
+  CalculateLogSecondarySpeciesConcentrationData< numPrimarySpecies, numSecondarySpecies, numSpecies > data;
+
+  pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
+  {
+    dataCopy->converged =
+      calculateLogSecondarySpeciesConcentration< double,
+                                                 int,
+                                                 int,
+                                                 carbonateIdentityActivityType,
+                                                 true >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                         carbonateIdentityActivityParams,
+                                                         dataCopy->logPrimarySpeciesSolution,
+                                                         dataCopy->logSecondarySpeciesConcentrations,
+                                                         dataCopy->logActivityCoefficients,
+                                                         dataCopy->logActivities,
+                                                         dataCopy->dLogActivities_dLogSpeciesConcentrations,
+                                                         dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations );
+  } );
+
+  // Reference solution, as in test_calculateLogSecondarySpeciesConcentrationNoActivityUpdate above:
+  // gamma = 1 makes the ideal seed exact, so the Newton has nothing to correct.
+  double const expectedSecondarySpeciesConcentrations[numSecondarySpecies] =
+  {
+    2.3278416955869804e-11,
+    0.37035984325260107,
+    3.956656978189425e-11,
+    9.1316525616762169e-05,
+    0.007654372189572687,
+    0.13676171061473555,
+    0.012773193926706526,
+    0.0041586871002752598,
+    0.013225336595688551,
+    0.00024148987937519677
+  };
+
+  for( int j = 0; j < numSecondarySpecies; ++j )
+  {
+    EXPECT_NEAR( exp( data.logSecondarySpeciesConcentrations[j] ),
+                 expectedSecondarySpeciesConcentrations[j],
+                 1.0e-8 );
+    EXPECT_NEAR( data.logActivityCoefficients[j], 0.0, 1.0e-15 );
+  }
+}
+
+
+template< int numPrimarySpecies, int numSecondarySpecies, int numSpecies >
+struct SpeciationDerivativeData : public CalculateLogSecondarySpeciesConcentrationData< numPrimarySpecies, numSecondarySpecies, numSpecies >
+{
+  double analytic[numSecondarySpecies][numPrimarySpecies] = {{0}};
+  double finiteDifference[numSecondarySpecies][numPrimarySpecies] = {{0}};
+};
+
+/**
+ * @brief Check d log(C_sec)/d log(C_prim) against a central difference of the solve itself.
+ *
+ * This derivative feeds the outer Newton that solves for the primary concentrations given the
+ * aggregate totals for equilibrium reaction run.
+ */
+template< typename ACTIVITY_MODEL, typename EQ_PARAMS, typename ACTIVITY_PARAMS >
+void test_calculateLogSecondarySpeciesConcentrationWrtLogC_helper( EQ_PARAMS const eqParams,
+                                                                   ACTIVITY_PARAMS const activityParams,
+                                                                   double const tolerance )
+{
+  static constexpr int numPrimarySpecies   = EQ_PARAMS::numPrimarySpecies();
+  static constexpr int numSecondarySpecies = EQ_PARAMS::numSecondarySpecies();
+  static constexpr int numSpecies          = EQ_PARAMS::numSpecies();
+
+  SpeciationDerivativeData< numPrimarySpecies, numSecondarySpecies, numSpecies > data;
+
+  pmpl::genericKernelWrapper( 1, &data, [eqParams, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
+  {
+    dataCopy->converged =
+      calculateLogSecondarySpeciesConcentrationWrtLogC< double,
+                                                        int,
+                                                        int,
+                                                        ACTIVITY_MODEL,
+                                                        true >( eqParams,
+                                                                activityParams,
+                                                                dataCopy->logPrimarySpeciesSolution,
+                                                                dataCopy->logSecondarySpeciesConcentrations,
+                                                                dataCopy->logActivityCoefficients,
+                                                                dataCopy->logActivities,
+                                                                dataCopy->dLogActivities_dLogSpeciesConcentrations,
+                                                                dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                                                dataCopy->analytic );
+
+    double constexpr perturbation = 1.0e-6;
+
+    for( int n = 0; n < numPrimarySpecies; ++n )
+    {
+      double logSecondaryPerturbed[2][numSecondarySpecies] = {{0}};
+
+      for( int side = 0; side < 2; ++side )
+      {
+        double logPrimaryPerturbed[numPrimarySpecies] = {0};
+        for( int k = 0; k < numPrimarySpecies; ++k )
+        {
+          logPrimaryPerturbed[k] = dataCopy->logPrimarySpeciesSolution[k];
+        }
+        logPrimaryPerturbed[n] += ( side == 0 ? perturbation : -perturbation );
+
+        // Scratch: only the concentrations are wanted here.
+        double logActivityCoefficients[numSpecies] = {0};
+        double logActivities[numSpecies] = {0};
+        double dLogActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
+        double dLogActivityCoefficients_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
+
+        calculateLogSecondarySpeciesConcentration< double,
+                                                   int,
+                                                   int,
+                                                   ACTIVITY_MODEL,
+                                                   true >( eqParams,
+                                                           activityParams,
+                                                           logPrimaryPerturbed,
+                                                           logSecondaryPerturbed[side],
+                                                           logActivityCoefficients,
+                                                           logActivities,
+                                                           dLogActivities_dLogSpeciesConcentrations,
+                                                           dLogActivityCoefficients_dLogSpeciesConcentrations );
+      }
+
+      for( int j = 0; j < numSecondarySpecies; ++j )
+      {
+        dataCopy->finiteDifference[j][n] =
+          ( logSecondaryPerturbed[0][j] - logSecondaryPerturbed[1][j] ) / ( 2.0 * perturbation );
+      }
+    }
+  } );
+
+  EXPECT_TRUE( data.converged );
+
+  for( int j = 0; j < numSecondarySpecies; ++j )
+  {
+    for( int n = 0; n < numPrimarySpecies; ++n )
+    {
+      EXPECT_NEAR( data.analytic[j][n], data.finiteDifference[j][n], tolerance )
+        << "d log(C_sec[" << j << "])/d log(C_prim[" << n << "])";
+    }
+  }
+}
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentrationWrtLogC_allEquilibrium_identity )
+{
+  test_calculateLogSecondarySpeciesConcentrationWrtLogC_helper< carbonateIdentityActivityType >(
+    carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+    carbonateIdentityActivityParams,
+    1.0e-7 );
+}
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentrationWrtLogC_allEquilibrium_bdot )
+{
+  test_calculateLogSecondarySpeciesConcentrationWrtLogC_helper< carbonateActivityType >(
+    carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+    carbonateActivityParamsEQ36,
+    1.0e-7 );
+}
+
+TEST( testMassActions, test_calculateLogSecondarySpeciesConcentrationWrtLogC_mixedSystem_bdot )
+{
+  test_calculateLogSecondarySpeciesConcentrationWrtLogC_helper< carbonateNosolidActivityType >(
+    carbonateSystem.equilibriumReactionsParameters(),
+    carbonateNosolidActivityParams,
+    1.0e-7 );
+}
+
+
+template< int numPrimarySpecies, int numSecondarySpecies, int numSpecies >
+struct CalculateAggregatePrimaryConcentrationsWrtLogCHelperData
+  : public CalculateLogSecondarySpeciesConcentrationData< numPrimarySpecies, numSecondarySpecies, numSpecies >
+{
+  double dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{0}};
   double aggregatePrimarySpeciesConcentration[numPrimarySpecies] = {0};
   CArrayWrapper< double, numPrimarySpecies, numPrimarySpecies > dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations;
 
 };
 
+/**
+ * @brief Check the aggregate mole balance against the ideal-solution reference values.
+ *
+ * The aggregate is a pure mole balance on whatever secondary state it is handed, so the reference
+ * values below are reached through the Identity activity model rather than through a separate
+ * ideal-solution entry point.
+ */
 void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
 {
-  static constexpr int numPrimarySpecies = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  static constexpr int numPrimarySpecies   = carbonateSystemAllEquilibrium.numPrimarySpecies();
+  static constexpr int numSecondarySpecies = carbonateSystemAllEquilibrium.numSecondarySpecies();
+  static constexpr int numSpecies          = carbonateSystemAllEquilibrium.numSpecies();
 
-  CalculateAggregatePrimaryConcentrationsWrtLogCHelperData< numPrimarySpecies > data;
+  CalculateAggregatePrimaryConcentrationsWrtLogCHelperData< numPrimarySpecies, numSecondarySpecies, numSpecies > data;
 
   pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
   {
+    dataCopy->converged =
+      calculateLogSecondarySpeciesConcentrationWrtLogC< double,
+                                                        int,
+                                                        int,
+                                                        carbonateIdentityActivityType,
+                                                        true >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                                carbonateIdentityActivityParams,
+                                                                dataCopy->logPrimarySpeciesSolution,
+                                                                dataCopy->logSecondarySpeciesConcentrations,
+                                                                dataCopy->logActivityCoefficients,
+                                                                dataCopy->logActivities,
+                                                                dataCopy->dLogActivities_dLogSpeciesConcentrations,
+                                                                dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                                                dataCopy->dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+
     calculateAggregatePrimaryConcentrationsWrtLogC< double, int, int >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                                        dataCopy->primarySpeciesSolution,
+                                                                        dataCopy->logPrimarySpeciesSolution,
+                                                                        dataCopy->logSecondarySpeciesConcentrations,
+                                                                        dataCopy->dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                                                         dataCopy->aggregatePrimarySpeciesConcentration,
                                                                         dataCopy->dAggregatePrimarySpeciesConcentrationsDerivatives_dLogPrimarySpeciesConcentrations );
   } );
+
+  EXPECT_TRUE( data.converged );
 
   double const expectedAggregatePrimarySpeciesConcentration[numPrimarySpecies] =
   {

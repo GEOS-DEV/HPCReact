@@ -67,63 +67,39 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
   {
-    RealType logSpeciesConcentration[numSpecies] = { 0.0 };
     RealType logSpeciesActivities[numSpecies] = { 0.0 };
     RealType dLogSpeciesActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
-    RealType logPrimaryActivities[numPrimarySpecies] = { 0.0 };
-    RealType dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[numPrimarySpecies][numPrimarySpecies] = {{ 0.0 }};
-    RealType logSecondarySpeciesConcentrations_guess[numSecondarySpecies] = { 0.0 };
     RealType dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
+    RealType logSpeciesActivityCoefficients[numSpecies] = { 0.0 };
+    RealType dLogSpeciesActivityCoefficients_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
 
+    // Secondary concentrations, activity coefficients and activities are solved together at the
+    // given primary concentrations, so on return all three are mutually consistent and satisfy the
+    // mass action law, and the derivative is the exact one for that converged state rather than
+    // the frozen activity coefficient approximation.
     massActions::calculateLogSecondarySpeciesConcentrationWrtLogC< REAL_TYPE,
                                                                    INT_TYPE,
-                                                                   INDEX_TYPE >( params.equilibriumReactionsParameters(),
-                                                                                 logPrimarySpeciesConcentrations,
-                                                                                 logSecondarySpeciesConcentrations_guess,
-                                                                                 dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
-    for( IntType i = 0; i < numSecondarySpecies; ++i )
-    {
-      logSpeciesConcentration[i] = logSecondarySpeciesConcentrations_guess[i];
-    }
-    for( IntType i = 0; i < numPrimarySpecies; ++i )
-    {
-      logSpeciesConcentration[i + numSecondarySpecies] = logPrimarySpeciesConcentrations[i];
-    }
+                                                                   INDEX_TYPE,
+                                                                   ACTIVITY_MODEL,
+                                                                   true >( params.equilibriumReactionsParameters(),
+                                                                           activityParams,
+                                                                           logPrimarySpeciesConcentrations,
+                                                                           logSecondarySpeciesConcentrations,
+                                                                           logSpeciesActivityCoefficients,
+                                                                           logSpeciesActivities,
+                                                                           dLogSpeciesActivities_dLogSpeciesConcentrations,
+                                                                           dLogSpeciesActivityCoefficients_dLogSpeciesConcentrations,
+                                                                           dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
 
-    calculateActivities< RealType,
-                         IntType,
-                         IndexType,
-                         ACTIVITY_MODEL,
-                         true >( activityParams,
-                                 logSpeciesConcentration,
-                                 logSpeciesActivities,
-                                 dLogSpeciesActivities_dLogSpeciesConcentrations );
-
-    for( IntType i = 0; i < numPrimarySpecies; ++i )
-    {
-      IntType const fullRow = i + numSecondarySpecies;
-      logPrimaryActivities[i] = logSpeciesActivities[fullRow];
-
-      for( IntType j = 0; j < numPrimarySpecies; ++j )
-      {
-        RealType value = dLogSpeciesActivities_dLogSpeciesConcentrations[fullRow][j + numSecondarySpecies];
-        for( IntType k = 0; k < numSecondarySpecies; ++k )
-        {
-          value += dLogSpeciesActivities_dLogSpeciesConcentrations[fullRow][k] *
-                   dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[k][j];
-        }
-        dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[i][j] = value;
-      }
-    }
-
-    // 1. Compute new aggregate species from primary species
+    // 1. Compute new aggregate species from primary and secondary species. Pure mole balance on
+    //    the solved state: the activity model is already accounted for in the calculation of the
+    //    two secondary species arrays, so nothing here reconstructs it.
     massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
                                                                                INT_TYPE,
                                                                                INDEX_TYPE >( params.equilibriumReactionsParameters(),
                                                                                              logPrimarySpeciesConcentrations,
-                                                                                             logPrimaryActivities,
-                                                                                             dLogPrimaryActivities_dLogPrimarySpeciesConcentrations,
                                                                                              logSecondarySpeciesConcentrations,
+                                                                                             dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                                                                              aggregatePrimarySpeciesConcentrations,
                                                                                              mobileAggregatePrimarySpeciesConcentrations,
                                                                                              dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
