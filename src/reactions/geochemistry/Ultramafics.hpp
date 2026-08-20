@@ -25,38 +25,63 @@ namespace geochemistry
 namespace ultramafics
 {
 
-constexpr CArrayWrapper<signed char, 21, 25> stoichMatrix = 
-{ //      OH-   CO2(aq)      CO3--      Mg2OH+++   Mg4(OH)++++   MgOH+   Mg2CO3++   MgCO3(aq)   MgHCO3+   Mg(H3SiO4)2      MgH2SiO4     MgH3SiO4+   H2SiO4--   H3SiO4-      H4(H2SiO4)----   H6(H2SiO4)--   Mg2SiO4   MgCO3   SiO2    Mg3Si2O5(OH)4     Mg(OH)2     H+      HCO3-      Mg++   SiO2(aq)  
-    {    -1,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        0,        0   }, //  OH- + H+ = H2O          
-    {     0,        -1,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,         1,       1,        0,        0   }, //  CO2(aq) + H2O = HCO3- + H+   
-    {     0,         0,      -1,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       1,        0,        0   }, //  CO3-- + H+ = HCO3-        
-    {     0,         0,       0,         -1,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        2,        0   }, //  Mg2OH+++ + H+ = 2Mg++ + H2O 
-    {     0,         0,       0,          0,         -1,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -4,       0,        4,        0   }, //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O 
-    {     0,         0,       0,          0,          0,      -1,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        1,        0   }, //  MgOH+ + H+ = Mg++ + H2O 
-    {     0,         0,       0,          0,          0,       0,         -1,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       1,        2,        0   }, //  Mg2CO3++ + H+ = 2Mg++ + HCO3- 
-    {     0,         0,       0,          0,          0,       0,          0,          -1,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       1,        1,        0   }, //  MgCO3 + H+ = Mg++ + HCO3- 
-    {     0,         0,       0,          0,          0,       0,          0,           0,        -1,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,         0,       1,        1,        0   }, //  MgHCO3+ = Mg++ + HCO3- 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,            -1,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -2,       0,        1,        1   }, //  Mg(H3SiO4)2 + 2H+ = Mg++ + SiO2(aq) + 4H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,         -1,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -2,       0,        1,        1   }, //  MgH2SiO4 + 2H+ = Mg++ + SiO2(aq) + 2H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,          -1,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        1,        1   }, //  MgH3SiO4+ + H+ = Mg++ + SiO2(aq) + 2H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,         -1,         0,            0,              0,         0,       0,         0,           0,           0,        -2,       0,        0,        1   }, //  H2SiO4-- + 2H+ = SiO2(aq) + 2H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,        -1,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        0,        1   }, //  H3SiO4- + H+ = SiO2(aq) + 2H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,           -1,              0,         0,       0,         0,           0,           0,        -4,       0,        0,        4   }, //  H4(H2SiO4)---- + 4H+ = 4SiO2(aq) + 8H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,             -1,         0,       0,         0,           0,           0,        -2,       0,        0,        4   }, //  H6(H2SiO4)-- + 2H+ = 4SiO2 + 8H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,        -1,       0,         0,           0,           0,        -4,       0,        2,        1   }, //  Mg2SiO4 + 4H+ = 2Mg++ + SiO2(aq) + 2H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,      -1,         0,           0,           0,        -1,       1,        1,        0   }, //  MgCO3 + H+ = Mg++ + HCO3- 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,        -1,           0,           0,         0,       0,        0,        1   }, //  SiO2 = SiO2(aq) 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,          -1,           0,        -6,       0,        3,        2   }, //  Mg3Si2O5(OH)4 + 6H+ = 3Mg++ + 2SiO2(aq) + 5H2O 
-    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,          -1,        -2,       0,        1,        0   }  //  Mg(OH)2 + 2H+ = Mg++ + 2H2O 
+constexpr CArrayWrapper<signed char, 21, 25> stoichMatrix =
+{ //      OH-   CO2(aq)      CO3--      Mg2OH+++   Mg4(OH)++++   MgOH+   Mg2CO3++   MgCO3(aq)   MgHCO3+   Mg(H3SiO4)2      MgH2SiO4     MgH3SiO4+   H2SiO4--   H3SiO4-      H4(H2SiO4)----   H6(H2SiO4)--   Mg2SiO4   MgCO3   SiO2    Mg3Si2O5(OH)4     Mg(OH)2     H+      HCO3-      Mg++   SiO2(aq)
+    {    -1,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        0,        0   }, //  OH- + H+ = H2O
+    {     0,        -1,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,         1,       1,        0,        0   }, //  CO2(aq) + H2O = HCO3- + H+
+    {     0,         0,      -1,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       1,        0,        0   }, //  CO3-- + H+ = HCO3-
+    {     0,         0,       0,         -1,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        2,        0   }, //  Mg2OH+++ + H+ = 2Mg++ + H2O
+    {     0,         0,       0,          0,         -1,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -4,       0,        4,        0   }, //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O
+    {     0,         0,       0,          0,          0,      -1,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        1,        0   }, //  MgOH+ + H+ = Mg++ + H2O
+    {     0,         0,       0,          0,          0,       0,         -1,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       1,        2,        0   }, //  Mg2CO3++ + H+ = 2Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,          -1,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       1,        1,        0   }, //  MgCO3 + H+ = Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,           0,        -1,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,         0,       1,        1,        0   }, //  MgHCO3+ = Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,            -1,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -2,       0,        1,        1   }, //  Mg(H3SiO4)2 + 2H+ = Mg++ + SiO2(aq) + 4H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,         -1,           0,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -2,       0,        1,        1   }, //  MgH2SiO4 + 2H+ = Mg++ + SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,          -1,          0,         0,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        1,        1   }, //  MgH3SiO4+ + H+ = Mg++ + SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,         -1,         0,            0,              0,         0,       0,         0,           0,           0,        -2,       0,        0,        1   }, //  H2SiO4-- + 2H+ = SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,        -1,            0,              0,         0,       0,         0,           0,           0,        -1,       0,        0,        1   }, //  H3SiO4- + H+ = SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,           -1,              0,         0,       0,         0,           0,           0,        -4,       0,        0,        4   }, //  H4(H2SiO4)---- + 4H+ = 4SiO2(aq) + 8H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,             -1,         0,       0,         0,           0,           0,        -2,       0,        0,        4   }, //  H6(H2SiO4)-- + 2H+ = 4SiO2 + 8H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,        -1,       0,         0,           0,           0,        -4,       0,        2,        1   }, //  Mg2SiO4 + 4H+ = 2Mg++ + SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,      -1,         0,           0,           0,        -1,       1,        1,        0   }, //  MgCO3 + H+ = Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,        -1,           0,           0,         0,       0,        0,        1   }, //  SiO2 = SiO2(aq)
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,          -1,           0,        -6,       0,        3,        2   }, //  Mg3Si2O5(OH)4 + 6H+ = 3Mg++ + 2SiO2(aq) + 5H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,         0,       0,         0,           0,          -1,        -2,       0,        1,        0   }  //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
   };
 
-// 2Mg2SiO4 + 3H2O → Mg3Si2O5(OH)4 + Mg(OH)2 Serpentinization reaction  
+constexpr CArrayWrapper<signed char, 21, 20> stoichMatrixNosolid =
+{ //      OH-   CO2(aq)      CO3--      Mg2OH+++   Mg4(OH)++++   MgOH+   Mg2CO3++   MgCO3(aq)   MgHCO3+   Mg(H3SiO4)2      MgH2SiO4     MgH3SiO4+   H2SiO4--   H3SiO4-      H4(H2SiO4)----   H6(H2SiO4)--   H+      HCO3-      Mg++   SiO2(aq)
+    {    -1,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       0,        0,        0   }, //  OH- + H+ = H2O
+    {     0,        -1,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,           1,       1,        0,        0   }, //  CO2(aq) + H2O = HCO3- + H+
+    {     0,         0,      -1,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       1,        0,        0   }, //  CO3-- + H+ = HCO3-
+    {     0,         0,       0,         -1,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       0,        2,        0   }, //  Mg2OH+++ + H+ = 2Mg++ + H2O
+    {     0,         0,       0,          0,         -1,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -4,       0,        4,        0   }, //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O
+    {     0,         0,       0,          0,          0,      -1,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       0,        1,        0   }, //  MgOH+ + H+ = Mg++ + H2O
+    {     0,         0,       0,          0,          0,       0,         -1,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       1,        2,        0   }, //  Mg2CO3++ + H+ = 2Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,          -1,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       1,        1,        0   }, //  MgCO3 + H+ = Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,           0,        -1,             0,          0,           0,          0,         0,            0,              0,           0,       1,        1,        0   }, //  MgHCO3+ = Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,            -1,          0,           0,          0,         0,            0,              0,          -2,       0,        1,        1   }, //  Mg(H3SiO4)2 + 2H+ = Mg++ + SiO2(aq) + 4H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,         -1,           0,          0,         0,            0,              0,          -2,       0,        1,        1   }, //  MgH2SiO4 + 2H+ = Mg++ + SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,          -1,          0,         0,            0,              0,          -1,       0,        1,        1   }, //  MgH3SiO4+ + H+ = Mg++ + SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,         -1,         0,            0,              0,          -2,       0,        0,        1   }, //  H2SiO4-- + 2H+ = SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,        -1,            0,              0,          -1,       0,        0,        1   }, //  H3SiO4- + H+ = SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,           -1,              0,          -4,       0,        0,        4   }, //  H4(H2SiO4)---- + 4H+ = 4SiO2(aq) + 8H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,             -1,          -2,       0,        0,        4   }, //  H6(H2SiO4)-- + 2H+ = 4SiO2 + 8H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -4,       0,        2,        1   }, //  Mg2SiO4 + 4H+ = 2Mg++ + SiO2(aq) + 2H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -1,       1,        1,        0   }, //  MgCO3 + H+ = Mg++ + HCO3-
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,           0,       0,        0,        1   }, //  SiO2 = SiO2(aq)
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -6,       0,        3,        2   }, //  Mg3Si2O5(OH)4 + 6H+ = 3Mg++ + 2SiO2(aq) + 5H2O
+    {     0,         0,       0,          0,          0,       0,          0,           0,         0,             0,          0,           0,          0,         0,            0,              0,          -2,       0,        1,        0   }  //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
+  };
 
-constexpr CArrayWrapper<double, 21> equilibriumConstants = 
-  { 
-    9.89E+13,   //  OH- + H+ = H2O         
-    4.42E-07,   //  CO2(aq) + H2O = HCO3- + H+  
-    2.23E+10,   //  CO3-- + H+ = HCO3-       
+// 2Mg2SiO4 + 3H2O → Mg3Si2O5(OH)4 + Mg(OH)2 Serpentinization reaction
+
+constexpr CArrayWrapper<double, 21> equilibriumConstants =
+  {
+    9.89E+13,   //  OH- + H+ = H2O
+    4.42E-07,   //  CO2(aq) + H2O = HCO3- + H+
+    2.23E+10,   //  CO3-- + H+ = HCO3-
     2.32E+13,   //  Mg2OH+++ + H+ = 2Mg++ + H2O
     4.47E+39,   //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O
     6.18E+11,   //  MgOH+ + H+ = Mg++ + H2O
@@ -77,11 +102,11 @@ constexpr CArrayWrapper<double, 21> equilibriumConstants =
     2.75E+16    //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
   };
 
-constexpr CArrayWrapper<double, 21> forwardRates = 
-  { 
-    1.00E+10,   //  OH- + H+ = H2O         
-    1.00E+10,   //  CO2(aq) + H2O = HCO3- + H+  
-    1.00E+10,   //  CO3-- + H+ = HCO3-       
+constexpr CArrayWrapper<double, 21> forwardRates =
+  {
+    1.00E+10,   //  OH- + H+ = H2O
+    1.00E+10,   //  CO2(aq) + H2O = HCO3- + H+
+    1.00E+10,   //  CO3-- + H+ = HCO3-
     1.00E+10,   //  Mg2OH+++ + H+ = 2Mg++ + H2O
     1.00E+10,   //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O
     1.00E+10,   //  MgOH+ + H+ = Mg++ + H2O
@@ -102,11 +127,11 @@ constexpr CArrayWrapper<double, 21> forwardRates =
     5.75E-09    //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
   };
 
-constexpr CArrayWrapper<double, 21> reverseRates = 
-  { 
-    1.00E+10,   //  OH- + H+ = H2O         
-    1.00E+10,   //  CO2(aq) + H2O = HCO3- + H+  
-    1.00E+10,   //  CO3-- + H+ = HCO3-       
+constexpr CArrayWrapper<double, 21> reverseRates =
+  {
+    1.00E+10,   //  OH- + H+ = H2O
+    1.00E+10,   //  CO2(aq) + H2O = HCO3- + H+
+    1.00E+10,   //  CO3-- + H+ = HCO3-
     1.00E+10,   //  Mg2OH+++ + H+ = 2Mg++ + H2O
     1.00E+10,   //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O
     1.00E+10,   //  MgOH+ + H+ = Mg++ + H2O
@@ -127,11 +152,11 @@ constexpr CArrayWrapper<double, 21> reverseRates =
     2.10E-25    //  Mg(OH)2 + 2H+ = Mg++ + 2H2O
   };
 
-constexpr CArrayWrapper<int, 21> mobileSpeciesFlag = 
-  { 
-    1,   //  OH- + H+ = H2O         
-    1,   //  CO2(aq) + H2O = HCO3- + H+  
-    1,   //  CO3-- + H+ = HCO3-       
+constexpr CArrayWrapper<int, 21> mobileSpeciesFlag =
+  {
+    1,   //  OH- + H+ = H2O
+    1,   //  CO2(aq) + H2O = HCO3- + H+
+    1,   //  CO3-- + H+ = HCO3-
     1,   //  Mg2OH+++ + H+ = 2Mg++ + H2O
     1,   //  Mg4(OH)++++ + 4H+ = 4Mg++ + 4H2O
     1,   //  MgOH+ + H+ = Mg++ + H2O
@@ -155,11 +180,11 @@ constexpr CArrayWrapper<int, 21> mobileSpeciesFlag =
 
   using ultramaficSystemAllKineticType     = reactionsSystems::MixedReactionsParameters< double, int, signed char, 25, 21, 0 >;
   using ultramaficSystemAllEquilibriumType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 25, 21, 21 >;
-  using ultramaficSystemType               = reactionsSystems::MixedReactionsParameters< double, int, signed char, 25, 21, 16 >;
+  using ultramaficSystemType               = reactionsSystems::MixedReactionsParameters< double, int, signed char, 20, 21, 16 >;
 
   constexpr ultramaficSystemAllKineticType     ultramaficSystemAllKinetic( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
   constexpr ultramaficSystemAllEquilibriumType ultramaficSystemAllEquilibrium( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
-  constexpr ultramaficSystemType               ultramaficSystem( ultramafics::stoichMatrix, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
+  constexpr ultramaficSystemType               ultramaficSystem( ultramafics::stoichMatrixNosolid, ultramafics::equilibriumConstants, ultramafics::forwardRates, ultramafics::reverseRates, ultramafics::mobileSpeciesFlag );
 
 // *****UNCRUSTIFY-ON******
 } // namespace geochemistry
