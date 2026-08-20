@@ -14,6 +14,7 @@
 #include "macros.hpp"
 #include "DirectSystemSolve.hpp"
 #include <math.h>
+#include <stdio.h>
 
 namespace hpcReact
 {
@@ -170,11 +171,17 @@ bool newtonRaphson( REAL_TYPE (& x)[N],
 
     double const norm = internal::norm< N >( residual );
 
-    printf( "--Iter %d: Residual norm = %.12e\n", iter, norm );
+    if( do_print )
+    {
+      printf( "--Iter %d: Residual norm = %.12e\n", iter, norm ); // LCOV_EXCL_LINE
+    }
 
     if( norm < tol )
     {
-      printf( "--Converged.\n" );
+      if( do_print )
+      {
+        printf( "--Converged.\n" ); // LCOV_EXCL_LINE
+      }
       isConverged = true;
       break;
     }
@@ -190,7 +197,7 @@ bool newtonRaphson( REAL_TYPE (& x)[N],
 
   }
 
-  if( !isConverged )
+  if( !isConverged && do_print )
   {
     printf( "--Newton solver error: Max iterations reached without convergence.\n" ); // LCOV_EXCL_LINE
   }

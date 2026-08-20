@@ -16,6 +16,7 @@
 #include "common/CArrayWrapper.hpp"
 #include "common/macros.hpp"
 
+#include <math.h>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -25,7 +26,16 @@ namespace hpcReact
 namespace reactionsSystems
 {
 
-
+/**
+ * @brief Selects which rate law is used to evaluate kinetic reaction rates.
+ */
+enum class ReactionRateLawOption : int
+{
+  /// \f$ \dot{R}_r = k^f_r \prod [C_i]^{-\nu_{ri}} - k^r_r \prod [C_i]^{\nu_{ri}} \f$
+  Elementary = 0,
+  /// \f$ \dot{R}_r = k_r A_r ( 1 - Q_r / K_r ) \f$
+  Affinity = 1
+};
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
@@ -54,8 +64,8 @@ struct EquilibriumReactionsParameters
   HPCREACT_HOST_DEVICE
   constexpr
   EquilibriumReactionsParameters( CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
-                                  CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant,
-                                  CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag ):
+                                  CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
+                                  CArrayWrapper< IntType, NUM_REACTIONS > const & mobileSecondarySpeciesFlag ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag )
@@ -91,12 +101,12 @@ struct KineticReactionsParameters
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
-                                        IntType const reactionRatesUpdateOption ):
+                                        ReactionRateLawOption const reactionRateLawOption ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_equilibiriumConstant( equilibriumConstant ), // Initialize to empty array
-    m_reactionRatesUpdateOption( reactionRatesUpdateOption )
+    m_reactionRateLawOption( reactionRateLawOption )
   {}
 
 
@@ -105,15 +115,16 @@ struct KineticReactionsParameters
   HPCREACT_HOST_DEVICE RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_rateConstantForward[r] / m_rateConstantReverse[r]; }
 
-  HPCREACT_HOST_DEVICE IntType reactionRatesUpdateOption() const { return m_reactionRatesUpdateOption; }
+  HPCREACT_HOST_DEVICE ReactionRateLawOption reactionRateLawOption() const { return m_reactionRateLawOption; }
 
   CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantForward;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibiriumConstant;
 
-  IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
+  ReactionRateLawOption m_reactionRateLawOption;
 };
+
 
 
 template< typename REAL_TYPE,
@@ -135,14 +146,14 @@ struct MixedReactionsParameters
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
-                                      CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag,
-                                      IntType const reactionRatesUpdateOption = 1 ):
+                                      CArrayWrapper< IntType, NUM_REACTIONS > const & mobileSecondarySpeciesFlag,
+                                      ReactionRateLawOption const reactionRateLawOption = ReactionRateLawOption::Affinity ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag ),
-    m_reactionRatesUpdateOption( reactionRatesUpdateOption )
+    m_reactionRateLawOption( reactionRateLawOption )
   {}
 
   HPCREACT_HOST_DEVICE static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -200,7 +211,7 @@ struct MixedReactionsParameters
       equilibriumConstant( i ) = m_equilibriumConstant( numEquilibriumReactions() + i );
     }
 
-    return { kineticMatrix, rateConstantForward, rateConstantReverse, equilibriumConstant, m_reactionRatesUpdateOption };
+    return { kineticMatrix, rateConstantForward, rateConstantReverse, equilibriumConstant, m_reactionRateLawOption };
   }
 
   HPCREACT_HOST_DEVICE
@@ -229,7 +240,7 @@ struct MixedReactionsParameters
       else // numSpecified == 3
       {
         RealType const absDiff = fabs( K - ( kf / kr ) );
-        RealType const effectiveMagnitude = max( fabs( K ), fabs( kf/kr ));
+        RealType const effectiveMagnitude = fmax( fabs( K ), fabs( kf/kr ));
         RealType const tolerance = effectiveMagnitude * pow( 10, -num_digits );
         if( absDiff > tolerance ) // Tolerance for floating point precision
         {
@@ -250,7 +261,7 @@ struct MixedReactionsParameters
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
   CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
 
-  IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
+  ReactionRateLawOption m_reactionRateLawOption = ReactionRateLawOption::Affinity;
 };
 
 

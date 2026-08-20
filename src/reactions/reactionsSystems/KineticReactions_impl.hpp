@@ -14,6 +14,7 @@
 #include "common/constants.hpp"
 #include "common/CArrayWrapper.hpp"
 #include "common/DirectSystemSolve.hpp"
+#include "constitutive/activity/activity.hpp"
 
 #include <math.h>
 #include <string>
@@ -34,6 +35,7 @@ namespace reactionsSystems
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           bool CALCULATE_DERIVATIVES,
@@ -44,17 +46,18 @@ HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
                   INDEX_TYPE,
+                  ACTIVITY_MODEL,
                   LOGE_CONCENTRATION
-                  >::computeReactionRates_impl( RealType const &, //temperature,
-                                                PARAMS_DATA const & params,
-                                                ARRAY_1D_TO_CONST const & speciesConcentration,
-                                                ARRAY_1D & reactionRates,
-                                                ARRAY_2D & reactionRatesDerivatives )
+                  >::computeReactionRatesElementary_impl( RealType const &, //temperature,
+                                                          PARAMS_DATA const & params,
+                                                          ARRAY_1D_TO_CONST const & activities,
+                                                          ARRAY_1D & reactionRates,
+                                                          ARRAY_2D & dReactionRate_dActivities )
 {
 
   if constexpr( !CALCULATE_DERIVATIVES )
   {
-    HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
+    HPCREACT_UNUSED_VAR( dReactionRate_dActivities );
   }
 
   // loop over each reaction
@@ -80,11 +83,11 @@ KineticReactions< REAL_TYPE,
 
         if( s_ri < 0.0 )
         {
-          productConcForward += (-s_ri) * speciesConcentration[i];
+          productConcForward += (-s_ri) * activities[i];
         }
         else if( s_ri > 0.0 )
         {
-          productConcReverse += s_ri * speciesConcentration[i];
+          productConcReverse += s_ri * activities[i];
         }
       }
 
@@ -98,15 +101,15 @@ KineticReactions< REAL_TYPE,
           RealType const s_ri = params.stoichiometricMatrix( r, i );
           if( s_ri < 0.0 )
           {
-            reactionRatesDerivatives( r, i ) = forwardRateConstant * exp( productConcForward ) * (-s_ri);
+            dReactionRate_dActivities[ r ][ i ] = forwardRateConstant * exp( productConcForward ) * (-s_ri);
           }
           else if( s_ri > 0.0 )
           {
-            reactionRatesDerivatives( r, i ) = -reverseRateConstant * exp( productConcReverse ) * s_ri;
+            dReactionRate_dActivities[ r ][ i ] = -reverseRateConstant * exp( productConcReverse ) * s_ri;
           }
           else
           {
-            reactionRatesDerivatives( r, i ) = 0.0;
+            dReactionRate_dActivities[ r ][ i ] = 0.0;
           }
         }
       }
@@ -130,7 +133,7 @@ KineticReactions< REAL_TYPE,
       {
 
         RealType const s_ri = params.stoichiometricMatrix( r, i );
-        RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], fabs( s_ri ) ) : 0.0;
+        RealType const productTerm_i = activities[i] > 1e-100 ? pow( activities[i], fabs( s_ri ) ) : 0.0;
 
         if( s_ri < 0.0 )
         {
@@ -150,7 +153,7 @@ KineticReactions< REAL_TYPE,
             {
               if( i==j )
               {
-                dProductConcForward_dC[j] *= -s_ri * pow( speciesConcentration[i], -s_ri-1 );
+                dProductConcForward_dC[j] *= -s_ri * pow( activities[i], -s_ri-1 );
                 dProductConcReverse_dC[j] = 0.0;
               }
               else
@@ -165,7 +168,7 @@ KineticReactions< REAL_TYPE,
             {
               if( i==j )
               {
-                dProductConcReverse_dC[j] *= s_ri * pow( speciesConcentration[i], s_ri-1 );
+                dProductConcReverse_dC[j] *= s_ri * pow( activities[i], s_ri-1 );
                 dProductConcForward_dC[j] = 0.0;
               }
               else
@@ -187,7 +190,7 @@ KineticReactions< REAL_TYPE,
       {
         for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
         {
-          reactionRatesDerivatives( r, i ) = forwardRateConstant * dProductConcForward_dC[i] - reverseRateConstant * dProductConcReverse_dC[i];
+          dReactionRate_dActivities[ r ][ i ] = forwardRateConstant * dProductConcForward_dC[i] - reverseRateConstant * dProductConcReverse_dC[i];
         }
       }
     } // end of if constexpr ( LOGE_CONCENTRATION )
@@ -197,6 +200,7 @@ KineticReactions< REAL_TYPE,
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           bool CALCULATE_DERIVATIVES,
@@ -208,17 +212,18 @@ HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
                   INDEX_TYPE,
+                  ACTIVITY_MODEL,
                   LOGE_CONCENTRATION
-                  >::computeReactionRatesQuotient_impl( RealType const &, //temperature,
+                  >::computeReactionRatesAffinity_impl( RealType const &, //temperature,
                                                         PARAMS_DATA const & params,
-                                                        ARRAY_1D_TO_CONST const & speciesConcentration,
+                                                        ARRAY_1D_TO_CONST const & activities,
                                                         ARRAY_1D_SA const & surfaceArea,
                                                         ARRAY_1D & reactionRates,
-                                                        ARRAY_2D & reactionRatesDerivatives )
+                                                        ARRAY_2D & dReactionRates_dActivities )
 {
   if constexpr( !CALCULATE_DERIVATIVES )
   {
-    HPCREACT_UNUSED_VAR( reactionRatesDerivatives );
+    HPCREACT_UNUSED_VAR( dReactionRates_dActivities );
   }
 
   // loop over each reaction
@@ -231,7 +236,7 @@ KineticReactions< REAL_TYPE,
     {
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
-        reactionRatesDerivatives( r, i ) = 0.0;
+        dReactionRates_dActivities[ r ][ i ] = 0.0;
       }
     }
 
@@ -249,7 +254,7 @@ KineticReactions< REAL_TYPE,
       for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
       {
         RealType const s_ri = params.stoichiometricMatrix( r, i );
-        logQuotient += s_ri * speciesConcentration[i];
+        logQuotient += s_ri * activities[i];
       }
       quotient = exp( logQuotient );
 
@@ -258,7 +263,7 @@ KineticReactions< REAL_TYPE,
         for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
         {
           RealType const s_ri = params.stoichiometricMatrix( r, i );
-          reactionRatesDerivatives( r, i ) = -rateConstant * surfaceArea[r] * s_ri * quotient / equilibriumConstant;
+          dReactionRates_dActivities[ r ][ i ] = -rateConstant * surfaceArea[r] * s_ri * quotient / equilibriumConstant;
         }
       } // end of if constexpr ( CALCULATE_DERIVATIVES )
     } // end of if constexpr ( LOGE_CONCENTRATION )
@@ -268,8 +273,11 @@ KineticReactions< REAL_TYPE,
       {
 
         RealType const s_ri = params.stoichiometricMatrix( r, i );
-        RealType const productTerm_i = speciesConcentration[i] > 1e-100 ? pow( speciesConcentration[i], s_ri ) : 0.0;
-        quotient *= productTerm_i;
+        if( s_ri > 0.0 || s_ri < 0.0 )
+        {
+          RealType const productTerm_i = activities[i] > 1e-100 ? pow( activities[i], s_ri ) : 0.0;
+          quotient *= productTerm_i;
+        }
       }
 
       if constexpr( CALCULATE_DERIVATIVES )
@@ -279,11 +287,11 @@ KineticReactions< REAL_TYPE,
           RealType const s_ri = params.stoichiometricMatrix( r, i );
           if( s_ri > 0.0 || s_ri < 0.0 )
           {
-            reactionRatesDerivatives( r, i ) = -rateConstant * surfaceArea[r] * s_ri * quotient / ( equilibriumConstant * speciesConcentration[i] );
+            dReactionRates_dActivities[ r ][ i ] = -rateConstant * surfaceArea[r] * s_ri * quotient / ( equilibriumConstant * activities[i] );
           }
           else
           {
-            reactionRatesDerivatives( r, i ) = 0.0;
+            dReactionRates_dActivities[ r ][ i ] = 0.0;
           }
         }
       } // end of if constexpr ( CALCULATE_DERIVATIVES )
@@ -296,6 +304,7 @@ KineticReactions< REAL_TYPE,
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           bool CALCULATE_DERIVATIVES,
@@ -306,22 +315,27 @@ HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
                   INDEX_TYPE,
+                  ACTIVITY_MODEL,
                   LOGE_CONCENTRATION
                   >::computeSpeciesRates_impl( RealType const & temperature,
                                                PARAMS_DATA const & params,
-                                               ARRAY_1D_TO_CONST const & speciesConcentration,
+                                               ARRAY_1D_TO_CONST const & activities,
                                                ARRAY_1D & speciesRates,
-                                               ARRAY_2D & speciesRatesDerivatives )
+                                               ARRAY_2D & dSpeciesRates_dActivities )
 {
   RealType reactionRates[PARAMS_DATA::numReactions()] = { 0.0 };
-  CArrayWrapper< double, PARAMS_DATA::numReactions(), PARAMS_DATA::numSpecies() > reactionRatesDerivatives;
+  CArrayWrapper< double, PARAMS_DATA::numReactions(), PARAMS_DATA::numSpecies() > dReactionRates_dActivities;
 
   if constexpr( !CALCULATE_DERIVATIVES )
   {
-    HPCREACT_UNUSED_VAR( speciesRatesDerivatives );
+    HPCREACT_UNUSED_VAR( dSpeciesRates_dActivities );
   }
 
-  computeReactionRates< PARAMS_DATA >( temperature, params, speciesConcentration, reactionRates, reactionRatesDerivatives );
+  computeReactionRatesElementary_impl< PARAMS_DATA, true >( temperature,
+                                                            params,
+                                                            activities,
+                                                            reactionRates,
+                                                            dReactionRates_dActivities );
 
   for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
   {
@@ -330,7 +344,7 @@ KineticReactions< REAL_TYPE,
     {
       for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
       {
-        speciesRatesDerivatives( i, j ) = 0.0;
+        dSpeciesRates_dActivities[ i ][ j ] = 0.0;
       }
     }
     for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
@@ -341,7 +355,7 @@ KineticReactions< REAL_TYPE,
       {
         for( IntType j = 0; j < PARAMS_DATA::numSpecies(); ++j )
         {
-          speciesRatesDerivatives( i, j ) += s_ir * reactionRatesDerivatives( r, j );
+          dSpeciesRates_dActivities[ i ][ j ] += s_ir * dReactionRates_dActivities[ r ][ j ];
         }
       }
     }
@@ -351,6 +365,7 @@ KineticReactions< REAL_TYPE,
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
@@ -360,6 +375,7 @@ HPCREACT_HOST_DEVICE inline void
 KineticReactions< REAL_TYPE,
                   INT_TYPE,
                   INDEX_TYPE,
+                  ACTIVITY_MODEL,
                   LOGE_CONCENTRATION >::timeStep( RealType const dt,
                                                   RealType const & temperature,
                                                   PARAMS_DATA const & params,

@@ -1,12 +1,11 @@
 # Specify list of tests
 set( testSourceFiles
-     testGeochemicalEquilibriumReactions.cpp
-     testGeochemicalKineticReactions.cpp
-     testGeochemicalMixedReactions.cpp
-     testCarbonateActivityVsEQ36.cpp
-     )
+     testBdot.cpp
+     testIonicStrength.cpp )
+
 
 set( dependencyList hpcReact gtest )
+
 if( ENABLE_CUDA )
     list( APPEND dependencyList cuda )
 endif()

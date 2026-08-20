@@ -8,22 +8,29 @@
  * See top level LICENSE files for details.
  * ------------------------------------------------------------------------------------------------------------
  */
-
 #pragma once
+
+#include "common/macros.hpp"
 
 namespace hpcReact
 {
-namespace constants
+
+template< typename REAL_TYPE >
+class StoichiometricIonicStrength
 {
+public:
 
-constexpr double R = 8.31446261815324; // J/(mol K)
-constexpr double F = 96485.3321233100184; // C/mol
-constexpr double NA = 6.02214076e23; // 1/mol
+  template< typename ARRAY_1D_TO_CONST >
+  static inline HPCREACT_HOST_DEVICE
+  REAL_TYPE
+  calculate( ARRAY_1D_TO_CONST const & speciesConcentration,
+             ARRAY_1D_TO_CONST const & speciesCharge,
+             int const numSpecies )
+  {
+    return 0.0;
+  }
 
-constexpr double metersPerAngstrom = 1.0e-10; // m/Angstrom
+};
 
-constexpr double ln10 = 2.302585092994046e+00;
-constexpr double invln10 = 4.342944819032518e-01;
 
-} // namespace constants
 } // namespace hpcReact

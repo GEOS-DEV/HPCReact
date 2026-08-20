@@ -30,6 +30,7 @@ namespace reactionsSystems
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
@@ -43,9 +44,11 @@ HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
                                   INDEX_TYPE,
+                                  ACTIVITY_MODEL,
                                   LOGE_CONCENTRATION
                                   >::updateMixedSystem_impl( RealType const & temperature,
                                                              PARAMS_DATA const & params,
+                                                             typename ACTIVITY_MODEL::Params const & activityParams,
                                                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                              ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                              ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
@@ -58,14 +61,50 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                                                              ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
 {
+  static_assert( LOGE_CONCENTRATION,
+                 "Linear-concentration mode is not implemented for the mixed system update yet." );
+
+  constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
+  constexpr IntType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  constexpr IntType numSecondarySpeciesStorage = numSecondarySpecies > 0 ? numSecondarySpecies : 1;
+  constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+
+  RealType dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpeciesStorage][numPrimarySpecies] = {{ 0.0 }};
+
   if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
   {
-    // 1. Compute new aggregate species from primary species
+    RealType logSpeciesActivities[numSpecies] = { 0.0 };
+    RealType dLogSpeciesActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
+    RealType logSpeciesActivityCoefficients[numSpecies] = { 0.0 };
+    RealType dLogSpeciesActivityCoefficients_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
+
+    // Secondary concentrations, activity coefficients and activities are solved together at the
+    // given primary concentrations, so on return all three are mutually consistent and satisfy the
+    // mass action law, and the derivative is the exact one for that converged state rather than
+    // the frozen activity coefficient approximation.
+    massActions::calculateLogSecondarySpeciesConcentrationWrtLogC< REAL_TYPE,
+                                                                   INT_TYPE,
+                                                                   INDEX_TYPE,
+                                                                   ACTIVITY_MODEL,
+                                                                   true >( params.equilibriumReactionsParameters(),
+                                                                           activityParams,
+                                                                           logPrimarySpeciesConcentrations,
+                                                                           logSecondarySpeciesConcentrations,
+                                                                           logSpeciesActivityCoefficients,
+                                                                           logSpeciesActivities,
+                                                                           dLogSpeciesActivities_dLogSpeciesConcentrations,
+                                                                           dLogSpeciesActivityCoefficients_dLogSpeciesConcentrations,
+                                                                           dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+
+    // 1. Compute new aggregate species from primary and secondary species. Pure mole balance on
+    //    the solved state: the activity model is already accounted for in the calculation of the
+    //    two secondary species arrays, so nothing here reconstructs it.
     massActions::calculateTotalAndMobileAggregatePrimaryConcentrationsWrtLogC< REAL_TYPE,
                                                                                INT_TYPE,
                                                                                INDEX_TYPE >( params.equilibriumReactionsParameters(),
                                                                                              logPrimarySpeciesConcentrations,
                                                                                              logSecondarySpeciesConcentrations,
+                                                                                             dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                                                                              aggregatePrimarySpeciesConcentrations,
                                                                                              mobileAggregatePrimarySpeciesConcentrations,
                                                                                              dAggregatePrimarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
@@ -73,8 +112,6 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   }
   else
   {
-    constexpr int numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
-
     for( int i = 0; i < numPrimarySpecies; ++i )
     {
       REAL_TYPE const speciesConcentration_i = exp( logPrimarySpeciesConcentrations[i] );
@@ -87,11 +124,14 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
   {
-    // 2. Compute the reaction rates for all kinetic reactions
+    // 2. Compute the reaction rates for all kinetic reactions and their derivatives w.r.t. log
+    //    primary species concentrations.
     computeReactionRates( temperature,
                           params,
+                          activityParams,
                           logPrimarySpeciesConcentrations,
                           logSecondarySpeciesConcentrations,
+                          dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                           surfaceArea,
                           reactionRates,
                           dReactionRates_dLogPrimarySpeciesConcentrations );
@@ -106,7 +146,10 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   }
   else
   {
-    GEOS_UNUSED_VAR( reactionRates, dReactionRates_dLogPrimarySpeciesConcentrations, aggregateSpeciesRates, dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
+    HPCREACT_UNUSED_VAR( reactionRates );
+    HPCREACT_UNUSED_VAR( dReactionRates_dLogPrimarySpeciesConcentrations );
+    HPCREACT_UNUSED_VAR( aggregateSpeciesRates );
+    HPCREACT_UNUSED_VAR( dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations );
   }
 
 }
@@ -114,10 +157,12 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST2,
+          typename ARRAY_2D_TO_CONST,
           typename ARRAY_1D_TO_CONST_KINETIC,
           typename ARRAY_1D,
           typename ARRAY_2D >
@@ -125,11 +170,14 @@ HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
                                   INDEX_TYPE,
+                                  ACTIVITY_MODEL,
                                   LOGE_CONCENTRATION
                                   >::computeReactionRates_impl( RealType const & temperature,
                                                                 PARAMS_DATA const & params,
+                                                                typename ACTIVITY_MODEL::Params const & activityParams,
                                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                                 ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                                                                ARRAY_2D_TO_CONST const & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                                                 ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                                 ARRAY_1D & reactionRates,
                                                                 ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
@@ -162,32 +210,57 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   kineticReactions::computeReactionRates( temperature,
                                           params.kineticReactionsParameters(),
+                                          activityParams,
                                           logSpeciesConcentration,
                                           surfaceArea,
                                           reactionRates,
                                           reactionRatesDerivatives );
 
   // Compute the reaction rates derivatives w.r.t. log primary species concentrations
+  // With the chain rule, we have
+  //
+  //   dR_i / dln(C_prim,j) = pd R_i / pd ln(C_prim,j)
+  //                        + sum_k  pd R_i / pd ln(C_sec,k) * X_kj
+  //
+  //   R_i   kinetic reaction rate i                    reactionRates[i]
+  //   X_kj  d ln(C_sec,k) / d ln(C_prim,j)             from the speciation solve
+  //
+  // Both pd R_i / pd ln(C_prim,j) and pd R_i / pd ln(C_sec,k) are from reactionRatesDerivatives.
+
+  // First term: the partial w.r.t. the primaries.
   for( IntType i = 0; i < numKineticReactions; ++i )
   {
     for( IntType j = 0; j < numPrimarySpecies; ++j )
     {
       dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) = reactionRatesDerivatives( i, j + numSecondarySpecies );
+    }
+  }
 
-      for( IntType k = 0; k < numSecondarySpecies; ++k )
+  if constexpr( numSecondarySpecies > 0 )
+  {
+    // Second term: the route through the secondaries.
+    for( IntType i = 0; i < numKineticReactions; ++i )
+    {
+      for( IntType j = 0; j < numPrimarySpecies; ++j )
       {
-        RealType const dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations = params.stoichiometricMatrix( k, j + numSecondarySpecies );
-
-        dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) +=
-          reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations;
+        for( IntType k = 0; k < numSecondarySpecies; ++k )
+        {
+          dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) +=
+            reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[k][j];
+        }
       }
     }
+  }
+  else
+  {
+    HPCREACT_UNUSED_VAR( dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
   }
 }
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
@@ -200,6 +273,7 @@ HPCREACT_HOST_DEVICE inline void
 MixedEquilibriumKineticReactions< REAL_TYPE,
                                   INT_TYPE,
                                   INDEX_TYPE,
+                                  ACTIVITY_MODEL,
                                   LOGE_CONCENTRATION
                                   >::computeAggregateSpeciesRates_impl( PARAMS_DATA const & params,
                                                                         ARRAY_1D_TO_CONST const & speciesConcentration,

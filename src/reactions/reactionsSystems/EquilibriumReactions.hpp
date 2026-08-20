@@ -15,6 +15,7 @@
 #include "common/CArrayWrapper.hpp"
 #include "common/DirectSystemSolve.hpp"
 #include "common/printers.hpp"
+#include "constitutive/activity/activity.hpp"
 
 #include <iostream>
 
@@ -35,7 +36,8 @@ namespace reactionsSystems
  */
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 class EquilibriumReactions
 {
 public:
@@ -70,6 +72,7 @@ public:
   void
   enforceEquilibrium_Extents( RealType const & temperature,
                               PARAMS_DATA const & params,
+                              typename ACTIVITY_MODEL::Params const & activityParams,
                               ARRAY_1D_TO_CONST const & speciesConcentration0,
                               ARRAY_1D & speciesConcentration );
 
@@ -94,6 +97,7 @@ public:
   void
   enforceEquilibrium_LogAggregate( RealType const & temperature,
                                    PARAMS_DATA const & params,
+                                   typename ACTIVITY_MODEL::Params const & activityParams,
                                    ARRAY_1D_TO_CONST const & speciesConcentration0,
                                    ARRAY_1D & speciesConcentration );
 
@@ -124,6 +128,7 @@ public:
   void
   enforceEquilibrium_Aggregate( RealType const & temperature,
                                 PARAMS_DATA const & params,
+                                typename ACTIVITY_MODEL::Params const & activityParams,
                                 ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
                                 ARRAY_1D & speciesConcentration );
@@ -151,6 +156,7 @@ public:
   static HPCREACT_HOST_DEVICE void
   computeResidualAndJacobianReactionExtents( RealType const & temperature,
                                              PARAMS_DATA const & params,
+                                             typename ACTIVITY_MODEL::Params const & activityParams,
                                              ARRAY_1D_TO_CONST const & speciesConcentration0,
                                              ARRAY_1D_TO_CONST2 const & xi,
                                              ARRAY_1D & residual,
@@ -179,6 +185,7 @@ public:
   static HPCREACT_HOST_DEVICE void
   computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
                                                             PARAMS_DATA const & params,
+                                                            typename ACTIVITY_MODEL::Params const & activityParams,
                                                             ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
                                                             ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
                                                             ARRAY_1D & residual,

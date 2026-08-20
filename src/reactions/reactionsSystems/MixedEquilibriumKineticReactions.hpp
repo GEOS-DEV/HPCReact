@@ -37,6 +37,7 @@ namespace reactionsSystems
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
+          typename ACTIVITY_MODEL,
           bool LOGE_CONCENTRATION >
 class MixedEquilibriumKineticReactions
 {
@@ -52,7 +53,7 @@ public:
   using IndexType = INDEX_TYPE;
 
   /// Type alias for the Kinetic reactions type used in the class.
-  using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, LOGE_CONCENTRATION >;
+  using kineticReactions = KineticReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, ACTIVITY_MODEL, LOGE_CONCENTRATION >;
 
   /**
    * @brief Update a mixed chemical system by computing secondary species concentrations,
@@ -93,6 +94,7 @@ public:
   static HPCREACT_HOST_DEVICE inline void
   updateMixedSystem( RealType const & temperature,
                      PARAMS_DATA const & params,
+                     typename ACTIVITY_MODEL::Params const & activityParams,
                      ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                      ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                      ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
@@ -107,6 +109,7 @@ public:
   {
     updateMixedSystem_impl( temperature,
                             params,
+                            activityParams,
                             logPrimarySpeciesConcentrations,
                             surfaceArea,
                             logSecondarySpeciesConcentrations,
@@ -133,30 +136,39 @@ public:
    * @param params Parameter data for the reaction system
    * @param logPrimarySpeciesConcentrations Log concentrations of primary species
    * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
+   * @param dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations d log(C_sec)/d log(C_prim)
+   *   for the converged speciation, used to complete the total derivative of the rates
    * @param surfaceArea Surface area for kinetic reactions
    * @param reactionRates Output reaction rates for each kinetic reaction
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
+   * @note TBD whether this should be private: updateMixedSystem is currently its only caller.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_2D_TO_CONST,
             typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE inline void
   computeReactionRates( RealType const & temperature,
                         PARAMS_DATA const & params,
+                        typename ACTIVITY_MODEL::Params const & activityParams,
                         ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                         ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                        ARRAY_2D_TO_CONST const & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                         ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
 
   {
+
     computeReactionRates_impl( temperature,
                                params,
+                               activityParams,
                                logPrimarySpeciesConcentrations,
                                logSecondarySpeciesConcentrations,
+                               dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                surfaceArea,
                                reactionRates,
                                dReactionRates_dLogPrimarySpeciesConcentrations );
@@ -247,6 +259,7 @@ private:
   static HPCREACT_HOST_DEVICE void
   updateMixedSystem_impl( RealType const & temperature,
                           PARAMS_DATA const & params,
+                          typename ACTIVITY_MODEL::Params const & activityParams,
                           ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                           ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                           ARRAY_1D_SECONDARY & logSecondarySpeciesConcentrations,
@@ -264,22 +277,29 @@ private:
    * @details Handles kinetic rate law evaluation for forward and reverse reactions.
    * @param temperature Temperature in Kelvin
    * @param params Parameter data for the reaction system
+   * @param activityParams Parameters of the activity model
    * @param logPrimarySpeciesConcentrations Log concentrations of primary species
    * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
+   * @param dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations d log(C_sec)/d log(C_prim)
+   *   for the converged speciation, used to complete the total derivative of the rates
+   * @param surfaceArea Surface area for kinetic reactions
    * @param reactionRates Output reaction rates for each kinetic reaction
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_2D_TO_CONST,
             typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
   computeReactionRates_impl( RealType const & temperature,
                              PARAMS_DATA const & params,
+                             typename ACTIVITY_MODEL::Params const & activityParams,
                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                              ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                             ARRAY_2D_TO_CONST const & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                              ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                              ARRAY_1D & reactionRates,
                              ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations );

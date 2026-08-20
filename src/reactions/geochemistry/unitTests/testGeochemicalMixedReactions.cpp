@@ -11,13 +11,23 @@
 
 #include "reactions/unitTestUtilities/mixedReactionsTestUtilities.hpp"
 #include "../GeochemicalSystems.hpp"
+#include "constitutive/activity/Bdot.hpp"
+#include "constitutive/activity/Identity.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
 
 
 using namespace hpcReact;
 using namespace hpcReact::unitTest_utilities;
 
 
-TEST( testMixedReactions, testTimeStep_carbonateSystem )
+/**
+ * @brief Run the carbonate time step for a given activity model.
+ * @details The system and initial state are identical across activity models, so only the model,
+ *          its parameters, and the expected result vary between the tests below.
+ */
+template< typename ACTIVITY_MODEL >
+void timeStepCarbonateSystemHelper( typename ACTIVITY_MODEL::Params const & activityParams,
+                                    double const (&expectedSpeciesConcentrations)[hpcReact::geochemistry::carbonateSystemType::numPrimarySpecies()] )
 {
   using namespace hpcReact::geochemistry;
 
@@ -39,7 +49,23 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
     1.09 // Na+1
   };
 
-  double const expectedSpeciesConcentrations[numPrimarySpecies] =
+  timeStepTest< double, true, ACTIVITY_MODEL >( carbonateSystem,
+                                                activityParams,
+                                                1.0,
+                                                10,
+                                                initialAggregateSpeciesConcentration,
+                                                surfaceArea,
+                                                expectedSpeciesConcentrations );
+}
+
+
+TEST( testMixedReactions, testTimeStep_carbonateSystem_Identity )
+{
+  using namespace hpcReact::geochemistry;
+
+  // The Identity model leaves activities equal to concentrations, so these are the
+  // ideal-solution concentrations.
+  double const expectedSpeciesConcentrations[carbonateSystemType::numPrimarySpecies()] =
   {
     0.00040311656239679382, // H+
     0.00041180885982392148, // HCO3-
@@ -50,13 +76,27 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
     1.070434904554991 // Na+1
   };
 
-  timeStepTest< double, true >( carbonateSystem,
-                                1.0,
-                                10,
-                                initialAggregateSpeciesConcentration,
-                                surfaceArea,
-                                expectedSpeciesConcentrations );
+  timeStepCarbonateSystemHelper< carbonateNosolidIdentityActivityType >( carbonateNosolidIdentityActivityParams,
+                                                                         expectedSpeciesConcentrations );
+}
 
+
+//******************************************************************************
+// Placeholder for the B-dot carbonate model.
+//
+// This one will be checked against EQ3/6 for verification.
+//
+// The values below are deliberately zero: if this is enabled before the EQ3/6 run is done, it
+// fails immediately rather than appearing to pass.
+TEST( testMixedReactions, DISABLED_testTimeStep_carbonateSystem_Bdot )
+{
+  using namespace hpcReact::geochemistry;
+
+  double const expectedSpeciesConcentrations[carbonateSystemType::numPrimarySpecies()] =
+  { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }; // TODO: from EQ3/6
+
+  timeStepCarbonateSystemHelper< carbonateNosolidActivityType >( carbonateNosolidActivityParams,
+                                                                 expectedSpeciesConcentrations );
 }
 
 int main( int argc, char * * argv )
