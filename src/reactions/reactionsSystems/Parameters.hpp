@@ -64,8 +64,8 @@ struct EquilibriumReactionsParameters
   HPCREACT_HOST_DEVICE
   constexpr
   EquilibriumReactionsParameters( CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
-                                  CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant,
-                                  CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag ):
+                                  CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
+                                  CArrayWrapper< IntType, NUM_REACTIONS > const & mobileSecondarySpeciesFlag ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag )
@@ -146,7 +146,7 @@ struct MixedReactionsParameters
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
-                                      CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag,
+                                      CArrayWrapper< IntType, NUM_REACTIONS > const & mobileSecondarySpeciesFlag,
                                       ReactionRateLawOption const reactionRateLawOption = ReactionRateLawOption::Affinity ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
@@ -261,7 +261,7 @@ struct MixedReactionsParameters
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
   CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
 
-  ReactionRateLawOption m_reactionRateLawOption;
+  ReactionRateLawOption m_reactionRateLawOption = ReactionRateLawOption::Affinity;
 };
 
 

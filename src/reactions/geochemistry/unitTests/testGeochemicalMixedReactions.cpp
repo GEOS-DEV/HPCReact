@@ -81,23 +81,19 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem_Identity )
 }
 
 
-TEST( testMixedReactions, testTimeStep_carbonateSystem_Bdot )
+//******************************************************************************
+// Placeholder for the B-dot carbonate model.
+//
+// This one will be checked against EQ3/6 for verification.
+//
+// The values below are deliberately zero: if this is enabled before the EQ3/6 run is done, it
+// fails immediately rather than appearing to pass.
+TEST( testMixedReactions, DISABLED_testTimeStep_carbonateSystem_Bdot )
 {
   using namespace hpcReact::geochemistry;
 
-  // TODO: these are still the ideal-solution values shared with the Identity case above. The
-  //       B-dot activity coefficients are not unity at this composition, so they need to be
-  //       regenerated against an independent reference.
   double const expectedSpeciesConcentrations[carbonateSystemType::numPrimarySpecies()] =
-  {
-    0.00040311656239679382, // H+
-    0.00041180885982392148, // HCO3-
-    0.0032499045666604504, // Ca+2
-    0.0036920967945592146, // SO4-2
-    1.8542541730074311, // Cl-
-    0.010162194793470079, // Mg+2
-    1.070434904554991 // Na+1
-  };
+  { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }; // TODO: from EQ3/6
 
   timeStepCarbonateSystemHelper< carbonateNosolidActivityType >( carbonateNosolidActivityParams,
                                                                  expectedSpeciesConcentrations );

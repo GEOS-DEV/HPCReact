@@ -14,6 +14,7 @@
 #include "common/macros.hpp"
 #include "common/pmpl.hpp"
 #include "constitutive/activity/Bdot.hpp"
+#include "constitutive/activity/Identity.hpp"
 #include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
 
 #include <gtest/gtest.h>
@@ -46,15 +47,16 @@ struct ComputeResidualAndJacobianTestData
   CArrayWrapper< double, numReactions, numReactions > jacobian;
 
   /// the species concentrations
-  double speciesConcentration[numSpecies];
+  double speciesConcentration[numSpecies] = { 0.0 };
 };
 
 //******************************************************************************
 template< typename REAL_TYPE,
           int RESIDUAL_FORM,
+          typename ACTIVITY_MODEL,
           typename PARAMS_DATA >
 void computeResidualAndJacobianTest( PARAMS_DATA const & params,
-                                     typename Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >::Params const & activityParams,
+                                     typename ACTIVITY_MODEL::Params const & activityParams,
                                      REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
                                      REAL_TYPE const (&expectedResidual)[PARAMS_DATA::numReactions()],
                                      REAL_TYPE const (&expectedJacobian)[PARAMS_DATA::numReactions()][PARAMS_DATA::numReactions()] )
@@ -62,7 +64,7 @@ void computeResidualAndJacobianTest( PARAMS_DATA const & params,
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                            int,
                                                                            int,
-                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies () > > >;
+                                                                           ACTIVITY_MODEL >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
   static constexpr int numReactions = PARAMS_DATA::numReactions();
@@ -126,16 +128,17 @@ struct TestEnforceEquilibriumData
 
 template< typename REAL_TYPE,
           int RESIDUAL_FORM,
+          typename ACTIVITY_MODEL,
           typename PARAMS_DATA >
 void testEnforceEquilibrium( PARAMS_DATA const & params,
-                             typename Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies() > >::Params const & activityParams,
+                             typename ACTIVITY_MODEL::Params const & activityParams,
                              REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
                              REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
 {
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                            int,
                                                                            int,
-                                                                           Bdot< REAL_TYPE, int, SpeciatedIonicStrength< REAL_TYPE, int, PARAMS_DATA::numSpecies () > > >;
+                                                                           ACTIVITY_MODEL >;
 
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
 

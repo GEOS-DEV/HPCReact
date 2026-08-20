@@ -42,7 +42,7 @@ template< int numReactions, int numSpecies >
 struct ComputeReactionRatesTestData
 {
   /// The species concentration
-  double speciesConcentration[numSpecies];
+  double speciesConcentration[numSpecies] = { 0.0 };
 
   /// The reaction rates
   double reactionRates[numReactions] = { 0.0 };
@@ -51,7 +51,7 @@ struct ComputeReactionRatesTestData
   CArrayWrapper< double, numReactions, numSpecies > reactionRatesDerivatives;
 
   /// The surface area
-  double surfaceArea[numReactions];
+  double surfaceArea[numReactions] = { 0.0 };
 };
 
 template< typename REAL_TYPE,
@@ -147,7 +147,7 @@ template< int numSpecies >
 struct ComputeSpeciesRatesTestData
 {
   /// The species concentrations
-  double speciesConcentration[numSpecies];
+  double speciesConcentration[numSpecies] = { 0.0 };
 
   /// The species rates
   double speciesRates[numSpecies] = { 0.0 };
@@ -232,7 +232,7 @@ template< int numSpecies >
 struct TimeStepTestData
 {
   /// The species concentrations
-  double speciesConcentration[numSpecies];
+  double speciesConcentration[numSpecies] = { 0.0 };
 
   /// The current time
   double time = 0.0;

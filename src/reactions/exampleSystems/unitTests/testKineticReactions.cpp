@@ -65,10 +65,13 @@ TEST( testKineticReactions, computeReactionRatesTest_simpleKineticTestRateParams
   double const initialSpeciesConcentration[] = { 1.0, 1.0e-16, 0.5, 1.0, 1.0e-16 };
   double const surfaceArea[] = { 0.0, 0.0 };
 
-  double const expectedReactionRates[] = { 1.0, 0.25 };
+  // Reference values derived independently from the B-dot equations in
+  // bdotKineticReference.py (I = 2.25, gamma = { 0.157531, 0.880784, 0.880784, 1,
+  // 0.880784 }) and cross-checked against a central difference of the rates.
+  double const expectedReactionRates[] = { 0.024816095046886668, 0.22019609961589134 };
   double const expectedReactionRatesDerivatives[][5] =
-  { { 2.0, -0.5, 0.0, 0.0, 0.0 },
-    { 0.0, 0.0, 0.5, 0.25, 0.0 } };
+  { { 0.054908038968070227, -0.38657161606983814, 0.0013189622185741268, 0.0, 0.0013189622185742044 },
+    { 0.078220259582388221, 0.019555064895597055, 0.45994726412737974, 0.22019609961589134, 0.019555064895596979 } };
 
   computeReactionRatesTest< double,
                             false,

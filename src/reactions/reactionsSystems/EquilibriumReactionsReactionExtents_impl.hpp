@@ -190,7 +190,11 @@ EquilibriumReactions< REAL_TYPE,
       residual[r] = -residual[r];
     }
 
-    solveNxN_Cholesky< double, numReactions >( jacobian.data, residual, dxi );
+    // Pivoted rather than Cholesky: this Jacobian is symmetric only for the Identity model. When
+    // the activity coefficients depend on concentration, the Jacobian gains a rank-1 term that is
+    // not symmetric, so Cholesky, which reads only the lower triangle, would solve against a
+    // different matrix and lose the Newton direction.
+    solveNxN_pivoted< double, numReactions >( jacobian.data, residual, dxi );
 
 
     // scaling

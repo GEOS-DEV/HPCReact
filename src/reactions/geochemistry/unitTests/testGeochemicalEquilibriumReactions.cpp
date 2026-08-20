@@ -34,7 +34,7 @@ using namespace hpcReact::unitTest_utilities;
 
 
 //******************************************************************************
-TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium_Bdot )
+TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium_Identity )
 {
   using namespace hpcReact::geochemistry;
 
@@ -81,10 +81,10 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium_Bdot )
   };
 
   std::cout<<" RESIDUAL_FORM 0:"<<std::endl;
-  testEnforceEquilibrium< double, 0 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                       hpcReact::geochemistry::carbonateActivityParams,
-                                       initialSpeciesConcentration,
-                                       expectedSpeciesConcentrations );
+  testEnforceEquilibrium< double, 0, carbonateIdentityActivityType >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                                      hpcReact::geochemistry::carbonateIdentityActivityParams,
+                                                                      initialSpeciesConcentration,
+                                                                      expectedSpeciesConcentrations );
 
   // std::cout<<" RESIDUAL_FORM 1:"<<std::endl;
   // testEnforceEquilibrium< double, 1 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
@@ -92,15 +92,15 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium_Bdot )
   //                                      expectedSpeciesConcentrations );
 
   std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-  testEnforceEquilibrium< double, 2 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                       hpcReact::geochemistry::carbonateActivityParams,
-                                       initialSpeciesConcentration,
-                                       expectedSpeciesConcentrations );
+  testEnforceEquilibrium< double, 2, carbonateIdentityActivityType >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                                      hpcReact::geochemistry::carbonateIdentityActivityParams,
+                                                                      initialSpeciesConcentration,
+                                                                      expectedSpeciesConcentrations );
 
 }
 
 
-TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2_Bdot )
+TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2_Identity )
 {
 
 
@@ -110,7 +110,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2_Bdot )
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double,
                                                                            int,
                                                                            int,
-                                                                           Bdot< double, int, SpeciatedIonicStrength< double, int, numSpecies > > >;
+                                                                           Identity< double, int, SpeciatedIonicStrength< double, int, numSpecies > > >;
 
   double const initialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
@@ -139,7 +139,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2_Bdot )
   double logPrimarySpeciesConcentration[numPrimarySpecies];
   EquilibriumReactionsType::enforceEquilibrium_LogAggregate( 0,
                                                              hpcReact::geochemistry::carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                             hpcReact::geochemistry::carbonateActivityParams,
+                                                             hpcReact::geochemistry::carbonateIdentityActivityParams,
                                                              logInitialPrimarySpeciesConcentration,
                                                              logPrimarySpeciesConcentration );
 
@@ -160,6 +160,46 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2_Bdot )
   }
 
 
+}
+
+//******************************************************************************
+// Placeholder for the B-dot carbonate model.
+//
+// This one will be checked against EQ3/6 for verification.
+//
+// The values below are deliberately zero: if this is enabled before the EQ3/6 run is done, it
+// fails immediately rather than appearing to pass.
+TEST( testEquilibriumReactions, DISABLED_testcarbonateSystemAllEquilibrium_Bdot )
+{
+  using namespace hpcReact::geochemistry;
+
+  double const initialSpeciesConcentration[17] =
+  {
+    1.0e-16, // OH-
+    1.0e-16, // CO2
+    1.0e-16, // CO3-2
+    1.0e-16, // CaHCO3+
+    1.0e-16, // CaSO4
+    1.0e-16, // CaCl+
+    1.0e-16, // CaCl2
+    1.0e-16, // MgSO4
+    1.0e-16, // NaSO4-
+    1.0e-16, // CaCO3
+    3.76e-1, // H+
+    3.76e-1, // HCO3-
+    3.87e-2, // Ca+2
+    3.21e-2, // SO4-2
+    1.89, // Cl-
+    1.65e-2, // Mg+2
+    1.09 // Na+1
+  };
+
+  double const expectedSpeciesConcentrations[17] = { 0.0 }; // TODO: from EQ3/6
+
+  testEnforceEquilibrium< double, 2, carbonateActivityType >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+                                                              hpcReact::geochemistry::carbonateActivityParams,
+                                                              initialSpeciesConcentration,
+                                                              expectedSpeciesConcentrations );
 }
 
 int main( int argc, char * * argv )
