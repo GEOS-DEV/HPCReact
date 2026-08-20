@@ -136,13 +136,17 @@ public:
    * @param params Parameter data for the reaction system
    * @param logPrimarySpeciesConcentrations Log concentrations of primary species
    * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
+   * @param dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations d log(C_sec)/d log(C_prim)
+   *   for the converged speciation, used to complete the total derivative of the rates
    * @param surfaceArea Surface area for kinetic reactions
    * @param reactionRates Output reaction rates for each kinetic reaction
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
+   * @note TBD whether this should be private: updateMixedSystem is currently its only caller.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_2D_TO_CONST,
             typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D,
             typename ARRAY_2D >
@@ -152,6 +156,7 @@ public:
                         typename ACTIVITY_MODEL::Params const & activityParams,
                         ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                         ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                        ARRAY_2D_TO_CONST const & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                         ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                         ARRAY_1D & reactionRates,
                         ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
@@ -163,6 +168,7 @@ public:
                                activityParams,
                                logPrimarySpeciesConcentrations,
                                logSecondarySpeciesConcentrations,
+                               dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                surfaceArea,
                                reactionRates,
                                dReactionRates_dLogPrimarySpeciesConcentrations );
@@ -271,14 +277,19 @@ private:
    * @details Handles kinetic rate law evaluation for forward and reverse reactions.
    * @param temperature Temperature in Kelvin
    * @param params Parameter data for the reaction system
+   * @param activityParams Parameters of the activity model
    * @param logPrimarySpeciesConcentrations Log concentrations of primary species
    * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
+   * @param dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations d log(C_sec)/d log(C_prim)
+   *   for the converged speciation, used to complete the total derivative of the rates
+   * @param surfaceArea Surface area for kinetic reactions
    * @param reactionRates Output reaction rates for each kinetic reaction
    * @param dReactionRates_dLogPrimarySpeciesConcentrations Derivatives of reaction rates w.r.t. log primary species
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
+            typename ARRAY_2D_TO_CONST,
             typename ARRAY_1D_TO_CONST_KINETIC,
             typename ARRAY_1D,
             typename ARRAY_2D >
@@ -288,6 +299,7 @@ private:
                              typename ACTIVITY_MODEL::Params const & activityParams,
                              ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                              ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                             ARRAY_2D_TO_CONST const & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                              ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                              ARRAY_1D & reactionRates,
                              ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations );

@@ -307,11 +307,13 @@ public:
                                                activities,
                                                dActivities_dConcentration );
 
+    char speciesRatesDerivatives;
+
     computeSpeciesRates_impl< PARAMS_DATA, false >( temperature,
                                                     params,
                                                     activities,
                                                     speciesRates,
-                                                    void() );
+                                                    speciesRatesDerivatives );
   }
 
   /**
@@ -327,6 +329,9 @@ public:
    * @param speciesConcentration The array of species concentrations at the end of the time step.
    * @param speciesRates The array of species rates.
    * @param speciesRatesDerivatives The array of species rates derivatives.
+   * @note Currently uninstantiated, and will not compile as written: the body calls
+   *   computeSpeciesRates without the activityParams argument every overload now requires. Add that
+   *   parameter here and pass it through before using this.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
@@ -343,17 +348,6 @@ public:
 
 
 private:
-
-  // template< typename ARRAY_1D_TO_CONST,
-  //           typename ARRAY_1D,
-  //           typename ARRAY_2D >
-  // static HPCREACT_HOST_DEVICE void
-  // calculateActivities( typename ACTIVITY_MODEL::Params const & params,
-  //                      ARRAY_1D_TO_CONST const & speciesConcentration,
-  //                      ARRAY_1D & activities,
-  //                      ARRAY_2D & dActivities_dConcentration );
-
-
 
   /**
    * @brief Compute the reaction rates for a given set of species concentrations.

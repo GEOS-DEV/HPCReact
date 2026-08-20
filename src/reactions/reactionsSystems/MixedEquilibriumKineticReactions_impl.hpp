@@ -61,15 +61,20 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                              ARRAY_1D_PRIMARY & aggregateSpeciesRates,
                                                              ARRAY_2D_PRIMARY & dAggregateSpeciesRates_dLogPrimarySpeciesConcentrations )
 {
+  static_assert( LOGE_CONCENTRATION,
+                 "Linear-concentration mode is not implemented for the mixed system update yet." );
+
   constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
   constexpr IntType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  constexpr IntType numSecondarySpeciesStorage = numSecondarySpecies > 0 ? numSecondarySpecies : 1;
   constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
+
+  RealType dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpeciesStorage][numPrimarySpecies] = {{ 0.0 }};
 
   if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
   {
     RealType logSpeciesActivities[numSpecies] = { 0.0 };
     RealType dLogSpeciesActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
-    RealType dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
     RealType logSpeciesActivityCoefficients[numSpecies] = { 0.0 };
     RealType dLogSpeciesActivityCoefficients_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
 
@@ -119,12 +124,14 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   if constexpr( PARAMS_DATA::numKineticReactions() > 0 )
   {
-    // 2. Compute the reaction rates for all kinetic reactions
+    // 2. Compute the reaction rates for all kinetic reactions and their derivatives w.r.t. log
+    //    primary species concentrations.
     computeReactionRates( temperature,
                           params,
                           activityParams,
                           logPrimarySpeciesConcentrations,
                           logSecondarySpeciesConcentrations,
+                          dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                           surfaceArea,
                           reactionRates,
                           dReactionRates_dLogPrimarySpeciesConcentrations );
@@ -155,6 +162,7 @@ template< typename REAL_TYPE,
 template< typename PARAMS_DATA,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D_TO_CONST2,
+          typename ARRAY_2D_TO_CONST,
           typename ARRAY_1D_TO_CONST_KINETIC,
           typename ARRAY_1D,
           typename ARRAY_2D >
@@ -169,6 +177,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                 typename ACTIVITY_MODEL::Params const & activityParams,
                                                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentrations,
                                                                 ARRAY_1D_TO_CONST2 const & logSecondarySpeciesConcentrations,
+                                                                ARRAY_2D_TO_CONST const & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
                                                                 ARRAY_1D_TO_CONST_KINETIC const & surfaceArea,
                                                                 ARRAY_1D & reactionRates,
                                                                 ARRAY_2D & dReactionRates_dLogPrimarySpeciesConcentrations )
@@ -208,6 +217,17 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
                                           reactionRatesDerivatives );
 
   // Compute the reaction rates derivatives w.r.t. log primary species concentrations
+  // With the chain rule, we have
+  //
+  //   dR_i / dln(C_prim,j) = pd R_i / pd ln(C_prim,j)
+  //                        + sum_k  pd R_i / pd ln(C_sec,k) * X_kj
+  //
+  //   R_i   kinetic reaction rate i                    reactionRates[i]
+  //   X_kj  d ln(C_sec,k) / d ln(C_prim,j)             from the speciation solve
+  //
+  // Both pd R_i / pd ln(C_prim,j) and pd R_i / pd ln(C_sec,k) are from reactionRatesDerivatives.
+
+  // First term: the partial w.r.t. the primaries.
   for( IntType i = 0; i < numKineticReactions; ++i )
   {
     for( IntType j = 0; j < numPrimarySpecies; ++j )
@@ -218,56 +238,7 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   if constexpr( numSecondarySpecies > 0 )
   {
-    RealType logSpeciesActivities[numSpecies] = { 0.0 };
-    RealType dLogSpeciesActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
-    RealType logPrimaryActivities[numPrimarySpecies] = { 0.0 };
-    RealType dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[numPrimarySpecies][numPrimarySpecies] = {{ 0.0 }};
-    RealType logSecondaryActivities[numSecondarySpecies] = { 0.0 };
-    RealType dLogSecondaryActivities_dLogPrimaryActivities[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
-    RealType dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
-
-    calculateActivities< RealType,
-                         IntType,
-                         IndexType,
-                         ACTIVITY_MODEL,
-                         true >( activityParams,
-                                 logSpeciesConcentration,
-                                 logSpeciesActivities,
-                                 dLogSpeciesActivities_dLogSpeciesConcentrations );
-
-    for( IntType i = 0; i < numPrimarySpecies; ++i )
-    {
-      IntType const fullRow = i + numSecondarySpecies;
-      logPrimaryActivities[i] = logSpeciesActivities[fullRow];
-      for( IntType j = 0; j < numPrimarySpecies; ++j )
-      {
-        dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[i][j] =
-          dLogSpeciesActivities_dLogSpeciesConcentrations[fullRow][j + numSecondarySpecies];
-      }
-    }
-
-    massActions::calculateLogSecondaryActivitiesWrtLogC< REAL_TYPE,
-                                                         INT_TYPE,
-                                                         INDEX_TYPE >( params.equilibriumReactionsParameters(),
-                                                                       logPrimaryActivities,
-                                                                       logSecondaryActivities,
-                                                                       dLogSecondaryActivities_dLogPrimaryActivities );
-    HPCREACT_UNUSED_VAR( logSecondaryActivities );
-
-    for( IntType k = 0; k < numSecondarySpecies; ++k )
-    {
-      for( IntType j = 0; j < numPrimarySpecies; ++j )
-      {
-        dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[k][j] = 0.0;
-        for( IntType l = 0; l < numPrimarySpecies; ++l )
-        {
-          dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[k][j] +=
-            dLogSecondaryActivities_dLogPrimaryActivities[k][l] *
-            dLogPrimaryActivities_dLogPrimarySpeciesConcentrations[l][j];
-        }
-      }
-    }
-
+    // Second term: the route through the secondaries.
     for( IntType i = 0; i < numKineticReactions; ++i )
     {
       for( IntType j = 0; j < numPrimarySpecies; ++j )
@@ -275,10 +246,14 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
         for( IntType k = 0; k < numSecondarySpecies; ++k )
         {
           dReactionRates_dLogPrimarySpeciesConcentrations( i, j ) +=
-            reactionRatesDerivatives( i, k ) * dLogSecondaryActivities_dLogPrimarySpeciesConcentrations[k][j];
+            reactionRatesDerivatives( i, k ) * dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[k][j];
         }
       }
     }
+  }
+  else
+  {
+    HPCREACT_UNUSED_VAR( dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
   }
 }
 

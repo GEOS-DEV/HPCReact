@@ -32,45 +32,6 @@ namespace reactionsSystems
 {
 
 
-// template< typename REAL_TYPE,
-//           typename INT_TYPE,
-//           typename INDEX_TYPE,
-//           typename ACTIVITY_MODEL,
-//           bool LOGE_CONCENTRATION >
-// template< typename ARRAY_1D_TO_CONST,
-//           typename ARRAY_1D,
-//           typename ARRAY_2D >
-// HPCREACT_HOST_DEVICE inline void
-// KineticReactions< REAL_TYPE,
-//                   INT_TYPE,
-//                   INDEX_TYPE,
-//                   ACTIVITY_MODEL,
-//                   LOGE_CONCENTRATION
-//                   >::calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams,
-//                                           ARRAY_1D_TO_CONST const & speciesConcentration,
-//                                           ARRAY_1D & activities,
-//                                           ARRAY_2D & dActivities_dConcentration )
-// {
-//   if constexpr( LOGE_CONCENTRATION )
-//   {
-//     RealType expSpeciesConcentration[ ACTIVITY_MODEL::Params::numSpecies() ];
-//     for( INT_TYPE i=0; i<ACTIVITY_MODEL::Params::numSpecies(); ++i )
-//     {
-//       expSpeciesConcentration[i] = exp( speciesConcentration[i] );
-//     }
-//     ACTIVITY_MODEL::calculateActivities( activityParams, expSpeciesConcentration, activities, dActivities_dConcentration );
-//     for( INT_TYPE i=0; i<ACTIVITY_MODEL::Params::numSpecies(); ++i )
-//     {
-//       activities[i] = log( activities[i] );
-//     }
-
-//   }
-//   else
-//   {
-//     ACTIVITY_MODEL::calculateActivities( activityParams, speciesConcentration, activities, dActivities_dConcentration );
-//   }
-// }
-
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
@@ -312,8 +273,11 @@ KineticReactions< REAL_TYPE,
       {
 
         RealType const s_ri = params.stoichiometricMatrix( r, i );
-        RealType const productTerm_i = activities[i] > 1e-100 ? pow( activities[i], s_ri ) : 0.0;
-        quotient *= productTerm_i;
+        if( s_ri > 0.0 || s_ri < 0.0 )
+        {
+          RealType const productTerm_i = activities[i] > 1e-100 ? pow( activities[i], s_ri ) : 0.0;
+          quotient *= productTerm_i;
+        }
       }
 
       if constexpr( CALCULATE_DERIVATIVES )
