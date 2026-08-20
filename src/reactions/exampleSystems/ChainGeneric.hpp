@@ -70,7 +70,7 @@ namespace ChainGeneric
     serialAllKineticForwardRates,
     serialAllKineticReverseRates,
     serialAllKineticMobileSpeciesFlag,
-    0 );
+    reactionsSystems::ReactionRateLawOption::Elementary );
 
   // species count taken from the system type so it cannot drift from it
   using serialAllKineticIonicStrengthType = SpeciatedIonicStrength< double, int, serialAllKineticType::numSpecies() >;

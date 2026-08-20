@@ -13,6 +13,7 @@
 
 #include "common/macros.hpp"
 #include "constitutive/activity/activity.hpp"
+#include "Parameters.hpp"
 
 #include <stdexcept>
 
@@ -83,11 +84,11 @@ public:
                                                activities,
                                                dActivities_dConcentration );
 
-    computeReactionRates< PARAMS_DATA, true >( temperature,
-                                               params,
-                                               activities,
-                                               reactionRates,
-                                               dReactionRates_dActivities );
+    computeReactionRatesElementary_impl< PARAMS_DATA, true >( temperature,
+                                                              params,
+                                                              activities,
+                                                              reactionRates,
+                                                              dReactionRates_dActivities );
 
     // chain rule to get dReactionRate_dConcentration
     for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
@@ -138,11 +139,11 @@ public:
                                                activities,
                                                dActivities_dConcentration );
 
-    computeReactionRates< PARAMS_DATA, false >( temperature,
-                                                params,
-                                                activities,
-                                                reactionRates,
-                                                dReactionRates_dActivities );
+    computeReactionRatesElementary_impl< PARAMS_DATA, false >( temperature,
+                                                               params,
+                                                               activities,
+                                                               reactionRates,
+                                                               dReactionRates_dActivities );
     HPCREACT_UNUSED_VAR( dReactionRates_dActivities );
   }
 
@@ -193,17 +194,17 @@ public:
                                                activities,
                                                dActivities_dConcentration );
 
-    if( params.reactionRatesUpdateOption() == 0 )
+    if( params.reactionRateLawOption() == ReactionRateLawOption::Elementary )
     {
-      computeReactionRates< PARAMS_DATA, true >( temperature,
-                                                 params,
-                                                 activities,
-                                                 reactionRates,
-                                                 dReactionRates_dActivities );
+      computeReactionRatesElementary_impl< PARAMS_DATA, true >( temperature,
+                                                                params,
+                                                                activities,
+                                                                reactionRates,
+                                                                dReactionRates_dActivities );
     }
-    else if( params.reactionRatesUpdateOption() == 1 )
+    else if( params.reactionRateLawOption() == ReactionRateLawOption::Affinity )
     {
-      computeReactionRatesQuotient_impl< PARAMS_DATA, true >( temperature,
+      computeReactionRatesAffinity_impl< PARAMS_DATA, true >( temperature,
                                                               params,
                                                               activities,
                                                               surfaceArea,
@@ -386,14 +387,15 @@ private:
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
-  computeReactionRates( RealType const & temperature,
-                        PARAMS_DATA const & params,
-                        ARRAY_1D_TO_CONST const & activities,
-                        ARRAY_1D & reactionRates,
-                        ARRAY_2D & dReactionRates_dActivities );
+  computeReactionRatesElementary_impl( RealType const & temperature,
+                                       PARAMS_DATA const & params,
+                                       ARRAY_1D_TO_CONST const & activities,
+                                       ARRAY_1D & reactionRates,
+                                       ARRAY_2D & dReactionRates_dActivities );
 
 /**
- * @brief
+ * @brief Compute the reaction rates from the departure of the activity quotient from equilibrium,
+ *   \f$ \dot{R}_r = k_r A_r ( 1 - Q_r / K_r ) \f$.
  *
  * @tparam PARAMS_DATA
  * @tparam CALCULATE_DERIVATIVES
@@ -415,7 +417,7 @@ private:
             typename ARRAY_1D,
             typename ARRAY_2D >
   static HPCREACT_HOST_DEVICE void
-  computeReactionRatesQuotient_impl( RealType const & temperature,
+  computeReactionRatesAffinity_impl( RealType const & temperature,
                                      PARAMS_DATA const & params,
                                      ARRAY_1D_TO_CONST const & activities,
                                      ARRAY_1D_SA const & surfaceArea,

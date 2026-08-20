@@ -48,11 +48,11 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE,
                   ACTIVITY_MODEL,
                   LOGE_CONCENTRATION
-                  >::computeReactionRates( RealType const &, //temperature,
-                                           PARAMS_DATA const & params,
-                                           ARRAY_1D_TO_CONST const & activities,
-                                           ARRAY_1D & reactionRates,
-                                           ARRAY_2D & dReactionRate_dActivities )
+                  >::computeReactionRatesElementary_impl( RealType const &, //temperature,
+                                                          PARAMS_DATA const & params,
+                                                          ARRAY_1D_TO_CONST const & activities,
+                                                          ARRAY_1D & reactionRates,
+                                                          ARRAY_2D & dReactionRate_dActivities )
 {
 
   if constexpr( !CALCULATE_DERIVATIVES )
@@ -214,7 +214,7 @@ KineticReactions< REAL_TYPE,
                   INDEX_TYPE,
                   ACTIVITY_MODEL,
                   LOGE_CONCENTRATION
-                  >::computeReactionRatesQuotient_impl( RealType const &, //temperature,
+                  >::computeReactionRatesAffinity_impl( RealType const &, //temperature,
                                                         PARAMS_DATA const & params,
                                                         ARRAY_1D_TO_CONST const & activities,
                                                         ARRAY_1D_SA const & surfaceArea,
@@ -331,11 +331,11 @@ KineticReactions< REAL_TYPE,
     HPCREACT_UNUSED_VAR( dSpeciesRates_dActivities );
   }
 
-  computeReactionRates< PARAMS_DATA, true >( temperature,
-                                             params,
-                                             activities,
-                                             reactionRates,
-                                             dReactionRates_dActivities );
+  computeReactionRatesElementary_impl< PARAMS_DATA, true >( temperature,
+                                                            params,
+                                                            activities,
+                                                            reactionRates,
+                                                            dReactionRates_dActivities );
 
   for( IntType i = 0; i < PARAMS_DATA::numSpecies(); ++i )
   {

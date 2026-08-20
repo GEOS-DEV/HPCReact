@@ -73,7 +73,7 @@ constexpr simpleKineticParamsType simpleKineticTestRateParams(
   simpleKineticForwardRates,
   simpleKineticReverseRates,
   simpleKineticEquilibriumConstants,
-  0 );
+  reactionsSystems::ReactionRateLawOption::Elementary );
 
 // species count taken from the system type so it cannot drift from it
 using simpleIonicStrengthType = SpeciatedIonicStrength< double, int, simpleKineticParamsType::numSpecies() >;
@@ -132,7 +132,7 @@ constexpr simpleMixedParamsType simpleTestRateParams(
   simpleMixedForwardRates,
   simpleMixedReverseRates,
   simpleMixedMobileSpeciesFlag,
-  0 );
+  reactionsSystems::ReactionRateLawOption::Elementary );
 
 // *****UNCRUSTIFY-ON******
 } // namespace bulkGeneric
