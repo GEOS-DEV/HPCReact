@@ -267,7 +267,9 @@ void test_calculateLogSecondarySpeciesConcentration_identityActivityModel_helper
 
   CalculateLogSecondarySpeciesConcentrationData< numPrimarySpecies, numSecondarySpecies, numSpecies > data;
 
-  pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
+  constexpr auto activityParams = carbonateIdentityActivityParams;
+
+  pmpl::genericKernelWrapper( 1, &data, [activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     dataCopy->converged =
       calculateLogSecondarySpeciesConcentration< double,
@@ -275,7 +277,7 @@ void test_calculateLogSecondarySpeciesConcentration_identityActivityModel_helper
                                                  int,
                                                  carbonateIdentityActivityType,
                                                  true >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                         carbonateIdentityActivityParams,
+                                                         activityParams,
                                                          dataCopy->logPrimarySpeciesSolution,
                                                          dataCopy->logSecondarySpeciesConcentrations,
                                                          dataCopy->logActivityCoefficients,
@@ -461,7 +463,9 @@ void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
 
   CalculateAggregatePrimaryConcentrationsWrtLogCHelperData< numPrimarySpecies, numSecondarySpecies, numSpecies > data;
 
-  pmpl::genericKernelWrapper( 1, &data, [] HPCREACT_DEVICE ( auto * const dataCopy )
+  constexpr auto activityParams = carbonateIdentityActivityParams;
+
+  pmpl::genericKernelWrapper( 1, &data, [activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     dataCopy->converged =
       calculateLogSecondarySpeciesConcentrationWrtLogC< double,
@@ -469,7 +473,7 @@ void testcalculateAggregatePrimaryConcentrationsWrtLogCHelper()
                                                         int,
                                                         carbonateIdentityActivityType,
                                                         true >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                                carbonateIdentityActivityParams,
+                                                                activityParams,
                                                                 dataCopy->logPrimarySpeciesSolution,
                                                                 dataCopy->logSecondarySpeciesConcentrations,
                                                                 dataCopy->logActivityCoefficients,

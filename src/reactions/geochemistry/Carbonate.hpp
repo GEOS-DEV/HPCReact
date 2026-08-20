@@ -316,8 +316,8 @@ constexpr carbonateNosolidActivityType::Params carbonateNosolidActivityParamsEQ3
 
 
 
-Identity< double, int, carbonateIonicStrengthType >::Params carbonateIdentityActivityParams = {};
-Identity< double, int, carbonateNosolidIonicStrengthType >::Params carbonateNosolidIdentityActivityParams = {};
+constexpr Identity< double, int, carbonateIonicStrengthType >::Params carbonateIdentityActivityParams = {};
+constexpr Identity< double, int, carbonateNosolidIonicStrengthType >::Params carbonateNosolidIdentityActivityParams = {};
 
 // *****UNCRUSTIFY-ON******
 } // namespace geochemistry
