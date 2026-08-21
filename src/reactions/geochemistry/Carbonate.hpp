@@ -110,120 +110,40 @@ constexpr CArrayWrapper<int, 10> mobileSpeciesFlag =
     1   // CaCO3 + H+ = Ca+2 + HCO3-
   };
 
+// Activity model parameters
+constexpr CArrayWrapper<double, 17> speciesCharge =
+  // OH-      CO2(aq)   CO3-2     CaHCO3+   CaSO4(aq) CaCl+     CaCl2(aq) MgSO4(aq) NaSO4-    CaCO3(aq) H+        HCO3-     Ca+2      SO4-2     Cl-       Mg+2      Na+
+  {  -1.0,    0.0,      -2.0,     1.0,      0.0,      1.0,      0.0,      0.0,      -1.0,     0.0,      1.0,      -1.0,     2.0,      -2.0,     -1.0,     2.0,      1.0 };
 
-
-
-
-constexpr CArrayWrapper<double, 17> speciesCharge = 
-  { -1.0, // OH-
-     0.0, // CO2(aq)
-    -2.0, // CO3-2
-     1.0, // CaHCO3+
-     0.0, // CaSO4(aq)
-     1.0, // CaCl+
-     0.0, // CaCl2(aq)
-     0.0, // MgSO4(aq)
-    -1.0, // NaSO4-
-     0.0, // CaCO3(aq)
-     1.0, // H+
-    -1.0, // HCO3-
-     2.0, // Ca+2
-    -2.0, // SO4-2
-    -1.0, // Cl-
-     2.0, // Mg+2
-     1.0  // Na+
-    };
-
-  // ion size parameter in ANGSTROM
+  // ion size parameter in ANGSTROM (phreeqc.dat -gamma values; 0.0 for neutral species and
+  // species without a -gamma entry, where gamma ≈ 1)
   constexpr CArrayWrapper<double, 17> ionSize =
-  {
-    3.5,  // OH-      (from H2O = OH- + H+, -gamma 3.5 0.0)
-    0.0,  // CO2(aq)  (neutral, no -gamma; typically gamma ≈ 1)
-    5.4,  // CO3-2
-    5.4,  // CaHCO3+
-    0.0,  // CaSO4(aq) (neutral)
-    0.0,  // CaCl+    (no -gamma in phreeqc.dat)
-    0.0,  // CaCl2(aq) (neutral)
-    0.0,  // MgSO4(aq) (neutral)
-    0.0,  // NaSO4-   (no -gamma in phreeqc.dat)
-    0.0,  // CaCO3(aq) (neutral)
-    9.0,  // H+
-    5.4,  // HCO3-    (from CO3-2 + H+ = HCO3-, -gamma 5.4 0.0)
-    5.0,  // Ca+2
-    5.0,  // SO4-2
-    3.5,  // Cl-
-    5.5,  // Mg+2
-    4.0   // Na+ 
-  };
+  // OH-      CO2(aq)   CO3-2     CaHCO3+   CaSO4(aq) CaCl+     CaCl2(aq) MgSO4(aq) NaSO4-    CaCO3(aq) H+        HCO3-     Ca+2      SO4-2     Cl-       Mg+2      Na+
+  {  3.5,     0.0,      5.4,      5.4,      0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      9.0,      5.4,      5.0,      5.0,      3.5,      5.5,      4.0 };
 
   constexpr CArrayWrapper<double, 17> bdotParameters =
-  {
-      0.0,    // OH-
-      0.0,    // CO2(aq)
-      0.0,    // CO3-2
-      0.0,    // CaHCO3+
-      0.0,    // CaSO4(aq)
-      0.0,    // CaCl+
-      0.0,    // CaCl2(aq)
-      0.0,    // MgSO4(aq)
-      0.0,    // NaSO4-
-      0.0,    // CaCO3(aq)
-      0.0,    // H+
-      0.0,    // HCO3-
-    0.165,  // Ca+2
-   -0.040,  // SO4-2
-    0.015,  // Cl-
-    0.200,  // Mg+2
-    0.075   // Na+
-  }; 
+  // OH-      CO2(aq)   CO3-2     CaHCO3+   CaSO4(aq) CaCl+     CaCl2(aq) MgSO4(aq) NaSO4-    CaCO3(aq) H+        HCO3-     Ca+2      SO4-2     Cl-       Mg+2      Na+
+  {  0.0,     0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      0.165,    -0.040,   0.015,    0.200,    0.075 };
 
 
 // EQ3/6 B-dot parameters (data0.com.V8.R6), for validation against EQ3NR. The WATEQ form reduces
 // to EQ3/6 B-dot when all species share one b. EQ3/6 applies b to charged species only.
 // CO2(aq) will not match: EQ3/6 gives it a Drummond salting-out term rather than gamma = 1.
 constexpr CArrayWrapper<double, 17> ionSizeEQ36 =
-  {
-    3.5,  // OH-
-    3.0,  // CO2(aq)
-    4.5,  // CO3-2
-    4.0,  // CaHCO3+
-    3.0,  // CaSO4(aq)
-    4.0,  // CaCl+
-    3.0,  // CaCl2(aq)
-    3.0,  // MgSO4(aq)
-    4.0,  // NaSO4-
-    3.0,  // CaCO3(aq)
-    9.0,  // H+
-    4.0,  // HCO3-
-    6.0,  // Ca+2
-    4.0,  // SO4-2
-    3.0,  // Cl-
-    8.0,  // Mg+2
-    4.0   // Na+
-  };
+  // OH-      CO2(aq)   CO3-2     CaHCO3+   CaSO4(aq) CaCl+     CaCl2(aq) MgSO4(aq) NaSO4-    CaCO3(aq) H+        HCO3-     Ca+2      SO4-2     Cl-       Mg+2      Na+
+  {  3.5,     3.0,      4.5,      4.0,      3.0,      4.0,      3.0,      3.0,      4.0,      3.0,      9.0,      4.0,      6.0,      4.0,      3.0,      8.0,      4.0 };
 
 constexpr double bdotEQ36_25C = 0.0410;
 
 constexpr CArrayWrapper<double, 17> bdotParametersEQ36 =
-  {
-    bdotEQ36_25C,  // OH-
-    0.0,           // CO2(aq)
-    bdotEQ36_25C,  // CO3-2
-    bdotEQ36_25C,  // CaHCO3+
-    0.0,           // CaSO4(aq)
-    bdotEQ36_25C,  // CaCl+
-    0.0,           // CaCl2(aq)
-    0.0,           // MgSO4(aq)
-    bdotEQ36_25C,  // NaSO4-
-    0.0,           // CaCO3(aq)
-    bdotEQ36_25C,  // H+
-    bdotEQ36_25C,  // HCO3-
-    bdotEQ36_25C,  // Ca+2
-    bdotEQ36_25C,  // SO4-2
-    bdotEQ36_25C,  // Cl-
-    bdotEQ36_25C,  // Mg+2
-    bdotEQ36_25C   // Na+
-  };
+  // OH-           CO2(aq)       CO3-2         CaHCO3+       CaSO4(aq)     CaCl+         CaCl2(aq)     MgSO4(aq)     NaSO4-        CaCO3(aq)     H+            HCO3-         Ca+2          SO4-2         Cl-           Mg+2          Na+
+  {  bdotEQ36_25C, 0.0,          bdotEQ36_25C, bdotEQ36_25C, 0.0,          bdotEQ36_25C, 0.0,          0.0,          bdotEQ36_25C, 0.0,          bdotEQ36_25C, bdotEQ36_25C, bdotEQ36_25C, bdotEQ36_25C, bdotEQ36_25C, bdotEQ36_25C, bdotEQ36_25C };
+
+// EQ3/6 'neutral ion type' column, transcribed from the same database. 0 is neutralSpeciesType::standard,
+// -1 is neutralSpeciesType::drummond.
+constexpr CArrayWrapper<signed char, 17> neutralSpeciesTypeEQ36 =
+  // OH-      CO2(aq)   CO3-2     CaHCO3+   CaSO4(aq) CaCl+     CaCl2(aq) MgSO4(aq) NaSO4-    CaCO3(aq) H+        HCO3-     Ca+2      SO4-2     Cl-       Mg+2      Na+
+  {  0,       -1,       0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0 };
 
 }
 
@@ -300,18 +220,28 @@ constexpr CArrayWrapper< double, 16 > carbonateNosolidBdotParametersEQ36 =
   carbonate::bdotParametersEQ36[13], carbonate::bdotParametersEQ36[14], carbonate::bdotParametersEQ36[15], carbonate::bdotParametersEQ36[16]
 };
 
+constexpr CArrayWrapper< signed char, 16 > carbonateNosolidNeutralSpeciesTypeEQ36 =
+{
+  carbonate::neutralSpeciesTypeEQ36[0], carbonate::neutralSpeciesTypeEQ36[1], carbonate::neutralSpeciesTypeEQ36[2], carbonate::neutralSpeciesTypeEQ36[3],
+  carbonate::neutralSpeciesTypeEQ36[4], carbonate::neutralSpeciesTypeEQ36[5], carbonate::neutralSpeciesTypeEQ36[6], carbonate::neutralSpeciesTypeEQ36[7],
+  carbonate::neutralSpeciesTypeEQ36[8], carbonate::neutralSpeciesTypeEQ36[10], carbonate::neutralSpeciesTypeEQ36[11], carbonate::neutralSpeciesTypeEQ36[12],
+  carbonate::neutralSpeciesTypeEQ36[13], carbonate::neutralSpeciesTypeEQ36[14], carbonate::neutralSpeciesTypeEQ36[15], carbonate::neutralSpeciesTypeEQ36[16]
+};
+
 constexpr carbonateActivityType::Params carbonateActivityParamsEQ36 =
 {
   {carbonate::speciesCharge},
   carbonate::ionSizeEQ36,
-  carbonate::bdotParametersEQ36
+  carbonate::bdotParametersEQ36,
+  carbonate::neutralSpeciesTypeEQ36
 };
 
 constexpr carbonateNosolidActivityType::Params carbonateNosolidActivityParamsEQ36 =
 {
   {carbonateNosolidSpeciesCharge},
   carbonateNosolidIonSizeEQ36,
-  carbonateNosolidBdotParametersEQ36
+  carbonateNosolidBdotParametersEQ36,
+  carbonateNosolidNeutralSpeciesTypeEQ36
 };
 
 

@@ -11,11 +11,31 @@
 #pragma once
 
 #include "DebyeHuckel.hpp"
+#include "Drummond.hpp"
 #include "common/CArrayWrapper.hpp"
 #include "common/constants.hpp"
 
 namespace hpcReact
 {
+
+/**
+ * @brief Selects which model supplies a species' activity coefficient.
+ *
+ * The values are EQ3/6's own "neutral ion type" codes, as tabulated in the 'bdot parameters' block
+ * of a data0 file, so a parameter file can transcribe that column without translating it. In
+ * data0.com.V8.R6 exactly three of the 1769 aqueous species are tagged for salting-out --
+ * CO2(aq), H2(aq) and O2(aq). Every other species carries the default, H2S(aq), N2(aq), NH3(aq)
+ * and SO2(aq) among them.
+ */
+namespace neutralSpeciesType
+{
+/// The standard B-dot expression. It degenerates to gamma = 1 for a neutral species, whose
+/// Debye-Huckel term vanishes with its charge.
+constexpr signed char standard = 0;
+
+/// Drummond (1981) salting-out polynomial, in place of the B-dot expression.
+constexpr signed char drummond = -1;
+}
 
 template< typename REAL_TYPE,
           typename INDEX_TYPE,
@@ -35,6 +55,10 @@ public:
 
     /// B-dot parameter in kg/mol, so that b*I is dimensionless.
     CArrayWrapper< RealType, IONIC_STRENGTH_TYPE::Params::numSpecies() > m_bdotParameter;
+
+    /// Per-species neutralSpeciesType tag. Defaults to all-standard, which is the behavior of a
+    /// parameter file written before this member existed.
+    CArrayWrapper< signed char, IONIC_STRENGTH_TYPE::Params::numSpecies() > m_neutralSpeciesType {};
   };
 
 
@@ -81,25 +105,38 @@ public:
     auto const & speciesCharge = params.m_speciesCharge;
     auto const & a = params.m_ionSizeParameter;
     auto const & b = params.m_bdotParameter;
+    auto const & neutralType = params.m_neutralSpeciesType;
 
     const IndexType numSpecies = params.numSpecies();
     for( IndexType i=0; i<numSpecies; ++i )
     {
-      RealType dlog10_gamma_dI;
-      RealType const DebyeHuckel_term = DebyeHuckel< RealType >::log10_gamma( sqrtI,
-                                                                              speciesCharge[i],
-                                                                              a[i],
-                                                                              A_gamma_log10,
-                                                                              B_gamma,
-                                                                              dlog10_gamma_dI );
-      logActivityCoefficients[i] = ( DebyeHuckel_term + b[i] * ionicStrength ) * constants::ln10;
+      RealType dLogGamma_dIonicStrength;
 
-      // d ln(gamma_i)/dc_j = ln(10) * dlog10(gamma_i)/dI * dI/dc_j.
-      // dlog10_gamma_dI is singular at I = 0, where the ionic strength term is dropped.
-      RealType const dLogGamma_dIonicStrength =
-        ionicStrength > 0.0 ?
-        constants::ln10 * ( dlog10_gamma_dI + b[i] ) :
-        0.0;
+      if( neutralType[i] == neutralSpeciesType::drummond )
+      {
+        logActivityCoefficients[i] = Drummond< RealType >::ln_gamma( ionicStrength,
+                                                                     T_K,
+                                                                     dLogGamma_dIonicStrength );
+      }
+      else
+      {
+        RealType dlog10_gamma_dI;
+        RealType const DebyeHuckel_term = DebyeHuckel< RealType >::log10_gamma( sqrtI,
+                                                                                speciesCharge[i],
+                                                                                a[i],
+                                                                                A_gamma_log10,
+                                                                                B_gamma,
+                                                                                dlog10_gamma_dI );
+        logActivityCoefficients[i] = ( DebyeHuckel_term + b[i] * ionicStrength ) * constants::ln10;
+
+        // d ln(gamma_i)/dc_j = ln(10) * dlog10(gamma_i)/dI * dI/dc_j.
+        // dlog10_gamma_dI is singular at I = 0, where the ionic strength term is dropped.
+        dLogGamma_dIonicStrength =
+          ionicStrength > 0.0 ?
+          constants::ln10 * ( dlog10_gamma_dI + b[i] ) :
+          0.0;
+      }
+
       for( IndexType j=0; j<numSpecies; ++j )
       {
         dLogActivityCoefficients_dConcentrations[i][j] = dLogGamma_dIonicStrength * dIonicStrength_dConcentration[j];

@@ -61,7 +61,7 @@ constexpr double eq36Molality[numSpecies] =
 constexpr double eq36Log10Gamma[numSpecies] =
 {
   -0.1965, // OH-
-  0.1555, // CO2(aq)   (Drummond salting-out, not reproduced here)
+  0.1555, // CO2(aq)   (Drummond salting-out)
   -0.8321, // CO3-2
   -0.1760, // CaHCO3+
   0.0000, // CaSO4(aq)
@@ -80,9 +80,6 @@ constexpr double eq36Log10Gamma[numSpecies] =
 };
 
 constexpr double eq36IonicStrength = 1.6126;
-
-/// EQ3/6 gives CO2(aq) a Drummond salting-out term; this model gives every neutral gamma = 1.
-constexpr int indexCO2 = 1;
 
 } // namespace
 
@@ -109,26 +106,10 @@ TEST( testCarbonateActivityVsEQ36, activityCoefficients )
 
   for( int i = 0; i < numSpecies; ++i )
   {
-    if( i == indexCO2 )
-      continue;
     // EQ3NR truncates log10(gamma) to four decimals, biasing the reference low by up to 1e-4.
     EXPECT_NEAR( logActivityCoefficients[i] * constants::invln10, eq36Log10Gamma[i], 2.0e-4 )
       << "species index " << i;
   }
-}
-
-
-TEST( testCarbonateActivityVsEQ36, neutralSpeciesAreIdeal )
-{
-  double logActivityCoefficients[numSpecies] = { 0.0 };
-  double dLogActivityCoefficients_dConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
-
-  carbonateActivityType::calculateLogActivityCoefficients( carbonateActivityParamsEQ36,
-                                                           eq36Molality,
-                                                           logActivityCoefficients,
-                                                           dLogActivityCoefficients_dConcentrations );
-
-  EXPECT_NEAR( logActivityCoefficients[indexCO2], 0.0, 1.0e-12 );
 }
 
 
