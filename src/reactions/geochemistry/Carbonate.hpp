@@ -55,19 +55,19 @@ constexpr CArrayWrapper<signed char, 10, 16> stoichMatrixNosolid =
     {     0,     0,     0,      0,     0,     0,     0,     0,     0,     -1,     1,     1,     0,     0,     0,     0  }  //   CaCO3(s) + H+ = Ca+2 + HCO3- (kinetic)
   };
 
-// thermodynamic constants derived from 'llnl.tdat' used by Geochemists' Workbench (originally from EQ36)
-constexpr CArrayWrapper<double, 10> equilibriumConstants = 
-  { 
-    9.89E+13,  //   OH- + H+ = H2O         
-    4.42E-07,  //  CO2 + H2O = H+ + HCO3-  
-    2.21E+10,  // CO3-2 + H+ = HCO3-       
-    6.00E-02,  //    CaHCO3+ = Ca+2 + HCO3-
-    4.79E-03,  //      CaSO4 = Ca+2 + SO4-2
-    2.00E-01,  //      CaCl+ = Ca+2 + Cl-  
-    3.98E+00,  //      CaCl2 = Ca+2 + 2Cl- 
-    5.92E-03,  //      MgSO4 = Mg+2 + SO4-2
-    2.02E-01,  //     NaSO4- = Na+ + SO4-2 
-    5.16E+01   // CaCO3 + H+ = Ca+2 + HCO3- (kinetic) 
+// logK the 25 C entry of the data0.com.V8.R6 grid. 
+constexpr CArrayWrapper<double, 10> equilibriumConstants =
+  {
+    9.88781E+13,  // logK  13.9951    OH- + H+ = H2O
+    4.52168E-07,  // logK  -6.3447   CO2 + H2O = H+ + HCO3-
+    2.13206E+10,  // logK  10.3288  CO3-2 + H+ = HCO3-
+    8.98049E-02,  // logK  -1.0467     CaHCO3+ = Ca+2 + HCO3-
+    7.74283E-03,  // logK  -2.1111       CaSO4 = Ca+2 + SO4-2
+    4.96135E+00,  // logK   0.6956       CaCl+ = Ca+2 + Cl-
+    4.40149E+00,  // logK   0.6436       CaCl2 = Ca+2 + 2Cl-
+    3.87525E-03,  // logK  -2.4117       MgSO4 = Mg+2 + SO4-2
+    1.51356E-01,  // logK  -0.8200      NaSO4- = Na+ + SO4-2
+    7.05830E+01   // logK   1.8487     Calcite + H+ = Ca+2 + HCO3- (kinetic)
   };
 
 constexpr CArrayWrapper<double, 10> forwardRates = 
@@ -84,17 +84,18 @@ constexpr CArrayWrapper<double, 10> forwardRates =
     1.55E-06  // CaCO3 + H+ = Ca+2 + HCO3- (kinetic) 
   };
 
-constexpr CArrayWrapper<double, 10> reverseRates = 
-  { 1.43E-03,  //   OH- + H+ = H2O         
-    8.92E+04,  //  CO2 + H2O = H+ + HCO3-  
-    4.67E-01,  // CO3-2 + H+ = HCO3-       
-    1.85E+07,  //    CaHCO3+ = Ca+2 + HCO3-
-    1.45E+07,  //      CaSO4 = Ca+2 + SO4-2
-    2.14E+07,  //      CaCl+ = Ca+2 + Cl-  
-    2.51E+06,  //      CaCl2 = Ca+2 + 2Cl- 
-    2.69E+07,  //      MgSO4 = Mg+2 + SO4-2
-    6.62E+07,  //     NaSO4- = Na+ + SO4-2
-    3.00E-08   // CaCO3 + H+ = Ca+2 + HCO3-
+// kr = kf / K
+constexpr CArrayWrapper<double, 10> reverseRates =
+  { 1.41588E-03,  //   OH- + H+ = H2O
+    8.62511E+04,  //  CO2 + H2O = H+ + HCO3-
+    4.69030E-01,  // CO3-2 + H+ = HCO3-
+    1.67029E+07,  //    CaHCO3+ = Ca+2 + HCO3-
+    1.29152E+07,  //      CaSO4 = Ca+2 + SO4-2
+    2.01558E+07,  //      CaCl+ = Ca+2 + Cl-
+    2.27196E+06,  //      CaCl2 = Ca+2 + 2Cl-
+    2.58048E+07,  //      MgSO4 = Mg+2 + SO4-2
+    6.60694E+07,  //     NaSO4- = Na+ + SO4-2
+    2.19600E-08   // CaCO3 + H+ = Ca+2 + HCO3-
   };
 
 constexpr CArrayWrapper<int, 10> mobileSpeciesFlag = 

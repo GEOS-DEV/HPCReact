@@ -67,13 +67,13 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem_Identity )
   // ideal-solution concentrations.
   double const expectedSpeciesConcentrations[carbonateSystemType::numPrimarySpecies()] =
   {
-    0.00040311656239679382, // H+
-    0.00041180885982392148, // HCO3-
-    0.0032499045666604504, // Ca+2
-    0.0036920967945592146, // SO4-2
-    1.8542541730074311, // Cl-
-    0.010162194793470079, // Mg+2
-    1.070434904554991 // Na+1
+    0.00043107371205575743, // H+
+    0.00039393087146083564, // HCO3-
+    0.015533203748051142, // Ca+2
+    0.0025349216394956169, // SO4-2
+    1.8597651352187075, // Cl-
+    0.0099750254121169241, // Mg+2
+    1.0720453048327119 // Na+1
   };
 
   timeStepCarbonateSystemHelper< carbonateNosolidIdentityActivityType >( carbonateNosolidIdentityActivityParams,
