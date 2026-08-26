@@ -110,6 +110,20 @@ constexpr CArrayWrapper<int, 10> mobileSpeciesFlag =
     1   // CaCO3 + H+ = Ca+2 + HCO3-
   };
 
+// H2O coefficient, product-positive like the rows of stoichMatrix.
+constexpr CArrayWrapper<signed char, 10> waterStoichiometry =
+  { 1,   //   OH- + H+ = H2O
+    -1,  //  CO2 + H2O = H+ + HCO3-
+    0,   // CO3-2 + H+ = HCO3-
+    0,   //    CaHCO3+ = Ca+2 + HCO3-
+    0,   //      CaSO4 = Ca+2 + SO4-2
+    0,   //      CaCl+ = Ca+2 + Cl-
+    0,   //      CaCl2 = Ca+2 + 2Cl-
+    0,   //      MgSO4 = Mg+2 + SO4-2
+    0,   //     NaSO4- = Na+ + SO4-2
+    0   // CaCO3 + H+ = Ca+2 + HCO3-
+  };
+
 // Activity model parameters
 constexpr CArrayWrapper<double, 17> speciesCharge =
   // OH-      CO2(aq)   CO3-2     CaHCO3+   CaSO4(aq) CaCl+     CaCl2(aq) MgSO4(aq) NaSO4-    CaCO3(aq) H+        HCO3-     Ca+2      SO4-2     Cl-       Mg+2      Na+
@@ -161,9 +175,9 @@ using carbonateNosolidActivityType = Bdot< double, int, carbonateNosolidIonicStr
 using carbonateNosolidIdentityActivityType = Identity< double, int, carbonateNosolidIonicStrengthType >;
 
 
-constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag, reactionsSystems::ReactionRateLawOption::Elementary );
-constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
-constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag );
+constexpr carbonateSystemAllKineticType carbonateSystemAllKinetic( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag, reactionsSystems::ReactionRateLawOption::Elementary, carbonate::waterStoichiometry );
+constexpr carbonateSystemAllEquilibriumType carbonateSystemAllEquilibrium( carbonate::stoichMatrix, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag, reactionsSystems::ReactionRateLawOption::Affinity, carbonate::waterStoichiometry );
+constexpr carbonateSystemType carbonateSystem( carbonate::stoichMatrixNosolid, carbonate::equilibriumConstants, carbonate::forwardRates, carbonate::reverseRates, carbonate::mobileSpeciesFlag, reactionsSystems::ReactionRateLawOption::Affinity, carbonate::waterStoichiometry );
 
 constexpr CArrayWrapper< double, 16 > carbonateNosolidSpeciesCharge =
 {
@@ -233,7 +247,8 @@ constexpr carbonateActivityType::Params carbonateActivityParamsEQ36 =
   {carbonate::speciesCharge},
   carbonate::ionSizeEQ36,
   carbonate::bdotParametersEQ36,
-  carbonate::neutralSpeciesTypeEQ36
+  carbonate::neutralSpeciesTypeEQ36,
+  carbonate::bdotEQ36_25C // the single b the water activity assumes all solutes share
 };
 
 constexpr carbonateNosolidActivityType::Params carbonateNosolidActivityParamsEQ36 =
@@ -241,7 +256,8 @@ constexpr carbonateNosolidActivityType::Params carbonateNosolidActivityParamsEQ3
   {carbonateNosolidSpeciesCharge},
   carbonateNosolidIonSizeEQ36,
   carbonateNosolidBdotParametersEQ36,
-  carbonateNosolidNeutralSpeciesTypeEQ36
+  carbonateNosolidNeutralSpeciesTypeEQ36,
+  carbonate::bdotEQ36_25C // the single b the water activity assumes all solutes share
 };
 
 

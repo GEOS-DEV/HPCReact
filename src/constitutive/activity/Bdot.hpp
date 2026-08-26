@@ -59,7 +59,15 @@ public:
     /// Per-species neutralSpeciesType tag. Defaults to all-standard, which is the behavior of a
     /// parameter file written before this member existed.
     CArrayWrapper< signed char, IONIC_STRENGTH_TYPE::Params::numSpecies() > m_neutralSpeciesType {};
+
+    /// The single B-dot parameter the water activity assumes all solutes share. Defaults to 0.
+    RealType m_bdotWater {};
   };
+
+  /// Ambient water properties, shared by the activity coefficients and the water activity.
+  static constexpr RealType rho_w = 997.0479; // kg/m3
+  static constexpr RealType eps_r = 78.54; // dimensionless
+  static constexpr RealType T_K = 298.15; // K
 
 
 
@@ -90,9 +98,6 @@ public:
                                                                    speciesConcentrations,
                                                                    dIonicStrength_dConcentration );
     RealType const sqrtI = sqrt( ionicStrength );
-    RealType const rho_w = 997.0479; // kg/m3
-    RealType const eps_r = 78.54; // dimensionless
-    RealType const T_K = 298.15;
     RealType const A_gamma = DebyeHuckel< RealType >::A_gamma( T_K, rho_w, eps_r );
     // A_gamma is returned in its natural-log form, while the log10_gamma equation below is
     // evaluated in log10. Convert it to the log10 scale.
@@ -142,6 +147,108 @@ public:
         dLogActivityCoefficients_dConcentrations[i][j] = dLogGamma_dIonicStrength * dIonicStrength_dConcentration[j];
       }
     }
+  }
+
+  /**
+   * @brief Compute ln(a_w), the activity of the solvent, and its derivatives.
+   * @param params activity model parameters
+   * @param speciesConcentrations linear concentrations c_i, in molality
+   * @param dLogWaterActivity_dConcentrations [out] d ln(a_w)/dc_j for every species j
+   * @return ln(a_w)
+   *
+   * The B-dot-consistent form
+   * \f[
+   *   \log_{10} a_w = \frac{1}{\Omega} \left[ -\frac{\sum_i m_i}{\ln 10}
+   *                 + \frac{2}{3} A^\gamma_{10} I^{3/2} \sigma( \mathring{a} B^\gamma \sqrt{I} )
+   *                 - \dot{B} I^2 \right],
+   *   \quad \sigma(x) = \frac{3}{x^3}\left( 1 + x - \frac{1}{1+x} - 2\ln(1+x) \right)
+   * \f]
+   * It is consistent with the B-dot gamma above when every solute is an ion sharing one hard core
+   * diameter, one B-dot parameter and one z^2.
+   */
+  template< typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D >
+  static inline HPCREACT_HOST_DEVICE
+  RealType
+  logWaterActivity( Params const & params,
+                    ARRAY_1D_TO_CONST const & speciesConcentrations,
+                    ARRAY_1D & dLogWaterActivity_dConcentrations )
+  {
+    RealType dIonicStrength_dConcentration[ Params::numSpecies() ];
+    RealType const ionicStrength = IONIC_STRENGTH_TYPE::calculate( params,
+                                                                   speciesConcentrations,
+                                                                   dIonicStrength_dConcentration );
+
+    RealType dLnWaterActivity_dSoluteMolality;
+    RealType dLnWaterActivity_dIonicStrength;
+    RealType const result = logWaterActivity_impl( params,
+                                                   speciesConcentrations,
+                                                   ionicStrength,
+                                                   dLnWaterActivity_dSoluteMolality,
+                                                   dLnWaterActivity_dIonicStrength );
+
+    IndexType const numSpecies = params.numSpecies();
+    for( IndexType j=0; j<numSpecies; ++j )
+    {
+      dLogWaterActivity_dConcentrations[j] = dLnWaterActivity_dSoluteMolality
+                                             + dLnWaterActivity_dIonicStrength * dIonicStrength_dConcentration[j];
+    }
+    return result;
+  }
+
+private:
+
+  /**
+   * @brief The closed form above, returning its two partial derivatives rather than a gradient.
+   * @param ionicStrength molal ionic strength I
+   * @param dLnWaterActivity_dSoluteMolality [out] d ln(a_w) / d(sum_i m_i)
+   * @param dLnWaterActivity_dIonicStrength [out] d ln(a_w) / dI
+   * @return ln(a_w)
+   */
+  template< typename ARRAY_1D_TO_CONST >
+  static inline HPCREACT_HOST_DEVICE
+  RealType
+  logWaterActivity_impl( Params const & params,
+                         ARRAY_1D_TO_CONST const & speciesConcentrations,
+                         RealType const ionicStrength,
+                         RealType & dLnWaterActivity_dSoluteMolality,
+                         RealType & dLnWaterActivity_dIonicStrength )
+  {
+    /// Hard core diameter in ANGSTROM, fixed for every solute.
+    constexpr RealType hardCoreDiameter = 4.0;
+
+    RealType soluteMolality = 0.0;
+    IndexType const numSpecies = params.numSpecies();
+    for( IndexType i=0; i<numSpecies; ++i )
+    {
+      soluteMolality += speciesConcentrations[i];
+    }
+
+    RealType const A_gamma_log10 = DebyeHuckel< RealType >::A_gamma( T_K, rho_w, eps_r ) * constants::invln10;
+    RealType const B_gamma = DebyeHuckel< RealType >::B_gamma( T_K, rho_w, eps_r ) * constants::metersPerAngstrom;
+
+    // I^(3/2)*sigma(k*sqrt(I)) reduces to (3/k^3)*h(x), which cancels both the I^(3/2) and the
+    // 1/x^3 and so is finite at I = 0.
+    RealType const k = hardCoreDiameter * B_gamma;
+    RealType const x = k * sqrt( ionicStrength );
+    RealType const onePlusX = 1.0 + x;
+    RealType const h      = 1.0 + x - 1.0 / onePlusX - 2.0 * log( onePlusX );
+    RealType const dh_dx  = 1.0 + 1.0 / ( onePlusX * onePlusX ) - 2.0 / onePlusX;
+
+    RealType const debyeHuckelTerm = 2.0 * A_gamma_log10 * h / ( k * k * k );
+    RealType const bdotTerm        = -params.m_bdotWater * ionicStrength * ionicStrength;
+
+    // dh_dx/(k*x) is the I-derivative of the Debye-Huckel term; it tends to 0 with x.
+    RealType const dTerms_dIonicStrength =
+      ionicStrength > 0.0 ?
+      A_gamma_log10 * dh_dx / ( k * x ) - 2.0 * params.m_bdotWater * ionicStrength :
+      0.0;
+
+    dLnWaterActivity_dSoluteMolality = -1.0 / constants::waterMolality;
+    dLnWaterActivity_dIonicStrength  = constants::ln10 * dTerms_dIonicStrength / constants::waterMolality;
+
+    return constants::ln10 * ( -soluteMolality * constants::invln10 + debyeHuckelTerm + bdotTerm )
+           / constants::waterMolality;
   }
 
 };

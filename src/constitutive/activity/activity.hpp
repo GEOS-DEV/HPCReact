@@ -25,6 +25,8 @@ namespace hpcReact
  *   `LOGE_CONCENTRATION == false`: input `c`, output `a`, derivatives wrt `c`.
  *   `LOGE_CONCENTRATION == true`: input `log(c)`, output `log(a)`, derivatives wrt `log(c)`.
  *   `logActivityCoefficients` is `ln(gamma)` in either case, for callers that need `C = a / gamma`.
+ *   `waterActivity` follows the same convention as `activities`: `ln(a_w)` when LOGE_CONCENTRATION,
+ *   `a_w` otherwise.
  */
 template< typename REAL_TYPE,
           typename INT_TYPE,
@@ -35,7 +37,8 @@ template< typename REAL_TYPE,
           typename ARRAY_1D,
           typename ARRAY_2D,
           typename ARRAY_1D_GAMMA,
-          typename ARRAY_2D_GAMMA >
+          typename ARRAY_2D_GAMMA,
+          typename ARRAY_1D_WATER >
 HPCREACT_HOST_DEVICE
 inline
 void calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams,
@@ -43,7 +46,9 @@ void calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams
                           ARRAY_1D & activities,
                           ARRAY_2D & dActivities_dConcentration,
                           ARRAY_1D_GAMMA & logActivityCoefficients,
-                          ARRAY_2D_GAMMA & dLogActivityCoefficients_dConcentration )
+                          ARRAY_2D_GAMMA & dLogActivityCoefficients_dConcentration,
+                          REAL_TYPE & waterActivity,
+                          ARRAY_1D_WATER & dWaterActivity_dConcentration )
 {
   HPCREACT_UNUSED_VAR( sizeof( INT_TYPE ) );
 
@@ -63,6 +68,10 @@ void calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams
                                                       logActivityCoefficients,
                                                       dLogActivityCoefficients_dConcentration );
 
+    waterActivity = ACTIVITY_MODEL::logWaterActivity( activityParams,
+                                                      linearConcentration,
+                                                      dWaterActivity_dConcentration );
+
     for( INDEX_TYPE i = 0; i < numSpecies; ++i )
     {
       activities[i] = speciesConcentration[i] + logActivityCoefficients[i];
@@ -77,6 +86,11 @@ void calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams
         dActivities_dConcentration[i][j] = ( i == j ? 1.0 : 0.0 ) + dLogGamma_dLogC;
       }
     }
+
+    for( INDEX_TYPE j = 0; j < numSpecies; ++j )
+    {
+      dWaterActivity_dConcentration[j] *= linearConcentration[j];
+    }
   }
   else
   {
@@ -84,6 +98,16 @@ void calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams
                                                       speciesConcentration,
                                                       logActivityCoefficients,
                                                       dLogActivityCoefficients_dConcentration );
+
+    // The linear branch reports a_w and its derivative on the same basis as `activities`.
+    REAL_TYPE const logWaterActivity = ACTIVITY_MODEL::logWaterActivity( activityParams,
+                                                                         speciesConcentration,
+                                                                         dWaterActivity_dConcentration );
+    waterActivity = exp( logWaterActivity );
+    for( INDEX_TYPE j = 0; j < numSpecies; ++j )
+    {
+      dWaterActivity_dConcentration[j] *= waterActivity;
+    }
 
     for( INDEX_TYPE i = 0; i < numSpecies; ++i )
     {
@@ -110,13 +134,16 @@ template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
           typename ARRAY_1D_TO_CONST,
           typename ARRAY_1D,
-          typename ARRAY_2D >
+          typename ARRAY_2D,
+          typename ARRAY_1D_WATER >
 HPCREACT_HOST_DEVICE
 inline
 void calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams,
                           ARRAY_1D_TO_CONST const & speciesConcentration,
                           ARRAY_1D & activities,
-                          ARRAY_2D & dActivities_dConcentration )
+                          ARRAY_2D & dActivities_dConcentration,
+                          REAL_TYPE & waterActivity,
+                          ARRAY_1D_WATER & dWaterActivity_dConcentration )
 {
   static constexpr INDEX_TYPE numSpecies = ACTIVITY_MODEL::Params::numSpecies();
 
@@ -132,7 +159,9 @@ void calculateActivities( typename ACTIVITY_MODEL::Params const & activityParams
                                              activities,
                                              dActivities_dConcentration,
                                              logActivityCoefficients,
-                                             dLogActivityCoefficients_dConcentration );
+                                             dLogActivityCoefficients_dConcentration,
+                                             waterActivity,
+                                             dWaterActivity_dConcentration );
 }
 
 } // namespace hpcReact

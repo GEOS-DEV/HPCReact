@@ -135,6 +135,8 @@ struct CalculateLogSecondarySpeciesConcentrationData
   double logActivities[numSpecies] = {0};
   double dLogActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
   double dLogActivityCoefficients_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
+  double logWaterActivity = 0.0;
+  double dLogWaterActivity_dLogSpeciesConcentrations[numSpecies] = {0};
   bool converged = false;
 
   double const logPrimarySpeciesSolution[numPrimarySpecies] =
@@ -186,16 +188,19 @@ void test_calculateLogSecondarySpeciesConcentration_helper( EQ_PARAMS const eqPa
                                                          dataCopy->logActivityCoefficients,
                                                          dataCopy->logActivities,
                                                          dataCopy->dLogActivities_dLogSpeciesConcentrations,
-                                                         dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations );
+                                                         dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                                         dataCopy->logWaterActivity,
+                                                         dataCopy->dLogWaterActivity_dLogSpeciesConcentrations );
   } );
 
   EXPECT_TRUE( data.converged );
 
   // The equilibrium constraint must hold at the returned state:
-  //   log(a_j) + log(K_j) - sum_k nu_jk log(a_k) = 0
+  //   log(a_j) + log(K_j) - sum_k nu_jk log(a_k) - nu_jw log(a_w) = 0
   for( int j = 0; j < numSecondarySpecies; ++j )
   {
-    double residual = data.logActivities[j] + log( eqParams.equilibriumConstant( j ) );
+    double residual = data.logActivities[j] + log( eqParams.equilibriumConstant( j ) )
+                      - eqParams.waterStoichiometry( j ) * data.logWaterActivity;
     for( int k = 0; k < numPrimarySpecies; ++k )
     {
       residual -= eqParams.stoichiometricMatrix( j, k + numSecondarySpecies ) *
@@ -283,7 +288,9 @@ void test_calculateLogSecondarySpeciesConcentration_identityActivityModel_helper
                                                          dataCopy->logActivityCoefficients,
                                                          dataCopy->logActivities,
                                                          dataCopy->dLogActivities_dLogSpeciesConcentrations,
-                                                         dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations );
+                                                         dataCopy->dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                                         dataCopy->logWaterActivity,
+                                                         dataCopy->dLogWaterActivity_dLogSpeciesConcentrations );
   } );
 
   // Reference solution, as in test_calculateLogSecondarySpeciesConcentrationNoActivityUpdate above:
@@ -378,6 +385,8 @@ void test_calculateLogSecondarySpeciesConcentrationWrtLogC_helper( EQ_PARAMS con
         double logActivities[numSpecies] = {0};
         double dLogActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
         double dLogActivityCoefficients_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{0}};
+        double logWaterActivity = 0.0;
+        double dLogWaterActivity_dLogSpeciesConcentrations[numSpecies] = {0};
 
         calculateLogSecondarySpeciesConcentration< double,
                                                    int,
@@ -390,7 +399,9 @@ void test_calculateLogSecondarySpeciesConcentrationWrtLogC_helper( EQ_PARAMS con
                                                            logActivityCoefficients,
                                                            logActivities,
                                                            dLogActivities_dLogSpeciesConcentrations,
-                                                           dLogActivityCoefficients_dLogSpeciesConcentrations );
+                                                           dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                                           logWaterActivity,
+                                                           dLogWaterActivity_dLogSpeciesConcentrations );
       }
 
       for( int j = 0; j < numSecondarySpecies; ++j )

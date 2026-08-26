@@ -81,6 +81,9 @@ constexpr double eq36Log10Gamma[numSpecies] =
 
 constexpr double eq36IonicStrength = 1.6126;
 
+/// EQ3NR 'Activity of water = 0.94187', as log10.
+constexpr double eq36Log10WaterActivity = -0.0260077;
+
 } // namespace
 
 
@@ -110,6 +113,19 @@ TEST( testCarbonateActivityVsEQ36, activityCoefficients )
     EXPECT_NEAR( logActivityCoefficients[i] * constants::invln10, eq36Log10Gamma[i], 2.0e-4 )
       << "species index " << i;
   }
+}
+
+
+TEST( testCarbonateActivityVsEQ36, waterActivity )
+{
+  double dLogWaterActivity_dConcentrations[numSpecies];
+
+  double const logWaterActivity =
+    carbonateActivityType::logWaterActivity( carbonateActivityParamsEQ36,
+                                             eq36Molality,
+                                             dLogWaterActivity_dConcentrations );
+
+  EXPECT_NEAR( logWaterActivity * constants::invln10, eq36Log10WaterActivity, 2.0e-5 );
 }
 
 

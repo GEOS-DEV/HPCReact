@@ -26,6 +26,19 @@ namespace massActions
 namespace massActions_impl
 {
 
+/**
+ * @brief Mass action for the secondary species, with the derivative reported through a callback.
+ * @param logPrimaryActivities log of the primary species activities.
+ * @param logSecondaryActivities [out] log(a_j) = -log(K_j) + nu_jw log(a_w) + sum_k nu_jk log(a_k).
+ * @param derivativeFunc invoked as (j, k, nu_jk) for every secondary/primary pair, where
+ *   nu_jk = d log(a_sec,j)/d log(a_prim,k). Pass a no-op to discard it.
+ * @param logWaterActivity ln(a_w), picked up in proportion to the water stoichiometry. Defaults to
+ *   0, i.e. an ideal solvent.
+ *
+ * The derivative is just the stoichiometric coefficient the loop already reads, so routing it
+ * through a callback lets the value-only and value-plus-derivative public overloads share one body.
+ * Callers use those overloads, not this.
+ */
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
@@ -38,7 +51,8 @@ inline
 void calculateLogSecondaryActivities( PARAMS_DATA const & params,
                                       ARRAY_1D_TO_CONST const & logPrimaryActivities,
                                       ARRAY_1D & logSecondaryActivities,
-                                      FUNC && derivativeFunc )
+                                      FUNC && derivativeFunc,
+                                      REAL_TYPE const logWaterActivity = 0.0 )
 {
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
   static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
@@ -50,7 +64,10 @@ void calculateLogSecondaryActivities( PARAMS_DATA const & params,
 
   for( int j=0; j<numSecondarySpecies; ++j )
   {
-    logSecondaryActivities[j] = -log( params.equilibriumConstant( j ) );
+    // Water is not one of the species, so its stoichiometry is carried separately. The term
+    // vanishes for an ideal solvent, where logWaterActivity is 0.
+    logSecondaryActivities[j] = -log( params.equilibriumConstant( j ) )
+                                + params.waterStoichiometry( j ) * logWaterActivity;
     for( int k=0; k<numPrimarySpecies; ++k )
     {
       logSecondaryActivities[j] += params.stoichiometricMatrix( j, k+numSecondarySpecies ) * ( logPrimaryActivities[k] );
@@ -61,6 +78,18 @@ void calculateLogSecondaryActivities( PARAMS_DATA const & params,
 
 } // namespace
 
+/**
+ * @brief Secondary species activities from mass action.
+ * @param logPrimaryActivities log of the primary species activities.
+ * @param logSecondaryActivities [out] log(a_j) = -log(K_j) + nu_jw log(a_w) + sum_k nu_jk log(a_k).
+ * @param logWaterActivity ln(a_w), picked up in proportion to the water stoichiometry. Defaults to
+ *   0, i.e. an ideal solvent.
+ *
+ * Updates the secondary activities directly from the primary activities, with no derivative output;
+ * use calculateLogSecondaryActivitiesWrtLogA when the derivative is needed. No additional activity
+ * model update is needed, since mass action is stated in activities. A no-op when there are no
+ * secondary species.
+ */
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
@@ -71,7 +100,8 @@ HPCREACT_HOST_DEVICE
 inline
 void calculateLogSecondaryActivities( PARAMS_DATA const & params,
                                       ARRAY_1D_TO_CONST const & logPrimaryActivities,
-                                      ARRAY_1D & logSecondaryActivities )
+                                      ARRAY_1D & logSecondaryActivities,
+                                      REAL_TYPE const logWaterActivity = 0.0 )
 {
   if constexpr( PARAMS_DATA::numSecondarySpecies() <= 0 )
   {
@@ -83,10 +113,22 @@ void calculateLogSecondaryActivities( PARAMS_DATA const & params,
                                                      INDEX_TYPE >( params,
                                                                    logPrimaryActivities,
                                                                    logSecondaryActivities,
-                                                                   []( INDEX_TYPE, INDEX_TYPE, REAL_TYPE ){} );
+                                                                   []( INDEX_TYPE, INDEX_TYPE, REAL_TYPE ){},
+                                                                   logWaterActivity );
 }
 
 
+/**
+ * @brief Secondary species activities from mass action, and their derivatives.
+ * @param logPrimaryActivities log of the primary species activities.
+ * @param logSecondaryActivities [out] log(a_j) = -log(K_j) + nu_jw log(a_w) + sum_k nu_jk log(a_k).
+ * @param dLogSecondaryActivities_dLogPrimaryActivities [out] d log(a_sec,j)/d log(a_prim,k), which
+ *   for mass action is just the stoichiometric matrix nu.
+ * @param logWaterActivity ln(a_w), picked up in proportion to the water stoichiometry. Defaults to
+ *   0, i.e. an ideal solvent, and is held fixed, so it contributes nothing to the derivative.
+ *
+ * Same as calculateLogSecondaryActivities, but also returns the derivative.
+ */
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
@@ -96,10 +138,11 @@ template< typename REAL_TYPE,
           typename ARRAY_2D >
 HPCREACT_HOST_DEVICE
 inline
-void calculateLogSecondaryActivitiesWrtLogC( PARAMS_DATA const & params,
+void calculateLogSecondaryActivitiesWrtLogA( PARAMS_DATA const & params,
                                              ARRAY_1D_TO_CONST const & logPrimaryActivities,
                                              ARRAY_1D & logSecondaryActivities,
-                                             ARRAY_2D & dLogSecondaryActivities_dLogPrimaryActivities )
+                                             ARRAY_2D & dLogSecondaryActivities_dLogPrimaryActivities,
+                                             REAL_TYPE const logWaterActivity = 0.0 )
 {
   massActions_impl::calculateLogSecondaryActivities< REAL_TYPE, INT_TYPE, INDEX_TYPE >( params,
                                                                                         logPrimaryActivities,
@@ -107,7 +150,8 @@ void calculateLogSecondaryActivitiesWrtLogC( PARAMS_DATA const & params,
                                                                                         [&]( const int j, const int k, REAL_TYPE const value )
   {
     dLogSecondaryActivities_dLogPrimaryActivities[j][k] = value;
-  } );
+  },
+                                                                                        logWaterActivity );
 }
 
 /**
@@ -118,6 +162,8 @@ void calculateLogSecondaryActivitiesWrtLogC( PARAMS_DATA const & params,
  *   species. Mass action yields activities; this converts them to concentrations via
  *   log(C_j) = log(a_j) - logSecondaryActivityCoefficients[j]. Pass zeros for an ideal solution,
  *   in which case the two coincide.
+ * @param logWaterActivity ln(a_w), which reactions pick up in proportion to their water
+ *   stoichiometry. Defaults to 0, i.e. an ideal solvent.
  *
  * The activity coefficients are taken as given, so the result is not self-consistent: the
  * concentrations returned imply an ionic strength that need not reproduce them. Use
@@ -135,7 +181,8 @@ inline
 void calculateLogSecondarySpeciesConcentrationNoActivityUpdate( PARAMS_DATA const & params,
                                                                 ARRAY_1D_TO_CONST const & logPrimaryActivities,
                                                                 ARRAY_1D_TO_CONST2 const & logSecondaryActivityCoefficients,
-                                                                ARRAY_1D & logSecondarySpeciesConcentrations )
+                                                                ARRAY_1D & logSecondarySpeciesConcentrations,
+                                                                REAL_TYPE const logWaterActivity = 0.0 )
 {
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
 
@@ -143,7 +190,8 @@ void calculateLogSecondarySpeciesConcentrationNoActivityUpdate( PARAMS_DATA cons
                                    INT_TYPE,
                                    INDEX_TYPE >( params,
                                                  logPrimaryActivities,
-                                                 logSecondarySpeciesConcentrations );
+                                                 logSecondarySpeciesConcentrations,
+                                                 logWaterActivity );
 
   for( INDEX_TYPE j = 0; j < numSecondarySpecies; ++j )
   {
@@ -172,23 +220,32 @@ void calculateLogSecondarySpeciesConcentrationWrtLogCNoActivityUpdate( PARAMS_DA
                                                                        ARRAY_1D_TO_CONST const & logPrimaryActivities,
                                                                        ARRAY_1D_TO_CONST2 const & logSecondaryActivityCoefficients,
                                                                        ARRAY_1D & logSecondarySpeciesConcentrations,
-                                                                       ARRAY_2D & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations )
+                                                                       ARRAY_2D & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations,
+                                                                       REAL_TYPE const logWaterActivity = 0.0 )
 {
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
+  static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
 
-  // The call below fills the derivative with nu, which is d log(a_sec)/d log(a_prim). That is the
-  // same as d log(C_sec)/d log(C_prim) only because the activity coefficients are fixed here. If
-  // they vary with concentration, use calculateLogSecondarySpeciesConcentrationWrtLogC instead.
-  calculateLogSecondaryActivitiesWrtLogC< REAL_TYPE,
+  REAL_TYPE dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesActivities[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
+
+  calculateLogSecondaryActivitiesWrtLogA< REAL_TYPE,
                                           INT_TYPE,
                                           INDEX_TYPE >( params,
                                                         logPrimaryActivities,
                                                         logSecondarySpeciesConcentrations,
-                                                        dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations );
+                                                        dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesActivities,
+                                                        logWaterActivity );
 
+  // The activity coefficients are frozen here, so log(a) = log(C) + const and the two derivatives
+  // coincide. If they vary with concentration, use calculateLogSecondarySpeciesConcentrationWrtLogC.
   for( INDEX_TYPE j = 0; j < numSecondarySpecies; ++j )
   {
     logSecondarySpeciesConcentrations[j] -= logSecondaryActivityCoefficients[j];
+    for( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
+    {
+      dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations[j][k] =
+        dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesActivities[j][k];
+    }
   }
 }
 
@@ -203,12 +260,15 @@ void calculateLogSecondarySpeciesConcentrationWrtLogCNoActivityUpdate( PARAMS_DA
  * @param logActivities [out] log of the activities for all species.
  * @param dLogActivities_dLogSpeciesConcentrations [out] d log(a_i)/d log(c_j).
  * @param dLogActivityCoefficients_dLogSpeciesConcentrations [out] d log(activityCoefficient_i)/d log(c_j).
+ * @param logWaterActivity [out] ln(a_w) at the converged state.
+ * @param dLogWaterActivity_dLogSpeciesConcentrations [out] d ln(a_w)/d log(c_j).
  * @return whether the solve converged.
  *
  * The activity coefficients depend on ionic strength, which depends on the secondary concentrations
  * this function produces. An inner Newton solve on log(C_sec) closes that loop, so on return the
- * concentrations, activity coefficients and activities are mutually consistent at the given primary
- * concentrations. Note the *primary* activity coefficients move too, since ionic strength does.
+ * concentrations, activity coefficients, activities and a_w are mutually consistent at the given
+ * primary concentrations. Note the *primary* activity coefficients move too, since ionic strength
+ * does.
  *
  * Requires numSecondarySpecies > 0; the caller decides whether there is anything to solve.
  */
@@ -223,7 +283,8 @@ template< typename REAL_TYPE,
           typename ARRAY_1D_GAMMA,
           typename ARRAY_1D_ACTIVITIES,
           typename ARRAY_2D_ACTIVITIES,
-          typename ARRAY_2D_GAMMA >
+          typename ARRAY_2D_GAMMA,
+          typename ARRAY_1D_WATER >
 HPCREACT_HOST_DEVICE
 inline
 bool calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
@@ -233,7 +294,9 @@ bool calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                 ARRAY_1D_GAMMA & logActivityCoefficients,
                                                 ARRAY_1D_ACTIVITIES & logActivities,
                                                 ARRAY_2D_ACTIVITIES & dLogActivities_dLogSpeciesConcentrations,
-                                                ARRAY_2D_GAMMA & dLogActivityCoefficients_dLogSpeciesConcentrations )
+                                                ARRAY_2D_GAMMA & dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                                REAL_TYPE & logWaterActivity,
+                                                ARRAY_1D_WATER & dLogWaterActivity_dLogSpeciesConcentrations )
 {
   static constexpr int numSpecies          = PARAMS_DATA::numSpecies();
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
@@ -283,12 +346,17 @@ bool calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
                                                logActivities,
                                                dLogActivities_dLogSpeciesConcentrations,
                                                logActivityCoefficients,
-                                               dLogActivityCoefficients_dLogSpeciesConcentrations );
+                                               dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                               logWaterActivity,
+                                               dLogWaterActivity_dLogSpeciesConcentrations );
 
-    // Equilibrium constraint: log(a_j) + log(K_j) - sum_k nu_jk log(a_k) = 0.
+    // Equilibrium constraint: log(a_j) + log(K_j) - sum_k nu_jk log(a_k) - nu_jw log(a_w) = 0.
     for( INDEX_TYPE j = 0; j < numSecondarySpecies; ++j )
     {
-      REAL_TYPE r = logActivities[j] + log( params.equilibriumConstant( j ) );
+      REAL_TYPE const nu_jw = params.waterStoichiometry( j );
+
+      REAL_TYPE r = logActivities[j] + log( params.equilibriumConstant( j ) )
+                    - nu_jw * logWaterActivity;
       for( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
       {
         r -= params.stoichiometricMatrix( j, k + numSecondarySpecies ) *
@@ -296,11 +364,12 @@ bool calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
       }
       residual[j] = r;
 
-      // d residual_j / d log(C_sec,m). The only dependence on the unknown is through the activity
-      // coefficients.
+      // d residual_j / d log(C_sec,m). The unknown enters through the activity coefficients and
+      // through a_w.
       for( INDEX_TYPE m = 0; m < numSecondarySpecies; ++m )
       {
-        REAL_TYPE value = dLogActivityCoefficients_dLogSpeciesConcentrations[j][m];
+        REAL_TYPE value = dLogActivityCoefficients_dLogSpeciesConcentrations[j][m]
+                          - nu_jw * dLogWaterActivity_dLogSpeciesConcentrations[m];
         for( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
         {
           value -= params.stoichiometricMatrix( j, k + numSecondarySpecies ) *
@@ -362,12 +431,16 @@ bool calculateLogSecondarySpeciesConcentrationWrtLogC( PARAMS_DATA const & param
                                                        ARRAY_2D_GAMMA & dLogActivityCoefficients_dLogSpeciesConcentrations,
                                                        ARRAY_2D & dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations )
 {
+  static constexpr int numSpecies          = PARAMS_DATA::numSpecies();
   static constexpr int numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
   static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
 
   static_assert( LOGE_CONCENTRATION,
                  "only LOGE_CONCENTRATION == true is available; LOGE_CONCENTRATION == false will be "
                  "implemented upon request." );
+
+  REAL_TYPE logWaterActivity;
+  REAL_TYPE dLogWaterActivity_dLogSpeciesConcentrations[numSpecies] = { 0.0 };
 
   bool const isConverged =
     calculateLogSecondarySpeciesConcentration< REAL_TYPE,
@@ -381,16 +454,21 @@ bool calculateLogSecondarySpeciesConcentrationWrtLogC( PARAMS_DATA const & param
                                                                      logActivityCoefficients,
                                                                      logActivities,
                                                                      dLogActivities_dLogSpeciesConcentrations,
-                                                                     dLogActivityCoefficients_dLogSpeciesConcentrations );
+                                                                     dLogActivityCoefficients_dLogSpeciesConcentrations,
+                                                                     logWaterActivity,
+                                                                     dLogWaterActivity_dLogSpeciesConcentrations );
 
   REAL_TYPE identityMinusA[numSecondarySpecies][numSecondarySpecies] = {{ 0.0 }};
   REAL_TYPE rhs[numSecondarySpecies][numPrimarySpecies] = {{ 0.0 }};
 
   for( INDEX_TYPE j = 0; j < numSecondarySpecies; ++j )
   {
+    REAL_TYPE const nu_jw = params.waterStoichiometry( j );
+
     for( INDEX_TYPE m = 0; m < numSecondarySpecies; ++m )
     {
-      REAL_TYPE a = -dLogActivityCoefficients_dLogSpeciesConcentrations[j][m];
+      REAL_TYPE a = -dLogActivityCoefficients_dLogSpeciesConcentrations[j][m]
+                    + nu_jw * dLogWaterActivity_dLogSpeciesConcentrations[m];
       for( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
       {
         a += params.stoichiometricMatrix( j, k + numSecondarySpecies ) *
@@ -402,7 +480,8 @@ bool calculateLogSecondarySpeciesConcentrationWrtLogC( PARAMS_DATA const & param
     for( INDEX_TYPE n = 0; n < numPrimarySpecies; ++n )
     {
       REAL_TYPE b = params.stoichiometricMatrix( j, n + numSecondarySpecies ) -
-                    dLogActivityCoefficients_dLogSpeciesConcentrations[j][n + numSecondarySpecies];
+                    dLogActivityCoefficients_dLogSpeciesConcentrations[j][n + numSecondarySpecies]
+                    + nu_jw * dLogWaterActivity_dLogSpeciesConcentrations[n + numSecondarySpecies];
       for( INDEX_TYPE k = 0; k < numPrimarySpecies; ++k )
       {
         b += params.stoichiometricMatrix( j, k + numSecondarySpecies ) *

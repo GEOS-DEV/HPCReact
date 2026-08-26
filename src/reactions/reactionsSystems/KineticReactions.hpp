@@ -74,6 +74,9 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    RealType waterActivity = 0.0;
+    RealType dWaterActivity_dConcentration[ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    RealType dReactionRates_dWaterActivity[ PARAMS_DATA::numReactions() ] = { 0.0 };
 
     calculateActivities< RealType,
                          IntType,
@@ -82,20 +85,24 @@ public:
                          LOGE_CONCENTRATION >( activityParams,
                                                speciesConcentration,
                                                activities,
-                                               dActivities_dConcentration );
+                                               dActivities_dConcentration,
+                                               waterActivity,
+                                               dWaterActivity_dConcentration );
 
     computeReactionRatesElementary_impl< PARAMS_DATA, true >( temperature,
                                                               params,
                                                               activities,
+                                                              waterActivity,
                                                               reactionRates,
-                                                              dReactionRates_dActivities );
+                                                              dReactionRates_dActivities,
+                                                              dReactionRates_dWaterActivity );
 
     // chain rule to get dReactionRate_dConcentration
     for( IntType r=0; r<PARAMS_DATA::numReactions(); ++r )
     {
       for( IntType i=0; i<PARAMS_DATA::numSpecies(); ++i )
       {
-        dReactionRates_dConcentration( r, i ) = 0.0;
+        dReactionRates_dConcentration( r, i ) = dReactionRates_dWaterActivity[r] * dWaterActivity_dConcentration[i];
         for( IntType j=0; j<PARAMS_DATA::numSpecies(); ++j )
         {
           dReactionRates_dConcentration( r, i ) += dReactionRates_dActivities[r][j] * dActivities_dConcentration[j][i];
@@ -129,6 +136,9 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    RealType waterActivity = 0.0;
+    RealType dWaterActivity_dConcentration[ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    RealType dReactionRates_dWaterActivity[ PARAMS_DATA::numReactions() ] = { 0.0 };
 
     calculateActivities< RealType,
                          IntType,
@@ -137,14 +147,19 @@ public:
                          LOGE_CONCENTRATION >( activityParams,
                                                speciesConcentration,
                                                activities,
-                                               dActivities_dConcentration );
+                                               dActivities_dConcentration,
+                                               waterActivity,
+                                               dWaterActivity_dConcentration );
 
     computeReactionRatesElementary_impl< PARAMS_DATA, false >( temperature,
                                                                params,
                                                                activities,
+                                                               waterActivity,
                                                                reactionRates,
-                                                               dReactionRates_dActivities );
+                                                               dReactionRates_dActivities,
+                                                               dReactionRates_dWaterActivity );
     HPCREACT_UNUSED_VAR( dReactionRates_dActivities );
+    HPCREACT_UNUSED_VAR( dReactionRates_dWaterActivity );
   }
 
   /**
@@ -184,6 +199,9 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ]{  };
     RealType dReactionRates_dActivities[ PARAMS_DATA::numReactions() ][ PARAMS_DATA::numSpecies() ]{  };
+    RealType waterActivity = 0.0;
+    RealType dWaterActivity_dConcentration[ PARAMS_DATA::numSpecies() ]{  };
+    RealType dReactionRates_dWaterActivity[ PARAMS_DATA::numReactions() ]{  };
 
     calculateActivities< RealType,
                          IntType,
@@ -192,24 +210,30 @@ public:
                          LOGE_CONCENTRATION >( activityParams,
                                                speciesConcentration,
                                                activities,
-                                               dActivities_dConcentration );
+                                               dActivities_dConcentration,
+                                               waterActivity,
+                                               dWaterActivity_dConcentration );
 
     if( params.reactionRateLawOption() == ReactionRateLawOption::Elementary )
     {
       computeReactionRatesElementary_impl< PARAMS_DATA, true >( temperature,
                                                                 params,
                                                                 activities,
+                                                                waterActivity,
                                                                 reactionRates,
-                                                                dReactionRates_dActivities );
+                                                                dReactionRates_dActivities,
+                                                                dReactionRates_dWaterActivity );
     }
     else if( params.reactionRateLawOption() == ReactionRateLawOption::Affinity )
     {
       computeReactionRatesAffinity_impl< PARAMS_DATA, true >( temperature,
                                                               params,
                                                               activities,
+                                                              waterActivity,
                                                               surfaceArea,
                                                               reactionRates,
-                                                              dReactionRates_dActivities );
+                                                              dReactionRates_dActivities,
+                                                              dReactionRates_dWaterActivity );
     }
 
     // chain rule to get dReactionRate_dConcentration
@@ -217,7 +241,7 @@ public:
     {
       for( IntType i=0; i<PARAMS_DATA::numSpecies(); ++i )
       {
-        dReactionRates_dConcentration( r, i ) = 0.0;
+        dReactionRates_dConcentration( r, i ) = dReactionRates_dWaterActivity[r] * dWaterActivity_dConcentration[i];
         for( IntType j=0; j<PARAMS_DATA::numSpecies(); ++j )
         {
           dReactionRates_dConcentration( r, i ) += dReactionRates_dActivities[r][j] * dActivities_dConcentration[j][i];
@@ -247,6 +271,9 @@ public:
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] {};
     RealType dSpeciesRates_dActivities[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] {};
+    RealType dSpeciesRates_dWaterActivity[ PARAMS_DATA::numSpecies() ] {};
+    RealType waterActivity = 0.0;
+    RealType dWaterActivity_dConcentration[ PARAMS_DATA::numSpecies() ] {};
 
     calculateActivities< RealType,
                          IntType,
@@ -255,19 +282,23 @@ public:
                          LOGE_CONCENTRATION >( activityParams,
                                                speciesConcentration,
                                                activities,
-                                               dActivities_dConcentration );
+                                               dActivities_dConcentration,
+                                               waterActivity,
+                                               dWaterActivity_dConcentration );
 
     computeSpeciesRates_impl< PARAMS_DATA, true >( temperature,
                                                    params,
                                                    activities,
+                                                   waterActivity,
                                                    speciesRates,
-                                                   dSpeciesRates_dActivities );
+                                                   dSpeciesRates_dActivities,
+                                                   dSpeciesRates_dWaterActivity );
     // chain rule to get dSpeciesRates_dConcentration
     for( IntType i=0; i<PARAMS_DATA::numSpecies(); ++i )
     {
       for( IntType j=0; j<PARAMS_DATA::numSpecies(); ++j )
       {
-        dSpeciesRates_dConcentration( i, j ) = 0.0;
+        dSpeciesRates_dConcentration( i, j ) = dSpeciesRates_dWaterActivity[i] * dWaterActivity_dConcentration[j];
         for( IntType k=0; k<PARAMS_DATA::numSpecies(); ++k )
         {
           dSpeciesRates_dConcentration( i, j ) += dSpeciesRates_dActivities[i][k] * dActivities_dConcentration[k][j];
@@ -298,6 +329,8 @@ public:
   {
     RealType activities[ PARAMS_DATA::numSpecies() ];
     RealType dActivities_dConcentration[ PARAMS_DATA::numSpecies() ][ PARAMS_DATA::numSpecies() ] = { 0.0 };
+    RealType waterActivity = 0.0;
+    RealType dWaterActivity_dConcentration[ PARAMS_DATA::numSpecies() ] = { 0.0 };
 
     calculateActivities< RealType,
                          IntType,
@@ -306,15 +339,20 @@ public:
                          LOGE_CONCENTRATION >( activityParams,
                                                speciesConcentration,
                                                activities,
-                                               dActivities_dConcentration );
+                                               dActivities_dConcentration,
+                                               waterActivity,
+                                               dWaterActivity_dConcentration );
 
     char speciesRatesDerivatives;
+    char speciesRatesWaterDerivatives;
 
     computeSpeciesRates_impl< PARAMS_DATA, false >( temperature,
                                                     params,
                                                     activities,
+                                                    waterActivity,
                                                     speciesRates,
-                                                    speciesRatesDerivatives );
+                                                    speciesRatesDerivatives,
+                                                    speciesRatesWaterDerivatives );
   }
 
   /**
@@ -385,13 +423,16 @@ private:
             bool CALCULATE_DERIVATIVES,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D,
-            typename ARRAY_2D >
+            typename ARRAY_2D,
+            typename ARRAY_1D_W >
   static HPCREACT_HOST_DEVICE void
   computeReactionRatesElementary_impl( RealType const & temperature,
                                        PARAMS_DATA const & params,
                                        ARRAY_1D_TO_CONST const & activities,
+                                       RealType const waterActivity,
                                        ARRAY_1D & reactionRates,
-                                       ARRAY_2D & dReactionRates_dActivities );
+                                       ARRAY_2D & dReactionRates_dActivities,
+                                       ARRAY_1D_W & dReactionRates_dWaterActivity );
 
 /**
  * @brief Compute the reaction rates from the departure of the activity quotient from equilibrium,
@@ -415,14 +456,17 @@ private:
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_SA,
             typename ARRAY_1D,
-            typename ARRAY_2D >
+            typename ARRAY_2D,
+            typename ARRAY_1D_W >
   static HPCREACT_HOST_DEVICE void
   computeReactionRatesAffinity_impl( RealType const & temperature,
                                      PARAMS_DATA const & params,
                                      ARRAY_1D_TO_CONST const & activities,
+                                     RealType const waterActivity,
                                      ARRAY_1D_SA const & surfaceArea,
                                      ARRAY_1D & reactionRates,
-                                     ARRAY_2D & dReactionRates_dActivities );
+                                     ARRAY_2D & dReactionRates_dActivities,
+                                     ARRAY_1D_W & dReactionRates_dWaterActivity );
 
   /**
    * @brief Compute the kinetic species rates for a given set of kinetic reactions.
@@ -435,19 +479,24 @@ private:
    * @param params The parameters data.
    * @param activities The array of activities.
    * @param speciesRates The array of species rates.
-   * @param dReactionRates_dActivities The array of species rates derivatives.
+   * @param dSpeciesRates_dActivities The array of species rates derivatives.
+   * @param dSpeciesRates_dWaterActivity The species rate derivatives with respect to a_w, which is
+   *   not one of the species. The caller chains it through d a_w/d c.
    */
   template< typename PARAMS_DATA,
             bool CALCULATE_DERIVATIVES,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D,
-            typename ARRAY_2D >
+            typename ARRAY_2D,
+            typename ARRAY_1D_W >
   static HPCREACT_HOST_DEVICE void
   computeSpeciesRates_impl( RealType const & temperature,
                             PARAMS_DATA const & params,
                             ARRAY_1D_TO_CONST const & activities,
+                            RealType const waterActivity,
                             ARRAY_1D & speciesRates,
-                            ARRAY_2D & dReactionRates_dActivities );
+                            ARRAY_2D & dSpeciesRates_dActivities,
+                            ARRAY_1D_W & dSpeciesRates_dWaterActivity );
 
 };
 

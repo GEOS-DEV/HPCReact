@@ -54,6 +54,28 @@ public:
     }
   }
 
+  /**
+   * @brief Ideal solution: the solvent is pure, so a_w = 1 and all derivatives vanish.
+   */
+  template< typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D,
+            typename PARAMS >
+  static inline HPCREACT_HOST_DEVICE
+  REAL_TYPE
+  logWaterActivity( PARAMS const &,
+                    ARRAY_1D_TO_CONST const & speciesConcentrations,
+                    ARRAY_1D & dLogWaterActivity_dConcentrations )
+  {
+    HPCREACT_UNUSED_VAR( speciesConcentrations );
+
+    constexpr IndexType numSpecies = PARAMS::numSpecies();
+    for( IndexType j=0; j<numSpecies; ++j )
+    {
+      dLogWaterActivity_dConcentrations[j] = 0.0;
+    }
+    return 0.0;
+  }
+
 };
 
 

@@ -62,6 +62,8 @@ EquilibriumReactions< REAL_TYPE,
 
   RealType activities[numSpecies] = { 0.0 };
   RealType dActivities_dConcentration[numSpecies][numSpecies] = {{ 0.0 }};
+  RealType waterActivity = 1.0;
+  RealType dWaterActivity_dConcentration[numSpecies] = { 0.0 };
   calculateActivities< RealType,
                        IntType,
                        IndexType,
@@ -69,7 +71,9 @@ EquilibriumReactions< REAL_TYPE,
                        false >( activityParams,
                                 speciesConcentration,
                                 activities,
-                                dActivities_dConcentration );
+                                dActivities_dConcentration,
+                                waterActivity,
+                                dWaterActivity_dConcentration );
 
   // loop over reactions
   for( IndexType a=0; a<numReactions; ++a )
@@ -120,13 +124,28 @@ EquilibriumReactions< REAL_TYPE,
         }
       }
     }
-    // compute the residual for this reaction
+    // compute the residual for this reaction, with water folded into whichever side it is on
+    RealType const nu_aw = params.waterStoichiometry( a );
+    if( nu_aw < 0.0 )
+    {
+      forwardProduct *= pow( waterActivity, -nu_aw );
+    }
+    else if( nu_aw > 0.0 )
+    {
+      reverseProduct *= pow( waterActivity, nu_aw );
+    }
     residual[a] = log( reverseProduct / ( forwardProduct * Keq ) );
 
     // compute the jacobian
     for( IndexType b=0; b<numReactions; ++b )
     {
-      jacobian( a, b ) = -dForwardProduct_dxi_divProduct[b] + dReverseProduct_dxi_divProduct[b];
+      RealType dWaterActivity_dxi_b = 0.0;
+      for( IndexType j = 0; j < numSpecies; ++j )
+      {
+        dWaterActivity_dxi_b += dWaterActivity_dConcentration[j] * params.stoichiometricMatrix( b, j );
+      }
+      jacobian( a, b ) = -dForwardProduct_dxi_divProduct[b] + dReverseProduct_dxi_divProduct[b]
+                         + nu_aw * dWaterActivity_dxi_b / waterActivity;
     }
   }
 }

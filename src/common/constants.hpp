@@ -22,6 +22,8 @@ constexpr double NA = 6.02214076e23; // 1/mol
 
 constexpr double metersPerAngstrom = 1.0e-10; // m/Angstrom
 
+constexpr double waterMolality = 1000.0 / 18.01528; // mol/kg, i.e. 1 kg of solvent
+
 constexpr double ln10 = 2.302585092994046e+00;
 constexpr double invln10 = 4.342944819032518e-01;
 
