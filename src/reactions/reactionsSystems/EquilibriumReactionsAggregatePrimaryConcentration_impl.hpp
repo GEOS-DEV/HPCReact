@@ -170,7 +170,9 @@ EquilibriumReactions< REAL_TYPE,
     //printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
     if( residualNorm < 1.0e-12 )
     {
+#if !defined(__HIP_DEVICE_COMPILE__)
       printf( " converged\n" );
+#endif
       break;
     }
 
