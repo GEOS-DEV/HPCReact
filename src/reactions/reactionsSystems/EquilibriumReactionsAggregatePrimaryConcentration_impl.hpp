@@ -14,6 +14,9 @@
 #endif
 
 #include "reactions/massActions/MassActions.hpp"
+#include "constitutive/activity/Identity.hpp"
+
+#include <type_traits>
 
 namespace hpcReact
 {
@@ -166,6 +169,9 @@ EquilibriumReactions< REAL_TYPE,
                                                                       ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
                                                                       ARRAY_1D & logPrimarySpeciesConcentration )
 {
+  // TODO: take a flag here and report the state of the solve through it, so GEOS can emit it on its
+  // own terms for the initial equilibrium run rather than having this and the secondary species
+  // iteration print from inside.
   if constexpr( PARAMS_DATA::numSecondarySpecies() <= 0 )
   {
     return;
@@ -184,12 +190,36 @@ EquilibriumReactions< REAL_TYPE,
     logPrimarySpeciesConcentration[i] = logPrimarySpeciesConcentration0[i];
   }
 
+#if HPCREACT_IDEAL_PRESOLVE
+  // Generate the initial guess for the full self-consistent solve from the ideal solution of the
+  // same system: the one with every activity coefficient and the water activity fixed at 1, which
+  // this loop reaches from any starting point.
+  //
+  // An arbitrary guess, such as the target aggregate concentrations, can give unrealistic ionic
+  // strength, water activity and activity coefficients. The secondary species iteration then stops
+  // converging and this loop reaches NaN within a few iterations.
+  using IdealActivityModel = Identity< RealType, IndexType, typename ACTIVITY_MODEL::IonicStrengthType >;
+  if constexpr( !std::is_same< ACTIVITY_MODEL, IdealActivityModel >::value )
+  {
+    using IdealEquilibriumReactions = EquilibriumReactions< REAL_TYPE, INT_TYPE, INDEX_TYPE, IdealActivityModel >;
+
+    // Identity reads nothing but the ionic strength parameters it shares with the real model.
+    typename IdealActivityModel::Params const idealActivityParams
+    {
+      static_cast< typename ACTIVITY_MODEL::IonicStrengthType::Params const & >( activityParams )
+    };
+
+    IdealEquilibriumReactions::enforceEquilibrium_Aggregate( temperature,
+                                                             params,
+                                                             idealActivityParams,
+                                                             targetAggregatePrimarySpeciesConcentration,
+                                                             logPrimarySpeciesConcentration0,
+                                                             logPrimarySpeciesConcentration );
+  }
+#endif
 
   REAL_TYPE residualNorm = 0.0;
-  // // Print for MoMaS only
-  // //         0:     1e-20       -0           2 -2.5e+11       1e-20        7           2      1.8           1        5
-  // printf( "iter       X1       R0           X2      R1          X3       R2          X4       R3           S       R4\n" );
-  // printf( "----   ---------------      ---------------      ---------------      ---------------      ---------------\n" );
+
   for( int k=0; k<150; ++k )
   {
     computeResidualAndJacobianAggregatePrimaryConcentrations( temperature,
@@ -207,21 +237,6 @@ EquilibriumReactions< REAL_TYPE,
     }
     residualNorm = sqrt( residualNorm );
 
-    //  // Print for MoMaS only
-    // printf( "%2d:  %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g  \n",
-    //         k,
-    //         exp( logPrimarySpeciesConcentration[0] ),
-    //         residual[0],
-    //         exp( logPrimarySpeciesConcentration[1] ),
-    //         residual[1],
-    //         exp( logPrimarySpeciesConcentration[2] ),
-    //         residual[2],
-    //         exp( logPrimarySpeciesConcentration[3] ),
-    //         residual[3],
-    //         exp( logPrimarySpeciesConcentration[4] ),
-    //         residual[4] );
-
-    //printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
     if( residualNorm < 1.0e-12 )
     {
       printf( " converged\n" );

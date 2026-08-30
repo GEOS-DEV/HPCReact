@@ -163,28 +163,30 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2_Identity )
 }
 
 //******************************************************************************
-// Placeholder for the B-dot carbonate model.
+// The B-dot activity model, verified against EQ3NR.
 //
-// This one will be checked against EQ3/6 for verification.
+// The nine complexation reactions solved here are the model EQ3NR solves, so the expected values
+// are its converged molalities, read from eq36Database/carbonate.3o. See the README there.
 //
-// The values below are deliberately zero: if this is enabled before the EQ3/6 run is done, it
-// fails immediately rather than appearing to pass.
-TEST( testEquilibriumReactions, DISABLED_testcarbonateSystemAllEquilibrium_Bdot )
+// The parameters are carbonateNosolidActivityParamsEQ36 rather than carbonateNosolidActivityParams:
+// the comparison is only meaningful with the EQ3/6 B-dot parameters, since the phreeqc set leaves
+// several of these complexes without an ion size and so at gamma = 1.
+//
+// The tolerance is set by the reference, not by the solver. EQ3NR prints five significant figures,
+// and it fits the Debye-Huckel A and B over its temperature grid rather than reading the 25 C
+// entry, so its effective values differ from the patched ones in the fifth decimal. Every primary
+// species here agrees to 8.9e-5 or better.
+TEST( testEquilibriumReactions, testcarbonateSystem_Bdot )
 {
   using namespace hpcReact::geochemistry;
 
-  double const initialSpeciesConcentration[17] =
+  static constexpr int numPrimarySpecies = carbonateSystemType::numPrimarySpecies();
+
+  using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< double, int, int,
+                                                                           carbonateNosolidActivityType >;
+
+  double const aggregatePrimarySpeciesConcentration[numPrimarySpecies] =
   {
-    1.0e-16, // OH-
-    1.0e-16, // CO2
-    1.0e-16, // CO3-2
-    1.0e-16, // CaHCO3+
-    1.0e-16, // CaSO4
-    1.0e-16, // CaCl+
-    1.0e-16, // CaCl2
-    1.0e-16, // MgSO4
-    1.0e-16, // NaSO4-
-    1.0e-16, // CaCO3
     3.76e-1, // H+
     3.76e-1, // HCO3-
     3.87e-2, // Ca+2
@@ -194,12 +196,43 @@ TEST( testEquilibriumReactions, DISABLED_testcarbonateSystemAllEquilibrium_Bdot 
     1.09 // Na+1
   };
 
-  double const expectedSpeciesConcentrations[17] = { 0.0 }; // TODO: from EQ3/6
+  // The totals themselves, which is what a caller has before a run. B-dot cannot be started from
+  // them directly; enforceEquilibrium_Aggregate seeds itself with an ideal solve to get there.
+  double logInitialGuess[numPrimarySpecies];
+  for( int i = 0; i < numPrimarySpecies; ++i )
+  {
+    logInitialGuess[i] = log( aggregatePrimarySpeciesConcentration[i] );
+  }
 
-  testEnforceEquilibrium< double, 2, carbonateActivityType >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                                              hpcReact::geochemistry::carbonateActivityParams,
-                                                              initialSpeciesConcentration,
-                                                              expectedSpeciesConcentrations );
+  double logPrimarySpeciesConcentration[numPrimarySpecies];
+  EquilibriumReactionsType::enforceEquilibrium_Aggregate( 298.15,
+                                                          carbonateSystem.equilibriumReactionsParameters(),
+                                                          carbonateNosolidActivityParamsEQ36,
+                                                          aggregatePrimarySpeciesConcentration,
+                                                          logInitialGuess,
+                                                          logPrimarySpeciesConcentration );
+
+  // EQ3NR converged molalities. This solve reports only the primary species; the secondary species
+  // of the same run are compared in testCarbonateActivityVsEQ36.
+  double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =
+  {
+    6.5867e-04, // H+
+    6.1144e-04, // HCO3-
+    3.2573e-02, // Ca+2
+    1.4996e-02, // SO4-2
+    1.8836e+00, // Cl-
+    1.4435e-02, // Mg+2
+    1.0766e+00 // Na+1
+  };
+
+  double const eq36Tolerance = 5.0e-4;
+
+  for( int i = 0; i < numPrimarySpecies; ++i )
+  {
+    EXPECT_NEAR( exp( logPrimarySpeciesConcentration[i] ),
+                 expectedPrimarySpeciesConcentrations[i],
+                 eq36Tolerance * expectedPrimarySpeciesConcentrations[i] );
+  }
 }
 
 int main( int argc, char * * argv )

@@ -23,6 +23,7 @@ class Identity
 public:
   using RealType = REAL_TYPE;
   using IndexType = INDEX_TYPE;
+  using IonicStrengthType = IONIC_STRENGTH_TYPE;
 
   struct Params : public IONIC_STRENGTH_TYPE::Params
   {};

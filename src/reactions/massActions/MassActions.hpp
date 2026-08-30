@@ -384,6 +384,18 @@ bool calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
     nonlinearSolvers::newtonRaphson< numSecondarySpecies >( logSecondarySpeciesConcentrationsSolution,
                                                             residualAndJacobian );
 
+  // Report the last iterate of each secondary species at nonconvergence.
+  if( !isConverged )
+  {
+    printf( "calculateLogSecondarySpeciesConcentration: no convergence\n" );
+    for( INDEX_TYPE j = 0; j < numSecondarySpecies; ++j )
+    {
+      printf( "  secondary species %2d: log c = %16.10g\n",
+              static_cast< int >( j ),
+              static_cast< double >( logSecondarySpeciesConcentrationsSolution[j] ) );
+    }
+  }
+
   for( INDEX_TYPE j = 0; j < numSecondarySpecies; ++j )
   {
     logSecondarySpeciesConcentrations[j] = logSecondarySpeciesConcentrationsSolution[j];

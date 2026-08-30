@@ -133,7 +133,8 @@ template< typename REAL_TYPE,
 void testEnforceEquilibrium( PARAMS_DATA const & params,
                              typename ACTIVITY_MODEL::Params const & activityParams,
                              REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numSpecies()],
-                             REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()] )
+                             REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numSpecies()],
+                             REAL_TYPE const relativeTolerance = 1.0e-8 )
 {
   using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                            int,
@@ -162,7 +163,7 @@ void testEnforceEquilibrium( PARAMS_DATA const & params,
   for( int r=0; r<numSpecies; ++r )
   {
 //    printf( "c[%d] = %22.14e\n", r, speciesConcentration[r] );
-    EXPECT_NEAR( data.speciesConcentration[r], expectedSpeciesConcentrations[r], 1.0e-8 * expectedSpeciesConcentrations[r] );
+    EXPECT_NEAR( data.speciesConcentration[r], expectedSpeciesConcentrations[r], relativeTolerance * expectedSpeciesConcentrations[r] );
   }
 
 }
