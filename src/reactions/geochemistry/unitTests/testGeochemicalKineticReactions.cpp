@@ -171,6 +171,9 @@ double calciteReactionRate( double const (&speciesConcentration)[16],
 
   auto const params = carbonateSystem.kineticReactionsParameters();
 
+  // Captured by value: a namespace-scope constexpr is host-only inside a device lambda.
+  auto const activityParams = hpcReact::geochemistry::carbonateNosolidActivityParamsEQ36;
+
   ComputeReactionRatesTestData< 1, 16 > data;
   for( int i = 0; i < 16; ++i )
   {
@@ -179,11 +182,11 @@ double calciteReactionRate( double const (&speciesConcentration)[16],
   }
   data.surfaceArea[0] = surfaceAreaValue;
 
-  pmpl::genericKernelWrapper( 1, &data, [params] HPCREACT_DEVICE ( auto * const dataCopy )
+  pmpl::genericKernelWrapper( 1, &data, [params, activityParams] HPCREACT_DEVICE ( auto * const dataCopy )
   {
     KineticReactionsType::computeReactionRates( 298.15,
                                                 params,
-                                                hpcReact::geochemistry::carbonateNosolidActivityParamsEQ36,
+                                                activityParams,
                                                 dataCopy->speciesConcentration,
                                                 dataCopy->surfaceArea,
                                                 dataCopy->reactionRates,
