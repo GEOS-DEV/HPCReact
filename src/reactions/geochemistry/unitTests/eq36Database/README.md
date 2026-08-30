@@ -1,45 +1,29 @@
-# EQ3NR reference data
+# EQ3/6 reference data
 
-Provenance for the hardcoded values in `../testCarbonateActivityVsEQ36.cpp`.
+References for the hardcoded values in the following tests that carry `EQ36` or `Bdot` in their name:
+
+| Test | Quantity compared | Reference |
+|---|---|---|
+| `../testCarbonateActivityVsEQ36.cpp` | log10(gamma) of all 16 species | the log gamma column of the `carbonate.3o` species distribution table |
+| `testcarbonateSystem_Bdot` in `../testGeochemicalEquilibriumReactions.cpp` | molality of the 7 primary species at equilibrium | the molality column of the `carbonate.3o` species distribution table |
+| `computeReactionRatesVsEQ36_carbonateSystem_Bdot` in `../testGeochemicalKineticReactions.cpp` | the calcite dissolution rate `k*A*(1 - Q/K)` | the calcite saturation state `log Q/K` from `carbonate.3o` fed into the TST law |
+| `testTimeStep_carbonateSystem_Bdot` in `../testGeochemicalMixedReactions.cpp` | molality of the 7 primary species after 10 s of calcite dissolution | the molality column of the `calcite.6o` species distribution table |
 
 | File | What it is |
 |---|---|
-| `cmpHPCReact.d0` | EQ3/6 `data0.com.V8.R6`, with the 25 C Debye-Huckel A and B replaced by the values this code derives from physical constants |
-| `carbonate.3i` | EQ3NR input: the carbonate brine of `testcarbonateSystemAllEquilibrium`, with species outside this 17-species model suppressed |
-| `carbonate.3o` | EQ3NR output. The molalities and log10(gamma) in the test are read from its species distribution table |
+| `cmpHPCReact.d0` | EQ3/6 `data0.com.V8.R6`, with the 25 C Debye-Huckel A and B replaced by the values `HPCReact` derives from physical constants |
+| `carbonate.3i` | EQ3NR input: the carbonate brine of `testcarbonateSystemAllEquilibrium`, with species outside the 17-species model suppressed |
+| `carbonate.3o` | EQ3NR output |
+| `calcite.6i` | EQ6 input: the `carbonate.3o` pickup, reacted with calcite under the TST rate law at a constant 100 cm2 (0.01 m2 in `HPCReact`) for 10 s |
+| `calcite.6o` | EQ6 output |
 
 ## Regenerating
 
 ```bash
 eqpt cmpHPCReact.d0          # writes cmpHPCReact.d1
 eq3nr cmpHPCReact.d1 carbonate.3i
+eq6   cmpHPCReact.d1 calcite.6i
 ```
 
-See `RUNNING_EQ3NR.md` in the eq3_6 distribution for the input format and option switches.
-
-## The database patch
-
-Only two lines differ from stock `cmp.d0`:
-
-```
-debye huckel a (adh)     0.5114  ->  0.5084960
-debye huckel b (bdh)     0.3288  ->  0.3281557
-```
-
-EQ3/6 tabulates A and B; this code computes them from physical constants with
-`rho_w = 997.0479, eps_r = 78.54, T = 298.15`. Patching the database rather than the code isolates
-the comparison to the activity model itself, so any disagreement is a real difference rather than a
-difference in A and B. Without the patch, A alone differs by 0.57%, which puts roughly 1% into
-gamma for divalent ions.
-
-## Precision floor
-
-EQ3NR truncates log10(gamma) to four decimals rather than rounding, so its reported values are
-biased low in magnitude by up to 1e-4. That, not any model difference, sets the tolerance in the
-test. EQ3/6 also fits A and B over its temperature grid rather than reading the 25 C entry
-directly, so the effective values differ from the tabulated ones in the fifth decimal.
-
-## Known departure
-
-EQ3/6 gives CO2(aq) a Drummond (1981) salting-out coefficient; this code gives every neutral
-species gamma = 1. That species is excluded from the comparison and asserted separately.
+`eqpt`, `eq3nr` and `eq6` are built from <https://github.com/39alpha/eq3_6>, which packages LLNL
+EQ3/6 version 8.0a with a Make-based build.

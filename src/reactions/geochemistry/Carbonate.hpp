@@ -80,8 +80,8 @@ constexpr CArrayWrapper<double, 10> forwardRates =
     1.0e8,    //      CaCl+ = Ca+2 + Cl-  
     1.0e7,    //      CaCl2 = Ca+2 + 2Cl- 
     1.0e5,    //      MgSO4 = Mg+2 + SO4-2
-    1.0e7,    //     NaSO4- = Na+ + SO4-2 
-    1.55E-06  // CaCO3 + H+ = Ca+2 + HCO3- (kinetic) 
+    1.0e7,    //     NaSO4- = Na+ + SO4-2
+    1.55E-02  // CaCO3 + H+ = Ca+2 + HCO3- (kinetic), mol/m2/s (1.55e-6 mol/cm2/s in EQ3/6)
   };
 
 // kr = kf / K
@@ -95,7 +95,7 @@ constexpr CArrayWrapper<double, 10> reverseRates =
     2.27196E+06,  //      CaCl2 = Ca+2 + 2Cl-
     2.58048E+07,  //      MgSO4 = Mg+2 + SO4-2
     6.60694E+07,  //     NaSO4- = Na+ + SO4-2
-    2.19600E-08   // CaCO3 + H+ = Ca+2 + HCO3-
+    2.19600E-04   // CaCO3 + H+ = Ca+2 + HCO3-
   };
 
 constexpr CArrayWrapper<int, 10> mobileSpeciesFlag = 

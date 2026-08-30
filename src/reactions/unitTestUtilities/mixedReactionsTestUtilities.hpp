@@ -37,7 +37,8 @@ void timeStepTest( PARAMS_DATA const & params,
                    int const numSteps,
                    REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numPrimarySpecies()],
                    REAL_TYPE const (&surfaceArea)[PARAMS_DATA::numKineticReactions()],
-                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numPrimarySpecies()] )
+                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numPrimarySpecies()],
+                   REAL_TYPE const relativeTolerance = 1.0e-8 )
 {
   HPCREACT_UNUSED_VAR( expectedSpeciesConcentrations );
 
@@ -149,7 +150,7 @@ void timeStepTest( PARAMS_DATA const & params,
   // Check results
   for( int i = 0; i < PARAMS_DATA::numPrimarySpecies(); ++i )
   {
-    EXPECT_NEAR( primarySpeciesConcentration[ i ], expectedSpeciesConcentrations[ i ], 1.0e-8 * expectedSpeciesConcentrations[ i ] );
+    EXPECT_NEAR( primarySpeciesConcentration[ i ], expectedSpeciesConcentrations[ i ], relativeTolerance * expectedSpeciesConcentrations[ i ] );
   }
 }
 

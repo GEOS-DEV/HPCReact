@@ -64,7 +64,7 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic_I
                                              -314076.36382919899, //      CaCl2 = Ca+2 + 2Cl-
                                              -13667.512319999991, //       MgSO4 = Mg+2 + SO4-2
                                              -2311702.236599999, //     NaSO4- = Na+ + SO4-2
-                                             -3.1954435199994173e-10 // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+                                             -3.1954435199994173e-06 // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
   };
   double const expectedReactionRatesDerivatives[10][17] =
   {
@@ -77,7 +77,7 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic_I
     { 0, 0, 0, 0, 0, 0, 10000000, 0, 0, 0, 0, 0, -8115668.3159999996, 0, -332355.94056000002, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 100000, 0, 0, 0, 0, 0, -425779.20000000001, 0, -828334.07999999996, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 0, 10000000, 0, 0, 0, 0, -72015646, 0, 0, -2120827.7399999998 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.8279999999999995e-07, 1.5500000000000001e-22, -8.4985199999999993e-10, -8.2569599999999996e-09, 0, 0, 0, 0 }
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.8279999999999995e-03, 1.5500000000000001e-18, -8.4985199999999993e-06, -8.2569599999999996e-05, 0, 0, 0, 0 }
 
   };
 
@@ -124,7 +124,7 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem_Ide
     1.09 // Na+1
   };
 
-  double const surfaceArea[1] = { 1e6 }; // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
+  double const surfaceArea[1] = { 1e2 }; // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
 
   double const expectedReactionRates[1] = { 1.5491501480000001 }; // CaCO3 + H+ = Ca+2 + HCO3- (kinetic)
 
@@ -151,6 +151,93 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem_Ide
                                             surfaceArea,
                                             expectedReactionRates,
                                             expectedReactionRatesDerivatives );
+}
+
+//******************************************************************************
+
+/**
+ * @brief Compute the calcite reaction rate for a given set of concentrations.
+ */
+template< bool LOGE_CONCENTRATION >
+double calciteReactionRate( double const (&speciesConcentration)[16],
+                            double const surfaceAreaValue )
+{
+  using ActivityType = carbonateNosolidActivityType;
+  using KineticReactionsType = reactionsSystems::KineticReactions< double,
+                                                                   int,
+                                                                   int,
+                                                                   ActivityType,
+                                                                   LOGE_CONCENTRATION >;
+
+  auto const params = carbonateSystem.kineticReactionsParameters();
+
+  ComputeReactionRatesTestData< 1, 16 > data;
+  for( int i = 0; i < 16; ++i )
+  {
+    data.speciesConcentration[i] = LOGE_CONCENTRATION ? log( speciesConcentration[i] )
+                                                      : speciesConcentration[i];
+  }
+  data.surfaceArea[0] = surfaceAreaValue;
+
+  pmpl::genericKernelWrapper( 1, &data, [params] HPCREACT_DEVICE ( auto * const dataCopy )
+  {
+    KineticReactionsType::computeReactionRates( 298.15,
+                                                params,
+                                                hpcReact::geochemistry::carbonateNosolidActivityParamsEQ36,
+                                                dataCopy->speciesConcentration,
+                                                dataCopy->surfaceArea,
+                                                dataCopy->reactionRates,
+                                                dataCopy->reactionRatesDerivatives );
+  } );
+
+  return data.reactionRates[0];
+}
+
+// The rate of the calcite reaction, verified against EQ3NR.
+//
+// The brine is the converged state of eq36Database/carbonate.3o, for which EQ3NR reports a calcite
+// saturation state of log Q/K = -4.14608. That fixes the expected rate through r = k * A * (1 - Q/K)
+// and so compares this code's activity model, ion activity product and equilibrium constant against
+// EQ3NR's own saturation calculation.
+TEST( testKineticReactions, computeReactionRatesVsEQ36_carbonateSystem_Bdot )
+{
+  // EQ3NR converged molalities, in this code's species order.
+  double const speciesConcentration[16] =
+  {
+    2.6702e-11, // OH-
+    3.7534e-01, // CO2
+    2.3166e-10, // CO3-2
+    4.7225e-05, // CaHCO3+
+    1.6821e-03, // CaSO4
+    2.3750e-03, // CaCl+
+    2.0222e-03, // CaCl2
+    2.0650e-03, // MgSO4
+    1.3357e-02, // NaSO4-
+    6.5867e-04, // H+
+    6.1144e-04, // HCO3-
+    3.2573e-02, // Ca+2
+    1.4996e-02, // SO4-2
+    1.8836e+00, // Cl-
+    1.4435e-02, // Mg+2
+    1.0766e+00 // Na+1
+  };
+
+  double const surfaceArea = 1.0;
+
+  // EQ3NR 'Calcite  -4.14608', from the saturation states of the pure solids.
+  double const eq36Log10QOverK = -4.14608;
+
+  double const expectedReactionRate =
+    carbonateSystem.kineticReactionsParameters().rateConstantForward( 0 ) * surfaceArea *
+    ( 1.0 - pow( 10.0, eq36Log10QOverK ) );
+
+  EXPECT_NEAR( calciteReactionRate< false >( speciesConcentration, surfaceArea ),
+               expectedReactionRate,
+               1.0e-7 * expectedReactionRate );
+
+  EXPECT_NEAR( calciteReactionRate< true >( speciesConcentration, surfaceArea ),
+               expectedReactionRate,
+               1.0e-7 * expectedReactionRate );
 }
 
 //******************************************************************************
