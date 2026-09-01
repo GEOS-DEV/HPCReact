@@ -11,7 +11,7 @@ References for the hardcoded values in the following tests that carry `EQ36` or 
 
 | File | What it is |
 |---|---|
-| `cmpHPCReact.d0` | EQ3/6 `data0.com.V8.R6`, with the 25 C Debye-Huckel A and B replaced by the values `HPCReact` derives from physical constants |
+| `cmpHPCReact.d0` | EQ3/6 `data0.com.V8.R6`, with the 25 C Debye-Huckel A and B replaced by the values `HPCReact` derives from physical constants. Not carried here; it lives at `test/data/eqpt/cmpHPCReact.d0` in <https://github.com/frankfeifan/eq3_6> |
 | `carbonate.3i` | EQ3NR input: the carbonate brine of `testcarbonateSystemAllEquilibrium`, with species outside the 17-species model suppressed |
 | `carbonate.3o` | EQ3NR output |
 | `calcite.6i` | EQ6 input: the `carbonate.3o` pickup, reacted with calcite under the TST rate law at a constant 100 cm2 (0.01 m2 in `HPCReact`) for 10 s |
