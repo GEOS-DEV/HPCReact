@@ -18,10 +18,15 @@
  * used directly in Debye–Hückel or extended Debye–Hückel/B-dot models.
  */
 
+/**
+ * @brief Debye-Huckel A^gamma and B parameters, and the extended Debye-Huckel log10(gamma).
+ * @tparam REAL_TYPE floating point type.
+ */
 template< typename REAL_TYPE >
 class DebyeHuckel
 {
 public:
+  /// alias for the floating point type used in the class.
   using RealType = REAL_TYPE;
 
   /// π (pi).
@@ -122,21 +127,48 @@ public:
   }
 
 
+  /**
+   * @brief Extended Debye-Huckel log10(gamma) for a single species, with A and B evaluated from
+   *        the water properties.
+   * @param sqrtI Square root of the molal ionic strength I.
+   * @param zi Charge of the species.
+   * @param ai Ion-size parameter of the species, in ANGSTROM.
+   * @param T_K Temperature in kelvin [K].
+   * @param rho_w Density of water in g/L (≈ kg/m³ numerically).
+   * @param eps_r Relative permittivity (dielectric constant) of water.
+   * @param dlog10_gamma_dI [out] d log10(gamma) / dI. Singular at I = 0.
+   * @return log10(gamma) for the species.
+   *
+   * A_gamma() and B_gamma() return their natural-log, SI forms, so A is converted to the log10
+   * scale and B is scaled to Angstrom here, to match the units of @p ai. A caller evaluating many
+   * species at one temperature should instead hoist A_gamma() and B_gamma() out of its loop and
+   * call the overload taking A and B directly, as Bdot does.
+   */
   static inline HPCREACT_HOST_DEVICE
   RealType log10_gamma( RealType const sqrtI,
                         RealType const zi,
                         RealType const ai,
                         RealType const T_K,
+                        RealType const rho_w,
+                        RealType const eps_r,
                         RealType & dlog10_gamma_dI )
   {
-    RealType const A       = A_gamma( T_K );
-    RealType const B       = B_gamma( T_K );
-    RealType const denom   = 1 + B * ai * sqrtI;
-    dlog10_gamma_dI = -0.5 * A * zi * zi / ( sqrtI * denom * denom );
-    return -A * zi * zi * sqrtI / denom;
+    RealType const A = A_gamma( T_K, rho_w, eps_r ) * hpcReact::constants::invln10;
+    RealType const B = B_gamma( T_K, rho_w, eps_r ) * hpcReact::constants::metersPerAngstrom;
+    return log10_gamma( sqrtI, zi, ai, A, B, dlog10_gamma_dI );
   }
 
 
+  /**
+   * @brief Extended Debye-Huckel log10(gamma) for a single species, with A and B supplied.
+   * @param sqrtI Square root of the molal ionic strength I.
+   * @param zi Charge of the species.
+   * @param ai Ion-size parameter of the species, in the length units of @p B.
+   * @param A Debye-Huckel A parameter, on the log10 scale.
+   * @param B Debye-Huckel B parameter, scaled so that B*ai*sqrt(I) is dimensionless.
+   * @param dlog10_gamma_dI [out] d log10(gamma) / dI. Singular at I = 0.
+   * @return log10(gamma) for the species.
+   */
   static inline HPCREACT_HOST_DEVICE
   RealType log10_gamma( RealType const sqrtI,
                         RealType const zi,

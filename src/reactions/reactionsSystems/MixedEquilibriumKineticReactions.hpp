@@ -69,6 +69,7 @@ public:
    *
    * @param temperature Temperature of the system (in Kelvin)
    * @param params Parameter object for stoichiometry, rates, etc.
+   * @param activityParams The parameters for the activity model.
    * @param logPrimarySpeciesConcentrations Log of primary species concentrations
    * @param surfaceArea surface Aread for kinetic reactions
    * @param logSecondarySpeciesConcentrations Output log concentrations for secondary species
@@ -134,6 +135,7 @@ public:
    *
    * @param temperature Temperature in Kelvin
    * @param params Parameter data for the reaction system
+   * @param activityParams The parameters for the activity model.
    * @param logPrimarySpeciesConcentrations Log concentrations of primary species
    * @param logSecondarySpeciesConcentrations Log concentrations of secondary species
    * @param dLogSecondarySpeciesConcentrations_dLogPrimarySpeciesConcentrations d log(C_sec)/d log(C_prim)
@@ -235,6 +237,7 @@ private:
    *
    * @param temperature Temperature of the system (in Kelvin)
    * @param params Parameter object for stoichiometry, rates, etc.
+   * @param activityParams The parameters for the activity model.
    * @param logPrimarySpeciesConcentrations Log of primary species concentrations
    * @param logSecondarySpeciesConcentrations Output log concentrations for secondary species
    * @param aggregatePrimarySpeciesConcentrations Output aggregate concentrations (per primary)

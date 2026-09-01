@@ -57,6 +57,7 @@ public:
    *        reaction extents.
    * @param temperature The temperature of the system.
    * @param params The parameters for the equilibrium reactions.
+   * @param activityParams The parameters for the activity model.
    * @param speciesConcentration0 The initial species concentrations.
    * @param speciesConcentration The species concentrations to be updated.
    * @details This method uses the reaction extents to enforce equilibrium
@@ -81,6 +82,7 @@ public:
    *        aggregate primary concentrations.
    * @param temperature The temperature of the system.
    * @param params The parameters for the equilibrium reactions.
+   * @param activityParams The parameters for the activity model.
    * @param speciesConcentration0 The initial species concentrations.
    * @param speciesConcentration The species concentrations to be updated.
    * @details This method uses the aggregate primary concentrations to enforce
@@ -110,6 +112,7 @@ public:
    * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
    * @param temperature The temperature of the system.
    * @param params The parameters for the equilibrium reactions.
+   * @param activityParams The parameters for the activity model.
    * @param targetAggregatePrimarySpeciesConcentration The target aggregate
    *        primary species concentration.
    * @param logPrimarySpeciesConcentration0 The initial value of the log of
@@ -143,6 +146,7 @@ public:
    * @tparam ARRAY_2D The type of the array of jacobian.
    * @param temperature The temperature of the system.
    * @param params The parameters for the equilibrium reactions.
+   * @param activityParams The parameters for the activity model.
    * @param speciesConcentration0 The initial species concentrations.
    * @param xi The reaction extents.
    * @param residual The residual.
@@ -172,6 +176,7 @@ public:
    * @tparam ARRAY_2D The type of the array of jacobian.
    * @param temperature The temperature of the system.
    * @param params The parameters for the equilibrium reactions.
+   * @param activityParams The parameters for the activity model.
    * @param targetAggregatePrimaryConcentrations The target aggregate primary concentrations.
    * @param logPrimarySpeciesConcentration The log of the primary species concentrations.
    * @param residual The residual.

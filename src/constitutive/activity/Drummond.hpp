@@ -41,6 +41,7 @@ template< typename REAL_TYPE >
 class Drummond
 {
 public:
+  /// alias for the floating point type used in the class.
   using RealType = REAL_TYPE;
 
   /// Constant term of the linear-in-I group [dimensionless].

@@ -56,7 +56,18 @@ public:
   using IndexType = INDEX_TYPE;
 
   /**
-   * @copydoc KineticReactions::computeReactionRates()
+   * @brief Compute the reaction rates, and their derivatives, for a given set of species
+   *        concentrations.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_1D The type of the array of reaction rates.
+   * @tparam ARRAY_2D The type of the array of reaction rates derivatives.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param activityParams The parameters for the activity model.
+   * @param speciesConcentration The array of species concentrations.
+   * @param reactionRates The array of reaction rates.
+   * @param dReactionRates_dConcentration The array of reaction rates derivatives.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
@@ -118,6 +129,7 @@ public:
    * @tparam ARRAY_1D The type of the array of reaction rates.
    * @param temperature The temperature of the system.
    * @param params The parameters data.
+   * @param activityParams The parameters for the activity model.
    * @param speciesConcentration The array of species concentrations.
    * @param reactionRates The array of reaction rates.
    */
@@ -171,6 +183,7 @@ public:
    * @tparam ARRAY_2D The type of the array of reaction rates derivatives.
    * @param temperature The temperature of the system.
    * @param params The parameters data.
+   * @param activityParams The parameters for the activity model.
    * @param speciesConcentration The array of species concentrations.
    * @param surfaceArea The array of surface area.
    * @param reactionRates The array of reaction rates.
@@ -253,7 +266,18 @@ public:
 
 
   /**
-   * @copydoc KineticReactions::computeSpeciesRates_impl()
+   * @brief Compute the species rates, and their derivatives, for a given set of species
+   *        concentrations.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @tparam ARRAY_1D The type of the array of species rates.
+   * @tparam ARRAY_2D The type of the array of species rates derivatives.
+   * @param temperature The temperature of the system.
+   * @param params The parameters data.
+   * @param activityParams The parameters for the activity model.
+   * @param speciesConcentration The array of species concentrations.
+   * @param speciesRates The array of species rates.
+   * @param dSpeciesRates_dConcentration The array of species rates derivatives.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D_TO_CONST,
@@ -314,6 +338,7 @@ public:
    * @tparam ARRAY_1D The type of the array of species rates.
    * @param temperature The temperature of the system.
    * @param params The parameters data.
+   * @param activityParams The parameters for the activity model.
    * @param speciesConcentration The array of species concentrations.
    * @param speciesRates The array of species rates.
    */

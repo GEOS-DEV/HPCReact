@@ -37,18 +37,30 @@ constexpr signed char standard = 0;
 constexpr signed char drummond = -1;
 }
 
+/**
+ * @brief The B-dot (Helgeson) activity model, with Drummond salting-out for the species tagged
+ *        for it, and the B-dot-consistent water activity.
+ * @tparam REAL_TYPE floating point type.
+ * @tparam INDEX_TYPE integral type used to index the species.
+ * @tparam IONIC_STRENGTH_TYPE the ionic strength model, which also supplies the base of Params.
+ */
 template< typename REAL_TYPE,
           typename INDEX_TYPE,
           typename IONIC_STRENGTH_TYPE >
 class Bdot
 {
 public:
+  /// alias for the floating point type used in the class.
   using RealType = REAL_TYPE;
+
+  /// alias for the integral type used to index the species.
   using IndexType = INDEX_TYPE;
+
+  /// alias for the ionic strength model used in the class.
   using IonicStrengthType = IONIC_STRENGTH_TYPE;
 
 
-
+  /// The B-dot parameters, extending those the ionic strength model requires.
   struct Params : public IONIC_STRENGTH_TYPE::Params
   {
     /// Ion size parameter in ANGSTROM (as tabulated by phreeqc.dat).
@@ -65,10 +77,14 @@ public:
     RealType m_bdotWater {};
   };
 
-  /// Ambient water properties, shared by the activity coefficients and the water activity.
-  static constexpr RealType rho_w = 997.0479; // kg/m3
-  static constexpr RealType eps_r = 78.54; // dimensionless
-  static constexpr RealType T_K = 298.15; // K
+  /// Ambient water density [kg/m3], shared by the activity coefficients and the water activity.
+  static constexpr RealType rho_w = 997.0479;
+
+  /// Ambient relative permittivity of water [dimensionless].
+  static constexpr RealType eps_r = 78.54;
+
+  /// Ambient temperature [K].
+  static constexpr RealType T_K = 298.15;
 
 
 
