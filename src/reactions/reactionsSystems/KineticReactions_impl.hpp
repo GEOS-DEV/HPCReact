@@ -349,11 +349,8 @@ KineticReactions< REAL_TYPE,
           quotient *= productTerm_i;
         }
       }
-      // add water activity
-      if( s_rw > 0.0 || s_rw < 0.0 )
-      {
-        quotient *= pow( waterActivity, s_rw );
-      }
+      // add water activity.
+      quotient *= pow( waterActivity, s_rw );
 
       if constexpr( CALCULATE_DERIVATIVES )
       {

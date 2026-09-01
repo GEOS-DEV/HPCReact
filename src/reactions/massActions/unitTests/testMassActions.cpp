@@ -212,17 +212,13 @@ void test_calculateLogSecondarySpeciesConcentration_helper( EQ_PARAMS const eqPa
   // Concentrations, activity coefficients and activities must be mutually consistent.
   for( int j = 0; j < numSecondarySpecies; ++j )
   {
-    EXPECT_NEAR( data.logActivities[j],
-                 data.logSecondarySpeciesConcentrations[j] + data.logActivityCoefficients[j],
-                 1.0e-12 ) << "a != c*gamma, secondary species " << j;
+    EXPECT_NEAR( data.logActivities[j], data.logSecondarySpeciesConcentrations[j] + data.logActivityCoefficients[j], 1.0e-12 ) << "a != c*gamma, secondary species " << j;
   }
 
   // The primary concentrations were held fixed, so their activities follow from them directly.
   for( int k = 0; k < numPrimarySpecies; ++k )
   {
-    EXPECT_NEAR( data.logActivities[k + numSecondarySpecies],
-                 data.logPrimarySpeciesSolution[k] + data.logActivityCoefficients[k + numSecondarySpecies],
-                 1.0e-12 ) << "a != c*gamma, primary species " << k;
+    EXPECT_NEAR( data.logActivities[k + numSecondarySpecies], data.logPrimarySpeciesSolution[k] + data.logActivityCoefficients[k + numSecondarySpecies], 1.0e-12 ) << "a != c*gamma, primary species " << k;
   }
 }
 
@@ -418,8 +414,7 @@ void test_calculateLogSecondarySpeciesConcentrationWrtLogC_helper( EQ_PARAMS con
   {
     for( int n = 0; n < numPrimarySpecies; ++n )
     {
-      EXPECT_NEAR( data.analytic[j][n], data.finiteDifference[j][n], tolerance )
-        << "d log(C_sec[" << j << "])/d log(C_prim[" << n << "])";
+      EXPECT_NEAR( data.analytic[j][n], data.finiteDifference[j][n], tolerance ) << "d log(C_sec[" << j << "])/d log(C_prim[" << n << "])";
     }
   }
 }
