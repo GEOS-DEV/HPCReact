@@ -12,6 +12,8 @@
 #pragma once
 
 #include "../reactionsSystems/Parameters.hpp"
+#include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
+#include "constitutive/activity/Identity.hpp"
 
 namespace hpcReact
 {
@@ -172,6 +174,15 @@ namespace MoMasBenchmark
     mediumCaseForwardRates,
     mediumCaseReverseRates,
     mediumCaseMobileSpeciesFlag );
+
+  using easyCaseIonicStrengthType   = SpeciatedIonicStrength< double, int, easyCaseType::numSpecies() >;
+  using mediumCaseIonicStrengthType = SpeciatedIonicStrength< double, int, mediumCaseType::numSpecies() >;
+
+  using easyCaseIdentityActivityType   = Identity< double, int, easyCaseIonicStrengthType >;
+  using mediumCaseIdentityActivityType = Identity< double, int, mediumCaseIonicStrengthType >;
+
+  constexpr easyCaseIdentityActivityType::Params   easyCaseIdentityActivityParams   = {};
+  constexpr mediumCaseIdentityActivityType::Params mediumCaseIdentityActivityParams = {};
 
 // *****UNCRUSTIFY-ON******
 } // namespace MoMasBenchmark

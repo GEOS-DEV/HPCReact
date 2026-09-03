@@ -100,7 +100,7 @@ constexpr simpleActivityParamsType simpleActivityTestParams =
   simpleBdotParameters
 };
 
-Identity< double, int, simpleIonicStrengthType >::Params simpleIdentityActivityTestParams = {};
+constexpr Identity< double, int, simpleIonicStrengthType >::Params simpleIdentityActivityTestParams = {};
 
 
 using simpleMixedParamsType = reactionsSystems::MixedReactionsParameters< double, int, signed char, 5, 2, 2 >;

@@ -97,7 +97,7 @@ namespace ChainGeneric
     serialAllKineticBdotParameters
   };
 
-  Identity< double, int, serialAllKineticIonicStrengthType >::Params serialAllKineticIdentityActivityParams = {};
+  constexpr Identity< double, int, serialAllKineticIonicStrengthType >::Params serialAllKineticIdentityActivityParams = {};
 
 
 // *****UNCRUSTIFY-ON******
