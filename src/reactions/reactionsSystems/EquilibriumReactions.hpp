@@ -85,6 +85,7 @@ public:
    * @param activityParams The parameters for the activity model.
    * @param speciesConcentration0 The initial species concentrations.
    * @param speciesConcentration The species concentrations to be updated.
+   * @return whether the solve converged.
    * @details This method uses the aggregate primary concentrations to enforce
    *          equilibrium for a given set of species. It uses the
    *          computeResidualAndJacobianAggregatePrimaryConcentrations method to
@@ -143,10 +144,21 @@ public:
                                 ARRAY_1D_SECONDARY & logSecondarySpeciesConcentration );
 
   /**
-   * @copydoc enforceEquilibrium_Aggregate
-   * @details Overload for callers that want only the primary concentrations. The secondary
-   *          concentrations are computed either way, so prefer the form above over recovering
-   *          them with a second speciation solve.
+   * @brief Overload for callers that want only the primary concentrations.
+   * @tparam PARAMS_DATA The type of the parameters data.
+   * @tparam ARRAY_1D The type of the array of species concentrations.
+   * @tparam ARRAY_1D_TO_CONST The type of the array of species concentrations.
+   * @param temperature The temperature of the system.
+   * @param params The parameters for the equilibrium reactions.
+   * @param activityParams The parameters for the activity model.
+   * @param targetAggregatePrimarySpeciesConcentration The target aggregate
+   *        primary species concentration.
+   * @param logPrimarySpeciesConcentration0 The initial value of the log of
+   *        the primary species concentrations.
+   * @param logPrimarySpeciesConcentration [out] The log of the primary species concentrations.
+   * @return whether the solve converged.
+   * @details The secondary concentrations are computed either way, so prefer the form above over
+   *          recovering them with a second speciation solve.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
