@@ -195,10 +195,14 @@ EquilibriumReactions< REAL_TYPE,
       residualNorm += residual[j] * residual[j];
     }
     residualNorm = sqrt( residualNorm );
+#if HPCREACT_SOLVER_DIAGNOSTICS
     printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
+#endif
     if( residualNorm < 1.0e-12 )
     {
+#if HPCREACT_SOLVER_DIAGNOSTICS
       printf( " converged\n" );
+#endif
       break;
     }
 

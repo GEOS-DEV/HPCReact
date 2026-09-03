@@ -31,6 +31,9 @@ if( NOT is_submodule )
     option( ENABLE_CUDA "Build with CUDA" OFF )
     option( ENABLE_HIP "Build with HIP" OFF )
 
+    # let the internal Newton loops report for themselves when there is no host code to do it
+    add_compile_definitions( HPCREACT_SOLVER_DIAGNOSTICS=1 )
+
 endif()
 
 include( ${BLT_SOURCE_DIR}/SetupBLT.cmake )

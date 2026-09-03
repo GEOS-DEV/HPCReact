@@ -42,6 +42,12 @@
 #define HPCREACT_IDEAL_PRESOLVE 1
 #endif
 
+/// Whether the internal Newton loops print their own diagnostics. On in the standalone build, off
+/// inside a host code, which calls these per cell and reports through the returned flag instead.
+#ifndef HPCREACT_SOLVER_DIAGNOSTICS
+#define HPCREACT_SOLVER_DIAGNOSTICS 0
+#endif
+
 
 #if defined( __clang__ )
 #define HPCREACT_NO_MISSING_BRACES( ... ) \

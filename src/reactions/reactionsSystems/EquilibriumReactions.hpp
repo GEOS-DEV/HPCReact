@@ -96,7 +96,7 @@ public:
             typename ARRAY_1D,
             typename ARRAY_1D_TO_CONST >
   static HPCREACT_HOST_DEVICE
-  void
+  bool
   enforceEquilibrium_LogAggregate( RealType const & temperature,
                                    PARAMS_DATA const & params,
                                    typename ACTIVITY_MODEL::Params const & activityParams,
@@ -117,7 +117,11 @@ public:
    *        primary species concentration.
    * @param logPrimarySpeciesConcentration0 The initial value of the log of
    *        the primary species concentrations.
-   * @param speciesConcentration The species concentrations to be updated.
+   * @param logPrimarySpeciesConcentration [out] The log of the primary species concentrations.
+   * @param logSecondarySpeciesConcentration [out] The log of the secondary species concentrations
+   *        at the converged state, which the last residual evaluation produces anyway.
+   * @return whether the solve converged, both the outer Newton loop and every speciation solve
+   *         inside it.
    * @details This method uses the log of aggregate primary concentrations to enforce
    *          equilibrium for a given set of species. It uses the
    *          computeResidualAndJacobianLogAggregate method to compute the residual and
@@ -126,15 +130,49 @@ public:
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
-            typename ARRAY_1D_TO_CONST >
+            typename ARRAY_1D_TO_CONST,
+            typename ARRAY_1D_SECONDARY >
   static HPCREACT_HOST_DEVICE
-  void
+  bool
   enforceEquilibrium_Aggregate( RealType const & temperature,
                                 PARAMS_DATA const & params,
                                 typename ACTIVITY_MODEL::Params const & activityParams,
                                 ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
                                 ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
-                                ARRAY_1D & speciesConcentration );
+                                ARRAY_1D & logPrimarySpeciesConcentration,
+                                ARRAY_1D_SECONDARY & logSecondarySpeciesConcentration );
+
+  /**
+   * @copydoc enforceEquilibrium_Aggregate
+   * @details Overload for callers that want only the primary concentrations. The secondary
+   *          concentrations are computed either way, so prefer the form above over recovering
+   *          them with a second speciation solve.
+   */
+  template< typename PARAMS_DATA,
+            typename ARRAY_1D,
+            typename ARRAY_1D_TO_CONST >
+  static HPCREACT_HOST_DEVICE
+  bool
+  enforceEquilibrium_Aggregate( RealType const & temperature,
+                                PARAMS_DATA const & params,
+                                typename ACTIVITY_MODEL::Params const & activityParams,
+                                ARRAY_1D_TO_CONST const & targetAggregatePrimarySpeciesConcentration,
+                                ARRAY_1D_TO_CONST const & logPrimarySpeciesConcentration0,
+                                ARRAY_1D & logPrimarySpeciesConcentration )
+  {
+    static constexpr INDEX_TYPE numSecondarySpeciesStorage =
+      PARAMS_DATA::numSecondarySpecies() > 0 ? PARAMS_DATA::numSecondarySpecies() : 1;
+
+    RealType logSecondarySpeciesConcentration[numSecondarySpeciesStorage] = { 0.0 };
+
+    return enforceEquilibrium_Aggregate( temperature,
+                                         params,
+                                         activityParams,
+                                         targetAggregatePrimarySpeciesConcentration,
+                                         logPrimarySpeciesConcentration0,
+                                         logPrimarySpeciesConcentration,
+                                         logSecondarySpeciesConcentration );
+  }
 
   /**
    * @brief This method computes the residual and jacobian when using reaction extents to solve
@@ -181,20 +219,25 @@ public:
    * @param logPrimarySpeciesConcentration The log of the primary species concentrations.
    * @param residual The residual.
    * @param jacobian The jacobian.
+   * @param logSecondarySpeciesConcentration [out] The log of the secondary species concentrations
+   *        the speciation solve produced at these primary concentrations.
+   * @return whether the inner speciation solve converged.
    */
   template< typename PARAMS_DATA,
             typename ARRAY_1D,
             typename ARRAY_1D_TO_CONST,
             typename ARRAY_1D_TO_CONST2,
-            typename ARRAY_2D >
-  static HPCREACT_HOST_DEVICE void
+            typename ARRAY_2D,
+            typename ARRAY_1D_SECONDARY >
+  static HPCREACT_HOST_DEVICE bool
   computeResidualAndJacobianAggregatePrimaryConcentrations( RealType const & temperature,
                                                             PARAMS_DATA const & params,
                                                             typename ACTIVITY_MODEL::Params const & activityParams,
                                                             ARRAY_1D_TO_CONST const & targetAggregatePrimaryConcentrations,
                                                             ARRAY_1D_TO_CONST2 const & logPrimarySpeciesConcentration,
                                                             ARRAY_1D & residual,
-                                                            ARRAY_2D & jacobian );
+                                                            ARRAY_2D & jacobian,
+                                                            ARRAY_1D_SECONDARY & logSecondarySpeciesConcentration );
 };
 
 

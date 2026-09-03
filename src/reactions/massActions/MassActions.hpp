@@ -386,6 +386,7 @@ bool calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
 
   // Report the last iterate of each secondary species at nonconvergence.
   // LCOV_EXCL_START
+#if HPCREACT_SOLVER_DIAGNOSTICS
   if( !isConverged )
   {
     printf( "calculateLogSecondarySpeciesConcentration: no convergence\n" );
@@ -396,6 +397,7 @@ bool calculateLogSecondarySpeciesConcentration( PARAMS_DATA const & params,
               static_cast< double >( logSecondarySpeciesConcentrationsSolution[j] ) );
     }
   }
+#endif
   // LCOV_EXCL_STOP
 
   for( INDEX_TYPE j = 0; j < numSecondarySpecies; ++j )
