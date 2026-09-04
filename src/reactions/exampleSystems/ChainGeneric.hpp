@@ -13,7 +13,6 @@
 
 #include "../reactionsSystems/Parameters.hpp"
 #include "constitutive/ionicStrength/SpeciatedIonicStrength.hpp"
-#include "constitutive/activity/Bdot.hpp"
 #include "constitutive/activity/Identity.hpp"
 
 namespace hpcReact
@@ -75,29 +74,9 @@ namespace ChainGeneric
   // species count taken from the system type so it cannot drift from it
   using serialAllKineticIonicStrengthType = SpeciatedIonicStrength< double, int, serialAllKineticType::numSpecies() >;
 
-  using serialAllKineticActivityParamsType = Bdot< double, int, serialAllKineticIonicStrengthType >::Params;
+  using serialAllKineticIdentityActivityType = Identity< double, int, serialAllKineticIonicStrengthType >;
 
-  constexpr CArrayWrapper< double, 3 > serialAllKineticSpeciesCharge =
-  { 0.0, 0.0, 0.0 };
-
-  // ion size parameter in ANGSTROM
-  constexpr CArrayWrapper< double, 3 > serialAllKineticIonSize =
-  { 3.5, 3.5, 3.5 };
-
-  constexpr CArrayWrapper< double, 3 > serialAllKineticBdotParameters =
-  { 0.0, 0.0, 0.0 };
-
-  constexpr serialAllKineticActivityParamsType serialAllKineticActivityParams =
-  {
-    // species charge
-    {{ serialAllKineticSpeciesCharge }},
-    // ion size parameter
-    serialAllKineticIonSize,
-    // bdot parameter
-    serialAllKineticBdotParameters
-  };
-
-  constexpr Identity< double, int, serialAllKineticIonicStrengthType >::Params serialAllKineticIdentityActivityParams = {};
+  constexpr serialAllKineticIdentityActivityType::Params serialAllKineticIdentityActivityParams = {};
 
 
 // *****UNCRUSTIFY-ON******

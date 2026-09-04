@@ -220,6 +220,9 @@ EquilibriumReactions< REAL_TYPE,
   }
 #endif
 
+  // TODO: find an appropriate scaler for the residual.
+  constexpr REAL_TYPE residualNormTolerance = 1.0e-8;
+
   REAL_TYPE residualNorm = 0.0;
   bool isConverged = false;
   bool speciationConverged = true;
@@ -243,7 +246,11 @@ EquilibriumReactions< REAL_TYPE,
     }
     residualNorm = sqrt( residualNorm );
 
-    if( residualNorm < 1.0e-12 )
+#if HPCREACT_SOLVER_DIAGNOSTICS
+    printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
+#endif
+
+    if( residualNorm < residualNormTolerance )
     {
 #if HPCREACT_SOLVER_DIAGNOSTICS
       printf( " converged\n" );
