@@ -24,7 +24,8 @@ constexpr bool debugPrinting = false;
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST,
@@ -34,12 +35,14 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
-                                                                               PARAMS_DATA const & params,
-                                                                               ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                                               ARRAY_1D_TO_CONST2 const & xi,
-                                                                               ARRAY_1D & residual,
-                                                                               ARRAY_2D & jacobian )
+                      INDEX_TYPE,
+                      ACTIVITY_MODEL >::computeResidualAndJacobianReactionExtents( REAL_TYPE const & temperature,
+                                                                                   PARAMS_DATA const & params,
+                                                                                   typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                                   ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                                   ARRAY_1D_TO_CONST2 const & xi,
+                                                                                   ARRAY_1D & residual,
+                                                                                   ARRAY_2D & jacobian )
 {
 
   HPCREACT_UNUSED_VAR( temperature );
@@ -57,6 +60,20 @@ EquilibriumReactions< REAL_TYPE,
     }
   }
 
+  RealType activities[numSpecies] = { 0.0 };
+  RealType dActivities_dConcentration[numSpecies][numSpecies] = {{ 0.0 }};
+  RealType waterActivity = 1.0;
+  RealType dWaterActivity_dConcentration[numSpecies] = { 0.0 };
+  calculateActivities< RealType,
+                       IntType,
+                       IndexType,
+                       ACTIVITY_MODEL,
+                       false >( activityParams,
+                                speciesConcentration,
+                                activities,
+                                dActivities_dConcentration,
+                                waterActivity,
+                                dWaterActivity_dConcentration );
 
   // loop over reactions
   for( IndexType a=0; a<numReactions; ++a )
@@ -79,31 +96,56 @@ EquilibriumReactions< REAL_TYPE,
       if( s_ai < 0.0 )
       {
         // forward reaction
-        forwardProduct *= pow( speciesConcentration[i], -s_ai );
+        forwardProduct *= pow( activities[i], -s_ai );
         // derivative of forward product with respect to xi
         for( IndexType b=0; b<numReactions; ++b )
         {
-          dForwardProduct_dxi_divProduct[b] += -s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
+          RealType dActivity_i_dxi_b = 0.0;
+          for( IndexType j = 0; j < numSpecies; ++j )
+          {
+            dActivity_i_dxi_b += dActivities_dConcentration[i][j] * params.stoichiometricMatrix( b, j );
+          }
+          dForwardProduct_dxi_divProduct[b] += -s_ai / activities[i] * dActivity_i_dxi_b;
         }
       }
       else if( s_ai > 0.0 )
       {
         // reverse reaction
-        reverseProduct *= pow( speciesConcentration[i], s_ai );
+        reverseProduct *= pow( activities[i], s_ai );
         // derivative of reverse product with respect to xi
         for( IndexType b=0; b<numReactions; ++b )
         {
-          dReverseProduct_dxi_divProduct[b] += s_ai / speciesConcentration[i] * params.stoichiometricMatrix( b, i );
+          RealType dActivity_i_dxi_b = 0.0;
+          for( IndexType j = 0; j < numSpecies; ++j )
+          {
+            dActivity_i_dxi_b += dActivities_dConcentration[i][j] * params.stoichiometricMatrix( b, j );
+          }
+          dReverseProduct_dxi_divProduct[b] += s_ai / activities[i] * dActivity_i_dxi_b;
         }
       }
     }
-    // compute the residual for this reaction
+    // compute the residual for this reaction, with water folded into whichever side it is on
+    RealType const nu_aw = params.waterStoichiometry( a );
+    if( nu_aw < 0.0 )
+    {
+      forwardProduct *= pow( waterActivity, -nu_aw );
+    }
+    else if( nu_aw > 0.0 )
+    {
+      reverseProduct *= pow( waterActivity, nu_aw );
+    }
     residual[a] = log( reverseProduct / ( forwardProduct * Keq ) );
 
     // compute the jacobian
     for( IndexType b=0; b<numReactions; ++b )
     {
-      jacobian( a, b ) = -dForwardProduct_dxi_divProduct[b] + dReverseProduct_dxi_divProduct[b];
+      RealType dWaterActivity_dxi_b = 0.0;
+      for( IndexType j = 0; j < numSpecies; ++j )
+      {
+        dWaterActivity_dxi_b += dWaterActivity_dConcentration[j] * params.stoichiometricMatrix( b, j );
+      }
+      jacobian( a, b ) = -dForwardProduct_dxi_divProduct[b] + dReverseProduct_dxi_divProduct[b]
+                         + nu_aw * dWaterActivity_dxi_b / waterActivity;
     }
   }
 }
@@ -112,7 +154,8 @@ EquilibriumReactions< REAL_TYPE,
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE >
+          typename INDEX_TYPE,
+          typename ACTIVITY_MODEL >
 template< typename PARAMS_DATA,
           typename ARRAY_1D,
           typename ARRAY_1D_TO_CONST >
@@ -120,10 +163,12 @@ HPCREACT_HOST_DEVICE inline
 void
 EquilibriumReactions< REAL_TYPE,
                       INT_TYPE,
-                      INDEX_TYPE >::enforceEquilibrium_Extents( REAL_TYPE const & temperature,
-                                                                PARAMS_DATA const & params,
-                                                                ARRAY_1D_TO_CONST const & speciesConcentration0,
-                                                                ARRAY_1D & speciesConcentration )
+                      INDEX_TYPE,
+                      ACTIVITY_MODEL >::enforceEquilibrium_Extents( REAL_TYPE const & temperature,
+                                                                    PARAMS_DATA const & params,
+                                                                    typename ACTIVITY_MODEL::Params const & activityParams,
+                                                                    ARRAY_1D_TO_CONST const & speciesConcentration0,
+                                                                    ARRAY_1D & speciesConcentration )
 {
   HPCREACT_UNUSED_VAR( temperature );
   static constexpr int numSpecies = PARAMS_DATA::numSpecies();
@@ -138,6 +183,7 @@ EquilibriumReactions< REAL_TYPE,
   {
     computeResidualAndJacobianReactionExtents( temperature,
                                                params,
+                                               activityParams,
                                                speciesConcentration0,
                                                xi,
                                                residual,
@@ -149,10 +195,14 @@ EquilibriumReactions< REAL_TYPE,
       residualNorm += residual[j] * residual[j];
     }
     residualNorm = sqrt( residualNorm );
+#if HPCREACT_SOLVER_DIAGNOSTICS
     printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
+#endif
     if( residualNorm < 1.0e-12 )
     {
+#if HPCREACT_SOLVER_DIAGNOSTICS
       printf( " converged\n" );
+#endif
       break;
     }
 
@@ -163,7 +213,11 @@ EquilibriumReactions< REAL_TYPE,
       residual[r] = -residual[r];
     }
 
-    solveNxN_Cholesky< double, numReactions >( jacobian.data, residual, dxi );
+    // Pivoted rather than Cholesky: this Jacobian is symmetric only for the Identity model. When
+    // the activity coefficients depend on concentration, the Jacobian gains a rank-1 term that is
+    // not symmetric, so Cholesky, which reads only the lower triangle, would solve against a
+    // different matrix and lose the Newton direction.
+    solveNxN_pivoted< double, numReactions >( jacobian.data, residual, dxi );
 
 
     // scaling

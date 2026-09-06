@@ -29,13 +29,16 @@ namespace unitTest_utilities
 //******************************************************************************
 template< typename REAL_TYPE,
           bool LOGE_CONCENTRATION,
+          typename ACTIVITY_MODEL,
           typename PARAMS_DATA >
 void timeStepTest( PARAMS_DATA const & params,
+                   typename ACTIVITY_MODEL::Params const & activityParams,
                    REAL_TYPE const dt,
                    int const numSteps,
                    REAL_TYPE const (&initialSpeciesConcentration)[PARAMS_DATA::numPrimarySpecies()],
                    REAL_TYPE const (&surfaceArea)[PARAMS_DATA::numKineticReactions()],
-                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numPrimarySpecies()] )
+                   REAL_TYPE const (&expectedSpeciesConcentrations)[PARAMS_DATA::numPrimarySpecies()],
+                   REAL_TYPE const relativeTolerance = 1.0e-8 )
 {
   HPCREACT_UNUSED_VAR( expectedSpeciesConcentrations );
 
@@ -53,10 +56,12 @@ void timeStepTest( PARAMS_DATA const & params,
         using MixedReactionsType = reactionsSystems::MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                                        int,
                                                                                        int,
+                                                                                       ACTIVITY_MODEL,
                                                                                        LOGE_CONCENTRATION >;
         using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                                  int,
-                                                                                 int >;
+                                                                                 int,
+                                                                                 ACTIVITY_MODEL >;
 
         // constexpr int numSpecies = PARAMS_DATA::numSpecies();
         static constexpr int numPrimarySpecies   = PARAMS_DATA::numPrimarySpecies();
@@ -87,6 +92,7 @@ void timeStepTest( PARAMS_DATA const & params,
 
         EquilibriumReactionsType::enforceEquilibrium_LogAggregate( temperature,
                                                                    params.equilibriumReactionsParameters(),
+                                                                   activityParams,
                                                                    logPrimarySpeciesConcentration,
                                                                    logPrimarySpeciesConcentration );
 
@@ -101,13 +107,14 @@ void timeStepTest( PARAMS_DATA const & params,
             aggregatePrimarySpeciesConcentration_n[i] = aggregatePrimarySpeciesConcentration[i];
           }
 
-          auto computeResidualAndJacobian = [&] ( REAL_TYPE const (&X)[numPrimarySpecies],
+          auto computeResidualAndJacobian = [&] ( REAL_TYPE const (&logPrimarySpeciesConcentrationNewton)[numPrimarySpecies],
                                                   REAL_TYPE ( & r )[numPrimarySpecies],
                                                   REAL_TYPE ( & J )[numPrimarySpecies][numPrimarySpecies] )
       {
         MixedReactionsType::updateMixedSystem( temperature,
                                                params,
-                                               X,
+                                               activityParams,
+                                               logPrimarySpeciesConcentrationNewton,
                                                surfaceArea,
                                                logSecondarySpeciesConcentration,
                                                aggregatePrimarySpeciesConcentration,
@@ -143,7 +150,7 @@ void timeStepTest( PARAMS_DATA const & params,
   // Check results
   for( int i = 0; i < PARAMS_DATA::numPrimarySpecies(); ++i )
   {
-    EXPECT_NEAR( primarySpeciesConcentration[ i ], expectedSpeciesConcentrations[ i ], 1.0e-8 * expectedSpeciesConcentrations[ i ] );
+    EXPECT_NEAR( primarySpeciesConcentration[ i ], expectedSpeciesConcentrations[ i ], relativeTolerance * expectedSpeciesConcentrations[ i ] );
   }
 }
 

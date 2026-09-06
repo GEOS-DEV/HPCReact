@@ -17,9 +17,12 @@ using namespace hpcReact;
 using namespace hpcReact::unitTest_utilities;
 
 //******************************************************************************
-TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionParams )
+TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionParams_Identity )
 {
   using namespace hpcReact::ChainGeneric;
+
+  using IonicStrengthType = ChainGeneric::serialAllKineticIonicStrengthType;
+  using ActivityType = Identity< double, int, IonicStrengthType >;
 
   double const initialSpeciesConcentration[] =
   {
@@ -44,12 +47,18 @@ TEST( testChainGenericKineticReactions, computeReactionRatesTest_chainReactionPa
   { { 0.05, 0.0, 0.0 },
     { 0.0, 0.03, 0.0 },
     { 0.0, 0.0, 0.02 } };
-  computeReactionRatesTest< double, false >( serialAllKineticParams.kineticReactionsParameters(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea, // No use. Just to pass something here
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( serialAllKineticParams.kineticReactionsParameters(),
+  computeReactionRatesTest< double,
+                            false,
+                            ActivityType >( serialAllKineticParams.kineticReactionsParameters(),
+                                            ChainGeneric::serialAllKineticIdentityActivityParams,
+                                            initialSpeciesConcentration,
+                                            surfaceArea, // No use. Just to pass something here
+                                            expectedReactionRates,
+                                            expectedReactionRatesDerivatives );
+  computeReactionRatesTest< double,
+                            true,
+                            ActivityType >( serialAllKineticParams.kineticReactionsParameters(),
+                                            ChainGeneric::serialAllKineticIdentityActivityParams,
                                             initialSpeciesConcentration,
                                             surfaceArea, // No use. Just to pass something here
                                             expectedReactionRates,
