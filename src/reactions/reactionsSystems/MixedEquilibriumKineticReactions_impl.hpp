@@ -64,7 +64,6 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
   static_assert( LOGE_CONCENTRATION,
                  "Linear-concentration mode is not implemented for the mixed system update yet." );
 
-  constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
   constexpr IntType numSecondarySpecies = PARAMS_DATA::numSecondarySpecies();
   constexpr IntType numSecondarySpeciesStorage = numSecondarySpecies > 0 ? numSecondarySpecies : 1;
   constexpr IntType numPrimarySpecies = PARAMS_DATA::numPrimarySpecies();
@@ -73,6 +72,8 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
 
   if constexpr( PARAMS_DATA::numEquilibriumReactions() > 0 )
   {
+    constexpr IntType numSpecies = PARAMS_DATA::numSpecies();
+
     RealType logSpeciesActivities[numSpecies] = { 0.0 };
     RealType dLogSpeciesActivities_dLogSpeciesConcentrations[numSpecies][numSpecies] = {{ 0.0 }};
     RealType logSpeciesActivityCoefficients[numSpecies] = { 0.0 };
