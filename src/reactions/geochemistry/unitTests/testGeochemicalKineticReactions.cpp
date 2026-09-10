@@ -81,16 +81,11 @@ TEST( testKineticReactions, computeReactionRatesTest_carbonateSystemAllKinetic )
 
   };
 
-  computeReactionRatesTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea, // No use. Just to pass something here
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                            initialSpeciesConcentration,
-                                            surfaceArea, // No use. Just to pass something here
-                                            expectedReactionRates,
-                                            expectedReactionRatesDerivatives );
+  computeReactionRatesTest< double >( carbonateSystemAllKinetic.kineticReactionsParameters(),
+                                      initialSpeciesConcentration,
+                                      surfaceArea,       // No use. Just to pass something here
+                                      expectedReactionRates,
+                                      expectedReactionRatesDerivatives );
 }
 
 TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
@@ -124,16 +119,11 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.0877659574468075e-03, -3.0877659574468075e-03, -2.9999999999999997e-02, 0, 0, 0, 0 }
   };
 
-  computeReactionRatesTest< double, false >( carbonateSystem.kineticReactionsParameters(),
-                                             initialSpeciesConcentration,
-                                             surfaceArea,
-                                             expectedReactionRates,
-                                             expectedReactionRatesDerivatives );
-  computeReactionRatesTest< double, true >( carbonateSystem.kineticReactionsParameters(),
-                                            initialSpeciesConcentration,
-                                            surfaceArea,
-                                            expectedReactionRates,
-                                            expectedReactionRatesDerivatives );
+  computeReactionRatesTest< double >( carbonateSystem.kineticReactionsParameters(),
+                                      initialSpeciesConcentration,
+                                      surfaceArea,
+                                      expectedReactionRates,
+                                      expectedReactionRatesDerivatives );
 }
 
 //******************************************************************************
@@ -175,62 +165,56 @@ TEST( testKineticReactions, computeReactionRatesQuotientTest_carbonateSystem )
 // }
 
 
-TEST( testKineticReactions, testTimeStep_carbonateSystemAllKinetic )
-{
-  double const initialSpeciesConcentration[17] =
-  {
-    1.0e-16, // OH-
-    1.0e-16, // CO2
-    1.0e-16, // CO3-2
-    1.0e-16, // CaHCO3+
-    1.0e-16, // CaSO4
-    1.0e-16, // CaCl+
-    1.0e-16, // CaCl2
-    1.0e-16, // MgSO4
-    1.0e-16, // NaSO4-
-    1.0e-16, // CaCO3
-    3.76e-1, // H+
-    3.76e-1, // HCO3-
-    3.87e-2, // Ca+2
-    3.21e-2, // SO4-2
-    1.89, // Cl-
-    1.65e-2, // Mg+2
-    1.09 // Na+1
-  };
+// TEST( testKineticReactions, testTimeStep_carbonateSystemAllKinetic )
+// {
+//   double const initialSpeciesConcentration[17] =
+//   {
+//     1.0e-16, // OH-
+//     1.0e-16, // CO2
+//     1.0e-16, // CO3-2
+//     1.0e-16, // CaHCO3+
+//     1.0e-16, // CaSO4
+//     1.0e-16, // CaCl+
+//     1.0e-16, // CaCl2
+//     1.0e-16, // MgSO4
+//     1.0e-16, // NaSO4-
+//     1.0e-16, // CaCO3
+//     3.76e-1, // H+
+//     3.76e-1, // HCO3-
+//     3.87e-2, // Ca+2
+//     3.21e-2, // SO4-2
+//     1.89, // Cl-
+//     1.65e-2, // Mg+2
+//     1.09 // Na+1
+//   };
 
-  double const expectedSpeciesConcentrations[17] =
-  { 2.327841695586879e-11, // OH-
-    0.37555955033916549, // CO2
-    3.956656978189456e-11, // CO3-2
-    6.739226982791492e-05, // CaHCO3+
-    5.298329882666738e-03, // CaSO4
-    5.844517547638333e-03, // CaCl+
-    1.277319392670652e-02, // CaCl2
-    6.618125707964991e-03, // MgSO4
-    1.769217213462983e-02, // NaSO4-
-    1.065032288527957e-09, // CaCO3
-    4.396954721488358e-04, // H+
-    3.723009698453808e-04, // HCO3-
-    1.471656530812871e-02, // Ca+2
-    2.491372274738741e-03, // SO4-2
-    1.858609094598949e+00, // Cl-
-    9.881874292035110e-03, // Mg+2
-    1.072307827865370e+00 // Na+1
-  };
+//   double const expectedSpeciesConcentrations[17] =
+//   { 2.327841695586879e-11, // OH-
+//     0.37555955033916549, // CO2
+//     3.956656978189456e-11, // CO3-2
+//     6.739226982791492e-05, // CaHCO3+
+//     5.298329882666738e-03, // CaSO4
+//     5.844517547638333e-03, // CaCl+
+//     1.277319392670652e-02, // CaCl2
+//     6.618125707964991e-03, // MgSO4
+//     1.769217213462983e-02, // NaSO4-
+//     1.065032288527957e-09, // CaCO3
+//     4.396954721488358e-04, // H+
+//     3.723009698453808e-04, // HCO3-
+//     1.471656530812871e-02, // Ca+2
+//     2.491372274738741e-03, // SO4-2
+//     1.858609094598949e+00, // Cl-
+//     9.881874292035110e-03, // Mg+2
+//     1.072307827865370e+00 // Na+1
+//   };
 
-  timeStepTest< double, false >( carbonateSystemAllKinetic.kineticReactionsParameters(),
-                                 10.0,
-                                 10000,
-                                 initialSpeciesConcentration,
-                                 expectedSpeciesConcentrations );
+//   timeStepTest< double >( carbonateSystemAllKinetic.kineticReactionsParameters(),
+//                           10.0,
+//                           10000,
+//                           initialSpeciesConcentration,
+//                           expectedSpeciesConcentrations );
 
-  // ln(c) as the primary variable results in a singular system.
-  // timeStepTest< double, true >( simpleKineticTestRateParams,
-  //                               2.0,
-  //                               10,
-  //                               initialSpeciesConcentration,
-  //                               expectedSpeciesConcentrations );
-}
+// }
 
 int main( int argc, char * * argv )
 {

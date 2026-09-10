@@ -28,7 +28,6 @@ namespace unitTest_utilities
 
 //******************************************************************************
 template< typename REAL_TYPE,
-          bool LOGE_CONCENTRATION,
           typename PARAMS_DATA >
 void timeStepTest( PARAMS_DATA const & params,
                    REAL_TYPE const dt,
@@ -52,8 +51,7 @@ void timeStepTest( PARAMS_DATA const & params,
       {
         using MixedReactionsType = reactionsSystems::MixedEquilibriumKineticReactions< REAL_TYPE,
                                                                                        int,
-                                                                                       int,
-                                                                                       LOGE_CONCENTRATION >;
+                                                                                       int >;
         using EquilibriumReactionsType = reactionsSystems::EquilibriumReactions< REAL_TYPE,
                                                                                  int,
                                                                                  int >;
@@ -81,7 +79,7 @@ void timeStepTest( PARAMS_DATA const & params,
         // Initialize species concentrations
         for( int i = 0; i < numPrimarySpecies; ++i )
         {
-          logPrimarySpeciesConcentration[i] = log( speciesConcentration[i] );
+          logPrimarySpeciesConcentration[i] = logmath::log( speciesConcentration[i] );
           aggregatePrimarySpeciesConcentration[i] = speciesConcentration[i];
         }
 
@@ -136,7 +134,7 @@ void timeStepTest( PARAMS_DATA const & params,
         }
         for( int i = 0; i < numPrimarySpecies; ++i )
         {
-          speciesConcentration[i] = exp( logPrimarySpeciesConcentration[i] );
+          speciesConcentration[i] = logmath::exp( logPrimarySpeciesConcentration[i] );
         }
       } );
 

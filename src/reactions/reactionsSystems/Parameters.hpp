@@ -231,7 +231,7 @@ struct MixedReactionsParameters
         RealType const absDiff = fabs( K - ( kf / kr ) );
         RealType const effectiveMagnitude = max( fabs( K ), fabs( kf/kr ));
         RealType const tolerance = effectiveMagnitude * pow( 10, -num_digits );
-        if( absDiff > tolerance ) // Tolerance for floating point precision
+        if( absDiff > tolerance )  // Tolerance for floating point precision
         {
           throw std::runtime_error( "Error: Inconsistent equilibrium relation for reaction " + std::to_string( i ));
         }

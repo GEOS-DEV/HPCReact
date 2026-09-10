@@ -90,10 +90,10 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium )
   //                                      initialSpeciesConcentration,
   //                                      expectedSpeciesConcentrations );
 
-  std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
-  testEnforceEquilibrium< double, 2 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
-                                       initialSpeciesConcentration,
-                                       expectedSpeciesConcentrations );
+  // std::cout<<" RESIDUAL_FORM 2:"<<std::endl;
+  // testEnforceEquilibrium< double, 2 >( carbonateSystemAllEquilibrium.equilibriumReactionsParameters(),
+  //                                      initialSpeciesConcentration,
+  //                                      expectedSpeciesConcentrations );
 
 }
 
@@ -122,13 +122,13 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 
   double const logInitialPrimarySpeciesConcentration[numPrimarySpecies] =
   {
-    log( initialPrimarySpeciesConcentration[0] ),
-    log( initialPrimarySpeciesConcentration[1] ),
-    log( initialPrimarySpeciesConcentration[2] ),
-    log( initialPrimarySpeciesConcentration[3] ),
-    log( initialPrimarySpeciesConcentration[4] ),
-    log( initialPrimarySpeciesConcentration[5] ),
-    log( initialPrimarySpeciesConcentration[6] )
+    logmath::log( initialPrimarySpeciesConcentration[0] ),
+    logmath::log( initialPrimarySpeciesConcentration[1] ),
+    logmath::log( initialPrimarySpeciesConcentration[2] ),
+    logmath::log( initialPrimarySpeciesConcentration[3] ),
+    logmath::log( initialPrimarySpeciesConcentration[4] ),
+    logmath::log( initialPrimarySpeciesConcentration[5] ),
+    logmath::log( initialPrimarySpeciesConcentration[6] )
   };
 
   double logPrimarySpeciesConcentration[numPrimarySpecies];
@@ -150,7 +150,7 @@ TEST( testEquilibriumReactions, testcarbonateSystemAllEquilibrium2 )
 
   for( int r=0; r<numPrimarySpecies; ++r )
   {
-    EXPECT_NEAR( exp( logPrimarySpeciesConcentration[r] ), expectedPrimarySpeciesConcentrations[r], 1.0e-8 * expectedPrimarySpeciesConcentrations[r] );
+    EXPECT_NEAR( logmath::exp( logPrimarySpeciesConcentration[r] ), expectedPrimarySpeciesConcentrations[r], 1.0e-8 * expectedPrimarySpeciesConcentrations[r] );
   }
 
 

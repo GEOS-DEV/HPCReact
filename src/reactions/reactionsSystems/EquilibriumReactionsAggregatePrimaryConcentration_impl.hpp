@@ -85,7 +85,7 @@ EquilibriumReactions< REAL_TYPE,
 
   for( int i=0; i<numPrimarySpecies; ++i )
   {
-    targetAggregatePrimarySpeciesConcentration[i] = exp( logPrimarySpeciesConcentration0[i] );
+    targetAggregatePrimarySpeciesConcentration[i] = logmath::exp( logPrimarySpeciesConcentration0[i] );
   }
 
   enforceEquilibrium_Aggregate( temperature,
@@ -156,15 +156,15 @@ EquilibriumReactions< REAL_TYPE,
     //  // Print for MoMaS only
     // printf( "%2d:  %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g    %8.2g %8.2g  \n",
     //         k,
-    //         exp( logPrimarySpeciesConcentration[0] ),
+    //         logmath::exp( logPrimarySpeciesConcentration[0] ),
     //         residual[0],
-    //         exp( logPrimarySpeciesConcentration[1] ),
+    //         logmath::exp( logPrimarySpeciesConcentration[1] ),
     //         residual[1],
-    //         exp( logPrimarySpeciesConcentration[2] ),
+    //         logmath::exp( logPrimarySpeciesConcentration[2] ),
     //         residual[2],
-    //         exp( logPrimarySpeciesConcentration[3] ),
+    //         logmath::exp( logPrimarySpeciesConcentration[3] ),
     //         residual[3],
-    //         exp( logPrimarySpeciesConcentration[4] ),
+    //         logmath::exp( logPrimarySpeciesConcentration[4] ),
     //         residual[4] );
 
     //printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );

@@ -31,14 +31,12 @@ namespace reactionsSystems
  * @tparam REAL_TYPE The type of the real numbers used in the class.
  * @tparam INT_TYPE The type of the integer numbers used in the class.
  * @tparam INDEX_TYPE The type of the index used in the class.
- * @tparam LOGE_CONCENTRATION Whether to use logarithm of concentration for the calculations.
  * @details
  *   This class provides the ablity to compute kinetic reactions.
  */
 template< typename REAL_TYPE,
           typename INT_TYPE,
-          typename INDEX_TYPE,
-          bool LOGE_CONCENTRATION >
+          typename INDEX_TYPE >
 class KineticReactions
 {
 public:

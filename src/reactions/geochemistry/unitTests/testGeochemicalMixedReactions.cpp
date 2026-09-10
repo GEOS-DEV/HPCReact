@@ -50,12 +50,12 @@ TEST( testMixedReactions, testTimeStep_carbonateSystem )
     1.070434904554991 // Na+1
   };
 
-  timeStepTest< double, true >( carbonateSystem,
-                                1.0,
-                                10,
-                                initialAggregateSpeciesConcentration,
-                                surfaceArea,
-                                expectedSpeciesConcentrations );
+  timeStepTest< double >( carbonateSystem,
+                          1.0,
+                          10,
+                          initialAggregateSpeciesConcentration,
+                          surfaceArea,
+                          expectedSpeciesConcentrations );
 
 }
 
