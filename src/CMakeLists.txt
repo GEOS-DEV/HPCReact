@@ -11,7 +11,7 @@ set( hpcReact_headers
      reactions/geochemistry/Ultramafics.hpp
      reactions/massActions/MassActions.hpp
      reactions/reactionsSystems/EquilibriumReactions.hpp
-     reactions/reactionsSystems/EquilibriumReactionsAggregatePrimaryConcentration_impl.hpp
+     reactions/reactionsSystems/EquilibriumReactionsPrimaryConcentrations_impl.hpp
      reactions/reactionsSystems/EquilibriumReactionsReactionExtents_impl.hpp
      reactions/reactionsSystems/KineticReactions.hpp
      reactions/reactionsSystems/KineticReactions_impl.hpp

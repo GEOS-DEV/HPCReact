@@ -66,12 +66,12 @@ void testMoMasMediumEquilibriumHelper()
       log( initialPrimarySpeciesConcentration[4] )
     };
 
-    EquilibriumReactionsType::enforceEquilibrium_Aggregate( 0,
-                                                            hpcReact::MoMasBenchmark::mediumCaseParams.equilibriumReactionsParameters(),
-                                                            activityParams,
-                                                            targetAggregatePrimarySpeciesConcentration,
-                                                            logInitialPrimarySpeciesConcentration,
-                                                            logPrimarySpeciesConcentrationCopy );
+    EquilibriumReactionsType::enforceEquilibrium_PrimaryConcentrations( 0,
+                                                                        hpcReact::MoMasBenchmark::mediumCaseParams.equilibriumReactionsParameters(),
+                                                                        activityParams,
+                                                                        targetAggregatePrimarySpeciesConcentration,
+                                                                        logInitialPrimarySpeciesConcentration,
+                                                                        logPrimarySpeciesConcentrationCopy );
   } );
 
   double const expectedPrimarySpeciesConcentrations[numPrimarySpecies] =

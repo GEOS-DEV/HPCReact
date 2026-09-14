@@ -37,6 +37,24 @@ enum class ReactionRateLawOption : int
   Affinity = 1
 };
 
+/**
+ * @brief Selects the constraint that closes one row of the aggregate equilibrium solve.
+ */
+enum class PrimarySpeciesConstraintType : int
+{
+  /// Enforce the target aggregate (total) concentration of primary species i.
+  AggregateConcentration = 0,
+
+  /// Enforce the target pX of species (-log_{10} a_i). This is pH when species i is H+.
+  pX = 1,
+
+  /// Enforce electroneutrality. Replace concentration constraint for at most one primary species.
+  ChargeBalance = 2,
+
+  /// Enforce initial equilibrium for mineral reactions. Not implemented yet.
+  MineralEquilibrium = 3
+};
+
 template< typename REAL_TYPE,
           typename INT_TYPE,
           typename INDEX_TYPE,
@@ -276,6 +294,7 @@ struct MixedReactionsParameters
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
+  HPCREACT_HOST_DEVICE IntType mobileSecondarySpeciesFlag( IndexType const r ) const { return m_mobileSecondarySpeciesFlag[r]; }
 
   CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
 

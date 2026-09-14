@@ -36,8 +36,8 @@
 /// unused.
 #define HPCREACT_UNUSED_VAR( ... ) (void)( __VA_ARGS__ )
 
-/// Whether enforceEquilibrium_Aggregate seeds a non-ideal activity model with an ideal solve of the
-/// same system. Set to 0 to start from the caller's guess instead. See enforceEquilibrium_Aggregate.
+/// Whether enforceEquilibrium_PrimaryConcentrations seeds a non-ideal activity model with an ideal solve of the
+/// same system. Set to 0 to start from the caller's guess instead. See enforceEquilibrium_PrimaryConcentrations.
 #ifndef HPCREACT_IDEAL_PRESOLVE
 #define HPCREACT_IDEAL_PRESOLVE 1
 #endif
