@@ -16,6 +16,7 @@
 #include "common/CArrayWrapper.hpp"
 #include "common/macros.hpp"
 
+#include <math.h>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -25,7 +26,34 @@ namespace hpcReact
 namespace reactionsSystems
 {
 
+/**
+ * @brief Selects which rate law is used to evaluate kinetic reaction rates.
+ */
+enum class ReactionRateLawOption : int
+{
+  /// \f$ \dot{R}_r = k^f_r \prod [C_i]^{-\nu_{ri}} - k^r_r \prod [C_i]^{\nu_{ri}} \f$
+  Elementary = 0,
+  /// \f$ \dot{R}_r = k_r A_r ( 1 - Q_r / K_r ) \f$
+  Affinity = 1
+};
 
+/**
+ * @brief Selects the constraint that closes one row of the aggregate equilibrium solve.
+ */
+enum class PrimarySpeciesConstraintType : int
+{
+  /// Enforce the target aggregate (total) concentration of primary species i.
+  AggregateConcentration = 0,
+
+  /// Enforce the target pX of species (-log_{10} a_i). This is pH when species i is H+.
+  pX = 1,
+
+  /// Enforce electroneutrality. Replace concentration constraint for at most one primary species.
+  ChargeBalance = 2,
+
+  /// Enforce initial equilibrium for mineral reactions. Not implemented yet.
+  MineralEquilibrium = 3
+};
 
 template< typename REAL_TYPE,
           typename INT_TYPE,
@@ -54,19 +82,26 @@ struct EquilibriumReactionsParameters
   HPCREACT_HOST_DEVICE
   constexpr
   EquilibriumReactionsParameters( CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > const & stoichiometricMatrix,
-                                  CArrayWrapper< RealType, NUM_REACTIONS > equilibriumConstant,
-                                  CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag ):
+                                  CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
+                                  CArrayWrapper< IntType, NUM_REACTIONS > const & mobileSecondarySpeciesFlag,
+                                  CArrayWrapper< IndexType, NUM_REACTIONS > const & waterStoichiometry = {} ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
+    m_waterStoichiometry( waterStoichiometry ),
     m_equilibriumConstant( equilibriumConstant ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag )
   {}
 
 
   HPCREACT_HOST_DEVICE IndexType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
+  HPCREACT_HOST_DEVICE IndexType waterStoichiometry( IndexType const r ) const { return m_waterStoichiometry[r]; }
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
   HPCREACT_HOST_DEVICE IntType mobileSecondarySpeciesFlag( IndexType const r ) const { return m_mobileSecondarySpeciesFlag[r]; }
 
   CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
+
+  /// Stoichiometric coefficient of H2O. Defaults to all-zero.
+  CArrayWrapper< IndexType, NUM_REACTIONS > m_waterStoichiometry;
+
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
   CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
 };
@@ -91,29 +126,37 @@ struct KineticReactionsParameters
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
-                                        IntType const reactionRatesUpdateOption ):
+                                        ReactionRateLawOption const reactionRateLawOption,
+                                        CArrayWrapper< IndexType, NUM_REACTIONS > const & waterStoichiometry = {} ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
+    m_waterStoichiometry( waterStoichiometry ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_equilibiriumConstant( equilibriumConstant ), // Initialize to empty array
-    m_reactionRatesUpdateOption( reactionRatesUpdateOption )
+    m_reactionRateLawOption( reactionRateLawOption )
   {}
 
 
   HPCREACT_HOST_DEVICE IndexType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
+  HPCREACT_HOST_DEVICE IndexType waterStoichiometry( IndexType const r ) const { return m_waterStoichiometry[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_rateConstantForward[r] / m_rateConstantReverse[r]; }
 
-  HPCREACT_HOST_DEVICE IntType reactionRatesUpdateOption() const { return m_reactionRatesUpdateOption; }
+  HPCREACT_HOST_DEVICE ReactionRateLawOption reactionRateLawOption() const { return m_reactionRateLawOption; }
 
   CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
+
+  /// Stoichiometric coefficient of H2O. Defaults to all-zero.
+  CArrayWrapper< IndexType, NUM_REACTIONS > m_waterStoichiometry;
+
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantForward;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibiriumConstant;
 
-  IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
+  ReactionRateLawOption m_reactionRateLawOption;
 };
+
 
 
 template< typename REAL_TYPE,
@@ -135,14 +178,16 @@ struct MixedReactionsParameters
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
-                                      CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag,
-                                      IntType const reactionRatesUpdateOption = 1 ):
+                                      CArrayWrapper< IntType, NUM_REACTIONS > const & mobileSecondarySpeciesFlag,
+                                      ReactionRateLawOption const reactionRateLawOption = ReactionRateLawOption::Affinity,
+                                      CArrayWrapper< IndexType, NUM_REACTIONS > const & waterStoichiometry = {} ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
+    m_waterStoichiometry( waterStoichiometry ),
     m_equilibriumConstant( equilibriumConstant ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag ),
-    m_reactionRatesUpdateOption( reactionRatesUpdateOption )
+    m_reactionRateLawOption( reactionRateLawOption )
   {}
 
   HPCREACT_HOST_DEVICE static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -165,6 +210,7 @@ struct MixedReactionsParameters
     CArrayWrapper< IndexType, numEquilibriumReactions(), numSpecies() > eqMatrix{};
     CArrayWrapper< RealType, numEquilibriumReactions() > eqConstants{};
     CArrayWrapper< IntType, numEquilibriumReactions() > mobileSpeciesFlags{};
+    CArrayWrapper< IndexType, numEquilibriumReactions() > eqWaterStoichiometry{};
 
     for( IntType i = 0; i < numEquilibriumReactions(); ++i )
     {
@@ -174,9 +220,10 @@ struct MixedReactionsParameters
       }
       eqConstants( i ) = m_equilibriumConstant( i );
       mobileSpeciesFlags( i ) = m_mobileSecondarySpeciesFlag( i );
+      eqWaterStoichiometry( i ) = m_waterStoichiometry( i );
     }
 
-    return { eqMatrix, eqConstants, mobileSpeciesFlags };
+    return { eqMatrix, eqConstants, mobileSpeciesFlags, eqWaterStoichiometry };
   }
 
   HPCREACT_HOST_DEVICE
@@ -188,6 +235,7 @@ struct MixedReactionsParameters
     CArrayWrapper< RealType, numKineticReactions() > rateConstantForward{};
     CArrayWrapper< RealType, numKineticReactions() > rateConstantReverse{};
     CArrayWrapper< RealType, numKineticReactions() > equilibriumConstant{};
+    CArrayWrapper< IndexType, numKineticReactions() > kineticWaterStoichiometry{};
 
     for( IndexType i = 0; i < numKineticReactions(); ++i )
     {
@@ -198,9 +246,11 @@ struct MixedReactionsParameters
       rateConstantForward( i ) = m_rateConstantForward( numEquilibriumReactions() + i );
       rateConstantReverse( i ) = m_rateConstantReverse( numEquilibriumReactions() + i );
       equilibriumConstant( i ) = m_equilibriumConstant( numEquilibriumReactions() + i );
+      kineticWaterStoichiometry( i ) = m_waterStoichiometry( numEquilibriumReactions() + i );
     }
 
-    return { kineticMatrix, rateConstantForward, rateConstantReverse, equilibriumConstant, m_reactionRatesUpdateOption };
+    return { kineticMatrix, rateConstantForward, rateConstantReverse, equilibriumConstant, m_reactionRateLawOption,
+             kineticWaterStoichiometry };
   }
 
   HPCREACT_HOST_DEVICE
@@ -229,7 +279,7 @@ struct MixedReactionsParameters
       else // numSpecified == 3
       {
         RealType const absDiff = fabs( K - ( kf / kr ) );
-        RealType const effectiveMagnitude = max( fabs( K ), fabs( kf/kr ));
+        RealType const effectiveMagnitude = fmax( fabs( K ), fabs( kf/kr ));
         RealType const tolerance = effectiveMagnitude * pow( 10, -num_digits );
         if( absDiff > tolerance ) // Tolerance for floating point precision
         {
@@ -240,17 +290,23 @@ struct MixedReactionsParameters
   }
 
   HPCREACT_HOST_DEVICE IndexType stoichiometricMatrix( IndexType const r, int const i ) const { return m_stoichiometricMatrix[r][i]; }
+  HPCREACT_HOST_DEVICE IndexType waterStoichiometry( IndexType const r ) const { return m_waterStoichiometry[r]; }
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_equilibriumConstant[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
+  HPCREACT_HOST_DEVICE IntType mobileSecondarySpeciesFlag( IndexType const r ) const { return m_mobileSecondarySpeciesFlag[r]; }
 
   CArrayWrapper< IndexType, NUM_REACTIONS, NUM_SPECIES > m_stoichiometricMatrix;
+
+  /// Stoichiometric coefficient of H2O. Defaults to all-zero.
+  CArrayWrapper< IndexType, NUM_REACTIONS > m_waterStoichiometry;
+
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibriumConstant;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantForward;
   CArrayWrapper< RealType, NUM_REACTIONS > m_rateConstantReverse;
   CArrayWrapper< IntType, NUM_REACTIONS > m_mobileSecondarySpeciesFlag;
 
-  IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
+  ReactionRateLawOption m_reactionRateLawOption = ReactionRateLawOption::Affinity;
 };
 
 
