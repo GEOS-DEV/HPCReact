@@ -209,7 +209,7 @@ KineticReactions< REAL_TYPE,
                   INT_TYPE,
                   INDEX_TYPE,
                   LOGE_CONCENTRATION
-                  >::computeReactionRatesQuotient_impl( RealType const &, //temperature,
+                  >::computeReactionRatesQuotient_impl( RealType const & temperature,
                                                         PARAMS_DATA const & params,
                                                         ARRAY_1D_TO_CONST const & speciesConcentration,
                                                         ARRAY_1D_SA const & surfaceArea,
@@ -238,7 +238,7 @@ KineticReactions< REAL_TYPE,
     // get/calculate the forward and reverse rate constants for this reaction
     RealType const rateConstant = params.rateConstantForward( r ); //* exp( -params.m_activationEnergy[r] / ( constants::R *
     // temperature ) );
-    RealType const equilibriumConstant = params.equilibriumConstant( r );
+    RealType const equilibriumConstant = params.equilibriumConstant( r, temperature );
 
     RealType quotient = 1.0;
 

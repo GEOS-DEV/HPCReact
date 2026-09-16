@@ -91,12 +91,18 @@ struct KineticReactionsParameters
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantForward,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
                                         CArrayWrapper< RealType, NUM_REACTIONS > const & equilibriumConstant,
-                                        IntType const reactionRatesUpdateOption ):
+                                        IntType const reactionRatesUpdateOption,
+                                        CArrayWrapper< RealType, NUM_REACTIONS > const & lnEqConstCoeffB = {},
+                                        CArrayWrapper< RealType, NUM_REACTIONS > const & lnEqConstCoeffC = {},
+                                        RealType const referenceTemperature = 298.15 ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_equilibiriumConstant( equilibriumConstant ), // Initialize to empty array
-    m_reactionRatesUpdateOption( reactionRatesUpdateOption )
+    m_reactionRatesUpdateOption( reactionRatesUpdateOption ),
+    m_lnEqConstCoeffB( lnEqConstCoeffB ),
+    m_lnEqConstCoeffC( lnEqConstCoeffC ),
+    m_referenceTemperature( referenceTemperature )
   {}
 
 
@@ -104,6 +110,29 @@ struct KineticReactionsParameters
   HPCREACT_HOST_DEVICE RealType rateConstantForward( IndexType const r ) const { return m_rateConstantForward[r]; }
   HPCREACT_HOST_DEVICE RealType rateConstantReverse( IndexType const r ) const { return m_rateConstantReverse[r]; }
   HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r ) const { return m_rateConstantForward[r] / m_rateConstantReverse[r]; }
+
+  /**
+   * @brief Multiplicative temperature correction on the equilibrium constant of reaction @p r.
+   * @details ln K(T) = ln K(T_ref) + B (1/T - 1/T_ref) + C ln(T/T_ref), so this returns K(T)/K(T_ref).
+   *          B and C default to zero, for which the factor is exactly 1 and a temperature-independent
+   *          system is unchanged bit for bit.
+   */
+  HPCREACT_HOST_DEVICE RealType equilibriumConstantFactor( IndexType const r, RealType const temperature ) const
+  {
+    RealType const B = m_lnEqConstCoeffB[r];
+    RealType const C = m_lnEqConstCoeffC[r];
+    // A non-positive temperature means the caller never set the field. Fall back to the reference
+    // temperature rather than returning inf, which is what 1/T and log(T) would otherwise give.
+    if( ( B == 0.0 && C == 0.0 ) || temperature <= 0.0 )
+    {
+      return 1.0;
+    }
+    return exp( B * ( 1.0 / temperature - 1.0 / m_referenceTemperature )
+                + C * log( temperature / m_referenceTemperature ) );
+  }
+
+  HPCREACT_HOST_DEVICE RealType equilibriumConstant( IndexType const r, RealType const temperature ) const
+  { return equilibriumConstant( r ) * equilibriumConstantFactor( r, temperature ); }
 
   HPCREACT_HOST_DEVICE IntType reactionRatesUpdateOption() const { return m_reactionRatesUpdateOption; }
 
@@ -113,6 +142,11 @@ struct KineticReactionsParameters
   CArrayWrapper< RealType, NUM_REACTIONS > m_equilibiriumConstant;
 
   IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
+
+  /// Coefficients of ln K(T) = ln K(T_ref) + B (1/T - 1/T_ref) + C ln(T/T_ref); zero means no T dependence
+  CArrayWrapper< RealType, NUM_REACTIONS > m_lnEqConstCoeffB;
+  CArrayWrapper< RealType, NUM_REACTIONS > m_lnEqConstCoeffC;
+  RealType m_referenceTemperature;
 };
 
 
@@ -137,14 +171,20 @@ struct MixedReactionsParameters
                                       CArrayWrapper< RealType, NUM_REACTIONS > const & rateConstantReverse,
                                       CArrayWrapper< IntType, NUM_REACTIONS > mobileSecondarySpeciesFlag,
                                       IntType const reactionRatesUpdateOption = 1,
-                                      RealType const solventDensity = constants::waterDensity ):
+                                      RealType const solventDensity = constants::waterDensity,
+                                      CArrayWrapper< RealType, NUM_REACTIONS > const & lnEqConstCoeffB = {},
+                                      CArrayWrapper< RealType, NUM_REACTIONS > const & lnEqConstCoeffC = {},
+                                      RealType const referenceTemperature = 298.15 ):
     m_stoichiometricMatrix( stoichiometricMatrix ),
     m_equilibriumConstant( equilibriumConstant ),
     m_rateConstantForward( rateConstantForward ),
     m_rateConstantReverse( rateConstantReverse ),
     m_mobileSecondarySpeciesFlag( mobileSecondarySpeciesFlag ),
     m_reactionRatesUpdateOption( reactionRatesUpdateOption ),
-    m_solventDensity( solventDensity )
+    m_solventDensity( solventDensity ),
+    m_lnEqConstCoeffB( lnEqConstCoeffB ),
+    m_lnEqConstCoeffC( lnEqConstCoeffC ),
+    m_referenceTemperature( referenceTemperature )
   {}
 
   HPCREACT_HOST_DEVICE static constexpr IndexType numReactions() { return NUM_REACTIONS; }
@@ -190,6 +230,8 @@ struct MixedReactionsParameters
     CArrayWrapper< RealType, numKineticReactions() > rateConstantForward{};
     CArrayWrapper< RealType, numKineticReactions() > rateConstantReverse{};
     CArrayWrapper< RealType, numKineticReactions() > equilibriumConstant{};
+    CArrayWrapper< RealType, numKineticReactions() > lnEqConstCoeffB{};
+    CArrayWrapper< RealType, numKineticReactions() > lnEqConstCoeffC{};
 
     for( IndexType i = 0; i < numKineticReactions(); ++i )
     {
@@ -200,9 +242,12 @@ struct MixedReactionsParameters
       rateConstantForward( i ) = m_rateConstantForward( numEquilibriumReactions() + i );
       rateConstantReverse( i ) = m_rateConstantReverse( numEquilibriumReactions() + i );
       equilibriumConstant( i ) = m_equilibriumConstant( numEquilibriumReactions() + i );
+      lnEqConstCoeffB( i ) = m_lnEqConstCoeffB( numEquilibriumReactions() + i );
+      lnEqConstCoeffC( i ) = m_lnEqConstCoeffC( numEquilibriumReactions() + i );
     }
 
-    return { kineticMatrix, rateConstantForward, rateConstantReverse, equilibriumConstant, m_reactionRatesUpdateOption };
+    return { kineticMatrix, rateConstantForward, rateConstantReverse, equilibriumConstant,
+             m_reactionRatesUpdateOption, lnEqConstCoeffB, lnEqConstCoeffC, m_referenceTemperature };
   }
 
   HPCREACT_HOST_DEVICE
@@ -256,6 +301,11 @@ struct MixedReactionsParameters
 
   IntType m_reactionRatesUpdateOption; // 0: forward and reverse rate. 1: quotient form.
   RealType m_solventDensity; // Unit should be kg/m3
+
+  /// Coefficients of ln K(T) = ln K(T_ref) + B (1/T - 1/T_ref) + C ln(T/T_ref); zero means no T dependence
+  CArrayWrapper< RealType, NUM_REACTIONS > m_lnEqConstCoeffB;
+  CArrayWrapper< RealType, NUM_REACTIONS > m_lnEqConstCoeffC;
+  RealType m_referenceTemperature;
 };
 
 
