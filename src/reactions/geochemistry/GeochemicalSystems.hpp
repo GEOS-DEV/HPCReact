@@ -16,6 +16,7 @@
 #include "Forge.hpp"
 #include "Serpentinization.hpp"
 #include "KineticCarbonate.hpp"
+#include "AmmoniumSulfate.hpp"
 
 #include <variant>
 
@@ -29,7 +30,8 @@ using systemTypes = std::variant< ultramaficSystemType,
                                   carbonateSystemAllEquilibriumType,
                                   forgeSystemType,
                                   serpentinizationSystemType,
-                                  kineticCarbonateSystemType >;
+                                  kineticCarbonateSystemType,
+                                  ammoniumSulfateSystemType >;
 
 } // namespace geochemistry
 } // namespace hpcReact

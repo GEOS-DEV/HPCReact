@@ -3,6 +3,7 @@ set( hpcReact_headers
      common/macros.hpp
      common/CArrayWrapper.hpp
      reactions/exampleSystems/BulkGeneric.hpp
+     reactions/geochemistry/AmmoniumSulfate.hpp
      reactions/geochemistry/Carbonate.hpp
      reactions/geochemistry/Forge.hpp
      reactions/geochemistry/GeochemicalSystems.hpp
