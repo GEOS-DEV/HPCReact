@@ -331,8 +331,8 @@ TEST( testKineticReactions, computeReactionRatesVsEQ36_carbonateSystem_Bdot )
 //                 false,
 //                 ActivityType >( carbonateSystemAllKinetic.kineticReactionsParameters(),
 //                                 ActivityType::Params(),
-//                                  10.0,
-//                                  10000,
+//                                  1000.0,
+//                                  100,
 //                                  initialSpeciesConcentration,
 //                                  expectedSpeciesConcentrations );
 

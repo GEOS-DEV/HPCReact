@@ -246,13 +246,13 @@ EquilibriumReactions< REAL_TYPE,
     }
     residualNorm = sqrt( residualNorm );
 
-#if HPCREACT_SOLVER_DIAGNOSTICS
+#if HPCREACT_SOLVER_DIAGNOSTICS && !defined(__HIP_DEVICE_COMPILE__)
     printf( "iter, residualNorm = %2d, %16.10g \n", k, residualNorm );
 #endif
 
     if( residualNorm < residualNormTolerance )
     {
-#if HPCREACT_SOLVER_DIAGNOSTICS
+#if HPCREACT_SOLVER_DIAGNOSTICS && !defined(__HIP_DEVICE_COMPILE__)
       printf( " converged\n" );
 #endif
       isConverged = true;
