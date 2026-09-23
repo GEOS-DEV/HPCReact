@@ -123,7 +123,8 @@ struct KineticReactionsParameters
     RealType const C = m_lnEqConstCoeffC[r];
     // A non-positive temperature means the caller never set the field. Fall back to the reference
     // temperature rather than returning inf, which is what 1/T and log(T) would otherwise give.
-    if( ( B == 0.0 && C == 0.0 ) || temperature <= 0.0 )
+    bool const coefficientsAreZero = B <= 0.0 && B >= 0.0 && C <= 0.0 && C >= 0.0;
+    if( coefficientsAreZero || temperature <= 0.0 )
     {
       return 1.0;
     }
