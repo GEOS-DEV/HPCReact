@@ -26,7 +26,7 @@ set( hpcReact_sources)
 find_package(LAPACK REQUIRED)
 find_package(BLAS REQUIRED)
 
-     
+
 set( hpcReact_dependencies
      LAPACK::LAPACK
      BLAS::BLAS
@@ -51,7 +51,7 @@ target_include_directories( hpcReact
 blt_print_target_properties( TARGET hpcReact )
 message(STATUS "HPCReact/src CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
-# install( FILES ${hpcReact_headers} 
+# install( FILES ${hpcReact_headers}
 #          DESTINATION include )
 
 

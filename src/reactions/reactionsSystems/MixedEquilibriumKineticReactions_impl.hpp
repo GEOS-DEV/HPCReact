@@ -90,15 +90,15 @@ MixedEquilibriumKineticReactions< REAL_TYPE,
     // 2. Compute the reaction rates for all kinetic reactions
     computeReactionRates( temperature,
                           params,
-                          logPrimarySpeciesConcentrations,
-                          logSecondarySpeciesConcentrations,
+                          logPrimarySpeciesConcentrations, // activity
+                          logSecondarySpeciesConcentrations, // activity
                           surfaceArea,
                           reactionRates,
-                          dReactionRates_dLogPrimarySpeciesConcentrations );
+                          dReactionRates_dLogPrimarySpeciesConcentrations ); // based on activity coefficients
 
     // 3. Compute aggregate species rates
     computeAggregateSpeciesRates( params,
-                                  logPrimarySpeciesConcentrations,
+                                  logPrimarySpeciesConcentrations, // concentrations
                                   reactionRates,
                                   dReactionRates_dLogPrimarySpeciesConcentrations,
                                   aggregateSpeciesRates,
